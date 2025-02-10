@@ -42,6 +42,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/barter',
     name: 'barter',
     component: () => import(/* webpackChunkName: "barter" */ '../views/stuff/BarterView.vue')
+  },
+  {
+    path: '/stuff/transfer/:id',
+    name: 'transfer',
+    component: () => import(/* webpackChunkName: "transfer" */ '../views/stuff/TransferView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

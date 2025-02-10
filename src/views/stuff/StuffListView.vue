@@ -138,14 +138,15 @@ export default defineComponent({
 
     // 操作方法
     const initiateTransfer = (item: any) => {
-      showDialog({
-        title: '确认出让',
-        message: '确定要发起出让申请吗？',
-        showCancelButton: true,
-      }).then(() => {
-        // 调用API发起出让
-        showToast('已提交出让申请')
-      })
+      // showDialog({
+      //   title: '确认出让',
+      //   message: '确定要发起出让申请吗？',
+      //   showCancelButton: true,
+      // }).then(() => {
+      //   // 调用API发起出让
+      //   showToast('已提交出让申请')
+      // })
+      router.push('/stuff/transfer/' + item.id)
     }
 
     const destroyItem = (item: any) => {

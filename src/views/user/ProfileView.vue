@@ -1,4 +1,9 @@
 <template>
+  <van-nav-bar
+      title="我的"
+      left-arrow
+      @click-left="onClickLeft"
+    />
     <div class="user-profile">
       <!-- 用户信息卡片 -->
       <van-card>
@@ -68,7 +73,18 @@
   
   <script>
   import { showDialog } from 'vant';
+  import { useRouter } from 'vue-router'
+
   export default {
+    setup() {
+      const router = useRouter()
+       // 返回上一页
+      const onClickLeft = () => {
+        router.back()
+      }
+
+      return {onClickLeft}
+    },
     data() {
       return {
         user: {
@@ -83,9 +99,7 @@
         usages: [
           { id: 1, amount: '50', time: '2023-10-01', type: '购买商品' },
           { id: 2, amount: '100', time: '2023-10-02', type: '提现' },
-          { id: 3, amount: '150', time: '2023-10-03', type: '购买商品' },
-          { id: 4, amount: '200', time: '2023-10-04', type: '提现' },
-          { id: 5, amount: '250', time: '2023-10-05', type: '购买商品' }
+          { id: 3, amount: '150', time: '2023-10-03', type: '购买商品' }
         ]
       };
     },
