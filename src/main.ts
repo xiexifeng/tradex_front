@@ -39,6 +39,7 @@ import {
   PullRefresh,
   DropdownMenu,
   DropdownItem,
+  DatePicker,
 } from 'vant'
 
 const app = createApp(App)
@@ -76,6 +77,7 @@ const vantComponents = [
   PullRefresh,
   DropdownMenu,
   DropdownItem,
+  DatePicker,
 ]
 
 vantComponents.forEach(component => {

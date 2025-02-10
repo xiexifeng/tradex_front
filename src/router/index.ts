@@ -48,6 +48,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'transfer',
     component: () => import(/* webpackChunkName: "transfer" */ '../views/stuff/TransferView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/stuff/exchange/:id',
+    name: 'exchange',
+    component: () => import(/* webpackChunkName: "exchange" */ '../views/stuff/ExchangeView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
