@@ -13,6 +13,7 @@
     "register-service-worker": "^1.7.2",
     "vant": "^4.9.16",
     "vue": "^3.2.13",
+    "@vue/runtime-dom": "^3.5.13",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"

@@ -93,14 +93,13 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast, showDialog } from 'vant'
-import type { FormInstance } from 'vant'
 
 export default defineComponent({
   name: 'TransferView',
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const formRef = ref<FormInstance>()
+    const formRef = ref(null)
     const showLocationPicker = ref(false)
 
     // 模拟物品信息
@@ -157,22 +156,28 @@ export default defineComponent({
     }
 
     // 提交表单
-    const onSubmit = () => {
-      formRef.value?.validate().then(() => {
-        showDialog({
+    const onSubmit = async () => {
+
+      if (!formRef.value) return
+      
+      try {
+        await formRef.value.validate()
+        await showDialog({
           title: '确认提交',
           message: '确定要发起转让申请吗？',
           showCancelButton: true,
-        }).then(() => {
-          // 这里调用API提交转让申请
-          console.log('提交的数据:', {
-            itemId: itemInfo.value.id,
-            ...formData.value
-          })
-          showToast('提交成功')
-          router.back()
         })
-      })
+        
+        // 这里调用API提交转让申请
+        console.log('提交的数据:', {
+          itemId: itemInfo.value.id,
+          ...formData.value
+        })
+        showToast('提交成功')
+        router.back()
+      } catch (error) {
+        console.error('表单验证失败:', error)
+      }
     }
 
     return {

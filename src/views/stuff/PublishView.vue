@@ -9,7 +9,7 @@
     />
 
     <div class="publish-form">
-      <van-form @submit="onSubmit" :show-error=true>
+      <van-form @submit="onSubmit" :show-error=true ref="formRef">
         <!-- 物品名称 -->
         <van-field
           v-model="formData.name"
@@ -126,6 +126,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const showTypePopup = ref(false)
+    const formRef = ref(null)
 
     // 物品类型选项
     const columns = [
@@ -178,37 +179,53 @@ export default defineComponent({
 
 
     // 提交表单
-    const onSubmit = (values:any) => {
-      console.log(values)
-     
-      if (formData.images.length === 0) {
-        showToast('请至少上传一张图片')
-        return
-      }
-
+    const onSubmit = async () => {
+      if (!formRef.value) return
+      console.log(formRef.value)
       try {
-        // 这里调用后端API保存数据
-        console.log('提交的数据:', formData)
+        await formRef.value.validate()
+
+        if (formData.images.length === 0) {
+          showToast('请至少上传一张图片')
+          return
+        }
+        await showDialog({
+          title: '确认提交',
+          message: '确定要发布吗？',
+          showCancelButton: true,
+        })
+        
+        // 这里调用API提交转让申请
+        console.log('提交的数据:', {
+          ...formData
+        })
         showToast('发布成功')
         router.back()
       } catch (error) {
+        console.error('表单验证失败:', error)
         showDialog({
           title: '发布失败',
           message: '请稍后重试'
         })
       }
+      
     }
 
     return {
       formData,
       showTypePopup,
       columns,
+      formRef,
       onClickLeft,
       onConfirm,
       validatePrice,
       afterRead,
       onSubmit
     }
+  },
+  mounted(){
+    console.log('mounted')
+    console.log(this.$refs.formRef.getValues())
   }
 
   
