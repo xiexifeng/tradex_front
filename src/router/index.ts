@@ -37,6 +37,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'stuffList',
     component: () => import(/* webpackChunkName: "stuffList" */ '../views/stuff/StuffListView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/barter',
+    name: 'barter',
+    component: () => import(/* webpackChunkName: "barter" */ '../views/stuff/BarterView.vue')
   }
 ]
 

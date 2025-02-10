@@ -35,7 +35,10 @@ import {
   Tab,
   List,
   Tag,
-  Divider
+  Divider,
+  PullRefresh,
+  DropdownMenu,
+  DropdownItem,
 } from 'vant'
 
 const app = createApp(App)
@@ -69,7 +72,10 @@ const vantComponents = [
   Tab,
   List,
   Tag,
-  Divider
+  Divider,
+  PullRefresh,
+  DropdownMenu,
+  DropdownItem,
 ]
 
 vantComponents.forEach(component => {
