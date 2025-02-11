@@ -65,17 +65,17 @@
       <van-tabbar-item icon="shop-o" to="/mall">
         电商广场
       </van-tabbar-item>
-      <van-tabbar-item icon="exchange" to="/barter">
+      <van-tabbar-item icon="exchange" to="/stuff/barter">
         易物广场
       </van-tabbar-item>
-      <van-tabbar-item to="/publish">
+      <van-tabbar-item to="/stuff/publish">
         <template #icon>
           <div class="publish-button">
             <van-icon name="plus" size="20" />
           </div>
         </template>
       </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/trades">
+      <van-tabbar-item icon="orders-o" to="/stuff/trades">
         交易列表
       </van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/user/profile">

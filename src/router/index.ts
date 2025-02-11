@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/publish',
+    path: '/stuff/publish',
     name: 'publish',
     component: () => import(/* webpackChunkName: "publish" */ '../views/stuff/PublishView.vue'),
     meta: { requiresAuth: true }
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/barter',
+    path: '/stuff/barter',
     name: 'barter',
     component: () => import(/* webpackChunkName: "barter" */ '../views/stuff/BarterView.vue')
   },
@@ -53,6 +53,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/stuff/exchange/:id',
     name: 'exchange',
     component: () => import(/* webpackChunkName: "exchange" */ '../views/stuff/ExchangeView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/stuff/trades',
+    name: 'tradeList',
+    component: () => import(/* webpackChunkName: "tradeList" */ '../views/stuff/TradeListView.vue'),
     meta: { requiresAuth: true }
   }
 ]
