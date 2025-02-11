@@ -60,6 +60,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'tradeList',
     component: () => import(/* webpackChunkName: "tradeList" */ '../views/stuff/TradeListView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/stuff/trade/:id',
+    name: 'tradeDetail',
+    component: () => import(/* webpackChunkName: "tradeDetail" */ '../views/stuff/TradeDetailView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
