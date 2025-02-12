@@ -128,7 +128,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已达成交易')
         tradeInfo.value.status = 'accepted'
-      }).catch(() => {})
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
     // 拒绝交易
@@ -140,7 +142,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已拒绝交易')
         exchangeItems.value = exchangeItems.value.filter(i => i.id !== item.id)
-      }).catch(() => {})
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
     onMounted(() => {

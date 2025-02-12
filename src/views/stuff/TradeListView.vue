@@ -171,7 +171,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已接受交易')
         trade.status = 'accepted'
-      }).catch(() => {})
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
     // 确认交易
@@ -183,7 +185,9 @@ export default defineComponent({
       }).then(() => {
         showToast('交易已完成')
         trade.status = 'completed'
-      }).catch(() => {})
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
     // 取消交易
@@ -195,7 +199,9 @@ export default defineComponent({
       }).then(() => {
         showToast('交易已取消')
         trade.status = 'cancelled'
-      }).catch(() => {})
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
     // 返回上一页

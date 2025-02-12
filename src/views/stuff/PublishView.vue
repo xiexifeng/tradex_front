@@ -116,7 +116,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showDialog, Form } from 'vant'
+import { showToast, showDialog, FormInstance } from 'vant'
 import type { UploaderFileListItem } from 'vant'
 
 
@@ -126,7 +126,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const showTypePopup = ref(false)
-    const formRef = ref(null)
+    const formRef = ref<FormInstance>()
 
     // 物品类型选项
     const columns = [
@@ -211,6 +211,11 @@ export default defineComponent({
       
     }
 
+    onMounted(() => {
+      console.log('mounted')
+      console.log(formRef.value?.getValues())
+    })
+
     return {
       formData,
       showTypePopup,
@@ -222,13 +227,7 @@ export default defineComponent({
       afterRead,
       onSubmit
     }
-  },
-  mounted(){
-    console.log('mounted')
-    console.log(this.$refs.formRef.getValues())
   }
-
-  
 })
 </script>
 

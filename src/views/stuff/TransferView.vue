@@ -92,14 +92,14 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { showToast, showDialog } from 'vant'
+import { showToast, showDialog, FormInstance } from 'vant'
 
 export default defineComponent({
   name: 'TransferView',
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const formRef = ref(null)
+    const formRef = ref<FormInstance>()
     const showLocationPicker = ref(false)
 
     // 模拟物品信息

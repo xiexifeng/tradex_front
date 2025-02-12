@@ -126,14 +126,14 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { showToast, showDialog } from 'vant'
+import { showToast, showDialog, FormInstance } from 'vant'
 
 export default defineComponent({
   name: 'ExchangeView',
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const formRef = ref(null)
+    const formRef = ref<FormInstance>()
     const showItemPicker = ref(false)
     const showLocationPicker = ref(false)
     const showTimePicker = ref(false)
