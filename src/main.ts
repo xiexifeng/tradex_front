@@ -40,6 +40,8 @@ import {
   DropdownMenu,
   DropdownItem,
   DatePicker,
+  AddressList,
+  AddressEdit,
 } from 'vant'
 
 const app = createApp(App)
@@ -78,6 +80,8 @@ const vantComponents = [
   DropdownMenu,
   DropdownItem,
   DatePicker,
+  AddressList,
+  AddressEdit,
 ]
 
 vantComponents.forEach(component => {
