@@ -67,13 +67,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "tradeDetail" */ '../views/stuff/TradeDetailView.vue'),
     meta: { requiresAuth: true }
   },
-  { path: '/publish', name: 'Publish', component: () => import('../views/PublishV1.vue') },
-  { path: '/review', name: 'Review', component: () => import('../views/ReviewV1.vue') },
-  { path: '/trade/:id', name: 'TradeDetail', component: () => import('../views/TradeDetail.vue') },
-  { path: '/profile', name: 'Profile', component: () => import('../views/ProfileV1.vue') },
-  { path: '/merchant', name: 'Merchant', component: () => import('../views/MerchantV1.vue') },
-  { path: '/pay/:id', name: 'Pay', component: () => import('../views/PayV1.vue') },
-  { path: '/search', name: 'Search', component: () => import('../views/SearchV1.vue') },
   {
     path: '/user/settings',
     name: 'settings',

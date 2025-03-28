@@ -65,6 +65,32 @@
       </van-tab>
     </van-tabs>
   </div>
+
+  <!-- 底部导航栏 -->
+  <van-tabbar v-model="activeTab" fixed route>
+      <van-tabbar-item icon="home-o" to="/">
+        首页
+      </van-tabbar-item>
+      <van-tabbar-item icon="envelop-o" to="/notification">
+        消息
+      </van-tabbar-item>
+      <van-tabbar-item to="/stuff/publish">
+        <template #icon>
+          <div class="publish-button">
+            <van-icon name="plus" size="20" />
+          </div>
+        </template>
+      </van-tabbar-item>
+      <van-tabbar-item icon="orders-o" to="/stuff/trades">
+        交易列表
+      </van-tabbar-item>
+      <van-tabbar-item icon="user-o" to="/user/profile">
+        我的
+      </van-tabbar-item>
+    </van-tabbar>
+
+    <!-- 为底部导航腾出空间 -->
+    <div class="bottom-space"></div>
 </template>
 
 <script lang="ts">
@@ -261,4 +287,45 @@ export default defineComponent({
 :deep(.van-card__desc) {
   margin: 8px 0;
 }
+
+.bottom-space {
+  height: 50px;
+}
+.publish-button {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #1989fa, #0066ff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
+}
+
+.publish-button .van-icon {
+  color: white;
+}
+
+/* 调整底部导航样式 */
+:deep(.van-tabbar-item) {
+  color: #7d7e80;
+}
+
+:deep(.van-tabbar-item--active) {
+  color: #1989fa;
+}
+
+:deep(.van-tabbar-item__icon) {
+  font-size: 20px;
+}
+
+:deep(.van-tabbar-item:nth-child(3)) {
+  margin-top: -14px;
+}
+
+:deep(.van-tabbar-item:nth-child(3) .van-tabbar-item__text) {
+  margin-top: 4px;
+}
+
 </style> 

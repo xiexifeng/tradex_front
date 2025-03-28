@@ -2,7 +2,6 @@
   <van-nav-bar
     title="我的"
     @click-left="onClickLeft"
-    @click-right="onClickRight"
     class="custom-nav"
   >
     <template #left>
@@ -56,6 +55,10 @@
       <div class="stats-row">
         <div class="stat-item">
           <span class="stat-value">{{ user.followers }}</span>
+          <span class="stat-label">关注</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ user.followers }}</span>
           <span class="stat-label">粉丝</span>
         </div>
         <div class="stat-item">
@@ -63,14 +66,16 @@
           <span class="stat-label">获赞</span>
         </div>
         <div class="stat-item">
-          <van-button size="small" type="primary" plain @click="editProfile">
+          <!-- <van-button size="small" type="primary" plain @click="editProfile">
             编辑资料
-          </van-button>
+          </van-button> -->
+          <van-icon name="edit" @click="editProfile"/>
         </div>
         <div class="stat-item">
-          <van-button size="small" plain @click="goToSettings">
+          <!-- <van-button size="small" plain @click="goToSettings">
             设置
-          </van-button>
+          </van-button> -->
+          <van-icon name="setting-o" @click="goToSettings"/>
         </div>
       </div>
     </van-cell-group>
@@ -115,11 +120,11 @@
 
   <!-- 底部导航栏 -->
   <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="shop-o" to="/mall">
-        电商广场
+      <van-tabbar-item icon="home-o" to="/">
+        首页
       </van-tabbar-item>
-      <van-tabbar-item icon="exchange" to="/stuff/barter">
-        易物广场
+      <van-tabbar-item icon="envelop-o" to="/notification">
+        消息
       </van-tabbar-item>
       <van-tabbar-item to="/stuff/publish">
         <template #icon>
@@ -141,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { showToast } from 'vant'
 
 export default defineComponent({
@@ -157,11 +162,12 @@ export default defineComponent({
     const onShare = () => {
       showToast('分享')
     }
-
+    const activeTab = ref(0)
     return {
       onClickLeft,
       openCamera,
-      onShare
+      onShare,
+      activeTab
     }
   },
   data() {

@@ -44,29 +44,54 @@
         推荐商品
       </van-divider>
       
-      <van-card
-        v-for="product in products"
-        :key="product.id"
-        :price="product.price"
-        :title="product.title"
-        :thumb="product.thumb"
-        :tag="product.tag"
-      >
-        <template #footer>
-          <van-button size="mini" type="primary" @click="onBuyClick(product.id)">
-            购买
-          </van-button>
-        </template>
-      </van-card>
-    </div>
+      <div class="product-list">
+        <van-card
+          v-for="product in products"
+          :key="product.id"
+          :price="product.tradeMethod === '人民币' ? product.transferPrice : product.tradeMethod === '积分' ? product.transferPoints : product.expectItem"
+          :currency="product.tradeMethod === '人民币' ? '¥' : product.tradeMethod === '积分' ? '积分' : ''"
+          :desc="product.itemDescription"
+          :title="product.itemTitle"
+          :thumb="product.firstImage"
+          class="product-card"
+        >
+          <template #tags>
+            <van-tag plain type="primary" class="product-tag">{{product.itemType}}</van-tag>
+            <van-tag plain type="success" class="product-tag">{{product.depreciation}}成新</van-tag>
+            <van-tag plain type="warning" class="product-tag">{{product.tradeMethod}}</van-tag>
+          </template>
+          <template #footer>
+            <div class="card-footer">
+              <div class="user-info">
+                <span class="user-name">{{product.userNickname}}</span>
+                <span class="publish-time">{{product.publishTime}}</span>
+              </div>
+              <div class="product-stats">
+                <span><van-icon name="eye-o" /> {{product.viewCount}}</span>
+                <span><van-icon name="like-o" /> {{product.loveCount}}</span>
+                <span><van-icon name="star-o" /> {{product.collectionCount}}</span>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <van-button v-if="product.tradeMethod !== '以物换物'" size="small" type="primary" @click="onBuyClick(product.id)">
+                购买
+              </van-button>
+              <van-button size="small" type="primary" @click="onViewClick(product.id)">
+                查看
+              </van-button>
+            </div>
+          </template>
+        </van-card>
+      </div>
+  </div>
 
     <!-- 底部导航栏 -->
     <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="shop-o" to="/mall">
-        电商广场
+      <van-tabbar-item icon="home-o" to="/">
+        首页
       </van-tabbar-item>
-      <van-tabbar-item icon="exchange" to="/stuff/barter">
-        易物广场
+      <van-tabbar-item icon="envelop-o" to="/notification">
+        消息
       </van-tabbar-item>
       <van-tabbar-item to="/stuff/publish">
         <template #icon>
@@ -107,19 +132,120 @@ export default defineComponent({
     ])
 
     const products = ref([
-      {
-        id: 1,
-        title: '区块链认证商品A',
-        price: '2.00',
-        thumb: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        tag: 'NFT'
+        {
+        "id": 2025032800001,
+        "userId": 2025032800001,
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "iphone 16",
+        "itemType": "数码手机",
+        "itemDescription": "刚买2个月 32G 9成新",
+        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+        "itemImageList": [
+          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        ],
+        "depreciation": 9,
+        "tradeMethod": "以物换物",
+        "expectItem": "山地自行车",
+        "transferTimes": 0,
+        "lastUserId": 2025032800001,
+        "blockchainId": "Hash2025032800001",
+        "loveCount": 10,
+        "collectionCount": 10,
+        "viewCount": 10,
+        "publishTime": "2025-03-28 12:10:00"
       },
       {
-        id: 2,
-        title: '区块链认证商品B',
-        price: '2.00',
-        thumb: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        tag: 'NFT'
+        "id": 2025032800001,
+        "userId": 2025032800001,
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "iphone 16",
+        "itemType": "数码手机",
+        "itemDescription": "刚买2个月 32G 9成新",
+        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+        "itemImageList": [
+          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        ],
+        "depreciation": 9,
+        "tradeMethod": "人民币",
+        "transferPrice": 10000,
+        "transferTimes": 0,
+        "lastUserId": 2025032800001,
+        "blockchainId": "Hash2025032800001",
+        "loveCount": 10,
+        "collectionCount": 10,
+        "viewCount": 10,
+        "publishTime": "2025-03-28 12:10:00"
+      },
+      {
+        "id": 2025032800001,
+        "userId": 2025032800001,
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "iphone 16",
+        "itemType": "数码手机",
+        "itemDescription": "刚买2个月 32G 9成新",
+        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+        "itemImageList": [
+          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        ],
+        "depreciation": 9,
+        "tradeMethod": "积分",
+        "transferPoints": 100,
+        "transferTimes": 0,
+        "lastUserId": 2025032800001,
+        "blockchainId": "Hash2025032800001",
+        "loveCount": 10,
+        "collectionCount": 10,
+        "viewCount": 10,
+        "publishTime": "2025-03-28 12:10:00"
+      },
+      {
+        "id": 2025032800001,
+        "userId": 2025032800001,
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "iphone 16",
+        "itemType": "数码手机",
+        "itemDescription": "刚买2个月 32G 9成新",
+        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+        "itemImageList": [
+          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        ],
+        "depreciation": 9,
+        "tradeMethod": "人民币",
+        "transferPrice": 100,
+        "transferTimes": 0,
+        "lastUserId": 2025032800001,
+        "blockchainId": "Hash2025032800001",
+        "loveCount": 10,
+        "collectionCount": 10,
+        "viewCount": 10,
+        "publishTime": "2025-03-28 12:10:00"
+      },
+      {
+        "id": 2025032800001,
+        "userId": 2025032800001,
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "iphone 16",
+        "itemType": "数码手机",
+        "itemDescription": "刚买2个月 32G 9成新刚买2个月 32G 9成新 刚买2个月 32G 9成新 ",
+        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+        "itemImageList": [
+          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        ],
+        "depreciation": 9,
+        "tradeMethod": "人民币",
+        "transferPrice": 100,
+        "transferTimes": 0,
+        "lastUserId": 2025032800001,
+        "blockchainId": "Hash2025032800001",
+        "loveCount": 10,
+        "collectionCount": 10,
+        "viewCount": 10,
+        "publishTime": "2025-03-28 12:10:00"
       }
     ])
 
@@ -138,6 +264,13 @@ export default defineComponent({
       }
       // 处理购买逻辑
     }
+    const onViewClick = (productId: number) => {
+      if (!userInfo.value) {
+        router.push('/login')
+        return
+      }
+      // 处理购买逻辑
+    }
 
     return {
       searchValue,
@@ -148,6 +281,7 @@ export default defineComponent({
       goToProfile,
       onBuyClick,
       activeTab,
+      onViewClick,
     }
   }
 })
@@ -241,4 +375,72 @@ export default defineComponent({
 :deep(.van-tabbar-item:nth-child(3) .van-tabbar-item__text) {
   margin-top: 4px;
 }
+
+.product-section {
+  padding: 0 12px;
+  transition: transform 0.3s ease;
+}
+
+.product-list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-card {
+  margin-bottom: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 16px;
+}
+
+.product-tag {
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-name {
+  font-size: 12px;
+  color: #323233;
+}
+
+.publish-time {
+  font-size: 10px;
+  color: #969799;
+  margin-top: 2px;
+}
+
+.product-stats {
+  display: flex;
+  gap: 8px;
+  color: #999;
+  font-size: 12px;
+}
+
+.product-stats span {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
 </style>
