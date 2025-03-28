@@ -320,11 +320,7 @@ export default defineComponent({
       // 处理购买逻辑
     }
     const onViewClick = (productId: number) => {
-      if (!userInfo.value) {
-        router.push('/login')
-        return
-      }
-      // 处理购买逻辑
+      router.push(`/square/item/detail/${productId}`)
     }
 
     const onSearchClick = () => {

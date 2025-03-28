@@ -179,7 +179,7 @@ export default defineComponent({
     }
 
     const onViewClick = (productId: number) => {
-      router.push('/login')
+      router.push(`/square/item/detail/${productId}`)
     }
 
     return {
