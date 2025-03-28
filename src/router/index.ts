@@ -90,6 +90,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'addressEdit',
     component: () => import(/* webpackChunkName: "addressEdit" */ '../views/user/address/AddressEditView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import(/* webpackChunkName: "search" */ '../views/SearchView.vue')
   }
 ]
 

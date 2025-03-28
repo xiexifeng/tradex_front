@@ -18,6 +18,8 @@
         placeholder="搜索商品"
         shape="round"
         background="#f7f8fa"
+        readonly
+        @click="onSearchClick"
       />
     </div>
 
@@ -44,9 +46,16 @@
         推荐商品
       </van-divider>
       
+      <!-- 筛选工具栏 -->
+      <van-dropdown-menu class="filter-toolbar">
+        <van-dropdown-item v-model="itemTypeFilter" :options="itemTypeOptions" />
+        <van-dropdown-item v-model="tradeMethodFilter" :options="tradeMethodOptions" />
+        <van-dropdown-item v-model="sortOrder" :options="sortOptions" />
+      </van-dropdown-menu>
+      
       <div class="product-list">
         <van-card
-          v-for="product in products"
+          v-for="product in filteredProducts"
           :key="product.id"
           :price="product.tradeMethod === '人民币' ? product.transferPrice : product.tradeMethod === '积分' ? product.transferPoints : product.expectItem"
           :currency="product.tradeMethod === '人民币' ? '¥' : product.tradeMethod === '积分' ? '积分' : ''"
@@ -83,7 +92,7 @@
           </template>
         </van-card>
       </div>
-  </div>
+    </div>
 
     <!-- 底部导航栏 -->
     <van-tabbar v-model="activeTab" fixed route>
@@ -114,7 +123,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -249,6 +258,52 @@ export default defineComponent({
       }
     ])
 
+    // 筛选选项
+    const itemTypeFilter = ref('all')
+    const tradeMethodFilter = ref('all')
+    const sortOrder = ref('newest')
+
+    const itemTypeOptions = [
+      { text: '全部类型', value: 'all' },
+      { text: '数码手机', value: '数码手机' },
+      { text: '电脑办公', value: '电脑办公' },
+      { text: '服装配饰', value: '服装配饰' },
+      { text: '图书音像', value: '图书音像' },
+      { text: '其他', value: '其他' },
+    ]
+
+    const tradeMethodOptions = [
+      { text: '全部交易', value: 'all' },
+      { text: '人民币', value: '人民币' },
+      { text: '积分', value: '积分' },
+      { text: '以物换物', value: '以物换物' },
+    ]
+
+    const sortOptions = [
+      { text: '最新发布', value: 'newest' },
+      { text: '价格最低', value: 'price_asc' },
+      { text: '价格最高', value: 'price_desc' },
+    ]
+
+    // 过滤后的商品列表
+    const filteredProducts = computed(() => {
+      return products.value.filter(product => {
+        const typeMatch = itemTypeFilter.value === 'all' || product.itemType === itemTypeFilter.value
+        const methodMatch = tradeMethodFilter.value === 'all' || product.tradeMethod === tradeMethodFilter.value
+        return typeMatch && methodMatch
+      }).sort((a, b) => {
+        switch (sortOrder.value) {
+          case 'price_asc':
+            return (a.transferPrice || 0) - (b.transferPrice || 0)
+          case 'price_desc':
+            return (b.transferPrice || 0) - (a.transferPrice || 0)
+          case 'newest':
+          default:
+            return new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime()
+        }
+      })
+    })
+
     const onClickRight = () => {
       router.push('/login')
     }
@@ -272,6 +327,10 @@ export default defineComponent({
       // 处理购买逻辑
     }
 
+    const onSearchClick = () => {
+      router.push('/search')
+    }
+
     return {
       searchValue,
       userInfo,
@@ -282,6 +341,14 @@ export default defineComponent({
       onBuyClick,
       activeTab,
       onViewClick,
+      onSearchClick,
+      itemTypeFilter,
+      tradeMethodFilter,
+      sortOrder,
+      itemTypeOptions,
+      tradeMethodOptions,
+      sortOptions,
+      filteredProducts
     }
   }
 })
@@ -442,5 +509,24 @@ export default defineComponent({
   justify-content: flex-end;
 }
 
+.filter-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background-color: #fff;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
 
+:deep(.van-dropdown-menu__bar) {
+  box-shadow: none;
+}
+
+:deep(.van-dropdown-menu__item) {
+  justify-content: center;
+}
+
+:deep(.van-dropdown-menu__title) {
+  font-size: 13px;
+}
 </style>
