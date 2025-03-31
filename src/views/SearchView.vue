@@ -87,6 +87,23 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+type SearchResult = {
+            id: number,
+            userId: number,
+            userAvatar: string,
+            userNickname: string,
+            itemTitle: string,
+            itemType: string,
+            itemDescription: string,
+            firstImage: string,
+            depreciation: number,
+            tradeMethod: string,
+            expectItem: string,
+            loveCount: number,
+            collectionCount: number,
+            viewCount: number,
+            publishTime: string
+          }
 
 export default defineComponent({
   name: 'SearchView',
@@ -95,9 +112,10 @@ export default defineComponent({
     const searchValue = ref('')
     const loading = ref(false)
     const finished = ref(false)
-    const searchResults = ref([])
+    const searchResults = ref<SearchResult[]>([])
     const searchHistory = ref<string[]>([])
 
+    
     // 从本地存储加载搜索历史
     onMounted(() => {
       const history = localStorage.getItem('searchHistory')
