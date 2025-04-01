@@ -137,6 +137,93 @@
         </van-button>
       </div>
     </div>
+
+    <!-- 交换申请弹出层 -->
+    <van-popup
+      v-model:show="showExchangeForm"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '70%' }"
+    >
+      <div class="exchange-popup">
+        <div class="popup-title">发起交换</div>
+        <van-form @submit="onExchangeSubmit">
+          <van-cell-group inset>
+            <van-field
+              v-model="exchangeForm.linkman"
+              name="linkman"
+              label="联系人"
+              placeholder="请输入联系人姓名"
+              :rules="[{ required: true, message: '请填写联系人' }]"
+            />
+            <van-field
+              v-model="exchangeForm.phone"
+              name="phone"
+              label="联系电话"
+              placeholder="请输入联系电话"
+              :rules="[{ required: true, message: '请填写联系电话' }]"
+            />
+            <van-field
+              v-model="exchangeForm.itemType"
+              name="itemType"
+              label="物品类型"
+              placeholder="请选择物品类型"
+              readonly
+              is-link
+              @click="showItemTypePopup = true"
+              :rules="[{ required: true, message: '请选择物品类型' }]"
+            />
+            <van-field
+              v-model="selectedItemTitle"
+              name="exchangeItem"
+              label="交换物品"
+              placeholder="请选择要交换的物品"
+              readonly
+              is-link
+              @click="showItemListPopup = true"
+              :rules="[{ required: true, message: '请选择交换物品' }]"
+            />
+            <van-field
+              v-model="exchangeForm.remark"
+              name="remark"
+              label="备注"
+              type="textarea"
+              rows="2"
+              autosize
+              placeholder="请输入备注信息（选填）"
+            />
+          </van-cell-group>
+          <div class="submit-button">
+            <van-button round block type="primary" native-type="submit">
+              提交申请
+            </van-button>
+          </div>
+        </van-form>
+      </div>
+    </van-popup>
+
+    <!-- 物品类型选择弹出层 -->
+    <van-popup v-model:show="showItemTypePopup" position="bottom" round>
+      <van-picker
+        :columns="itemTypeColumns"
+        @confirm="onItemTypeConfirm"
+        @cancel="showItemTypePopup = false"
+        show-toolbar
+        title="选择物品类型"
+      />
+    </van-popup>
+
+    <!-- 交换物品选择弹出层 -->
+    <van-popup v-model:show="showItemListPopup" position="bottom" round>
+      <van-picker
+        :columns="myItemColumns"
+        @confirm="onItemConfirm"
+        @cancel="showItemListPopup = false"
+        show-toolbar
+        title="选择交换物品"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -145,8 +232,8 @@ import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
 type ItemDetail = {
-      id: number,
-      userId: number,
+      id: string,
+      userId: string,
       nickname: string,
       avatarUrl: string,
       itemTitle: string,
@@ -156,7 +243,7 @@ type ItemDetail = {
       itemImageList: string[],
       depreciation: number,
       transferTimes: number,
-      lastUserId: number,
+      lastUserId: string,
       blockchainId: string,
       loveCount: number,
       collectionCount: number,
@@ -179,6 +266,15 @@ type ItemDetail = {
         blockchainId: string
       }
     }
+type ExchangeForm = {
+      targetItemId: string,
+      linkman: string,
+      phone: string,
+      itemId: string,
+      itemTitle: string,
+      itemType: string,
+      remark: string
+    }  
 
 export default defineComponent({
   name: 'ItemDetailView',
@@ -189,8 +285,8 @@ export default defineComponent({
     const isCollected = ref(false)
 
     const itemDetail = ref<ItemDetail>({
-      id: 0,
-      userId: 0,
+      id: '0',
+      userId: '0',
       nickname: '',
       avatarUrl: '',
       itemTitle: '',
@@ -200,7 +296,7 @@ export default defineComponent({
       itemImageList: [],
       depreciation: 0,
       transferTimes: 0,
-      lastUserId: 0,
+      lastUserId: '0',
       blockchainId: '',
       loveCount: 0,
       collectionCount: 0,
@@ -228,8 +324,8 @@ export default defineComponent({
       // 这里应该调用API获取物品详情
       // 模拟API调用
       itemDetail.value = {
-        id: 2025032500010,
-        userId: 20250324000002,
+        id: '2025032500010',
+        userId: '20250324000002',
         nickname: "NPE",
         avatarUrl: "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         itemTitle: "iphone 16",
@@ -239,13 +335,13 @@ export default defineComponent({
         itemImageList: ["https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg","https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"],
         depreciation: 9,
         transferTimes: 0,
-        lastUserId: 20250324000002,
+        lastUserId: '20250324000002',
         blockchainId: "Hash0030343jkjlkj",
         loveCount: 10,
         collectionCount: 10,
         viewCount: 10,
         tradeMethod: "以物换物",
-        transferPrice: 0.0000,
+        transferPrice: 190.0000,
         transferPoints: 0,
         expectItem: "ipad 10",
         contactInfo: {
@@ -297,8 +393,65 @@ export default defineComponent({
       }
     }
 
+    // 交换表单相关
+    const showExchangeForm = ref(false)
+    const showItemTypePopup = ref(false)
+    const showItemListPopup = ref(false)
+    const selectedItemTitle = ref('')
+
+    const exchangeForm = ref<ExchangeForm>({
+      targetItemId: '0',
+      linkman: '',
+      phone: '',
+      itemId: '0',
+      itemTitle: '',
+      itemType: '',
+      remark: ''
+    })
+
+    // 物品类型选项
+    const itemTypeColumns = [
+      {text: '电子产品', value: '电子产品'},
+      {text: '服装配饰', value: '服装配饰'},
+      {text: '图书音像', value: '图书音像'},
+      {text: '运动器材', value: '运动器材'},
+      {text: '家居用品', value: '家居用品'},
+      {text: '其他', value: '其他'}
+    ]
+
+    // 模拟我的物品列表
+    const myItemColumns = [
+      { text: 'iPhone 16', value: '2025032500011' },
+      { text: 'iPad Pro', value: '2025032500012' },
+      { text: 'MacBook Air', value: '2025032500013' }
+    ]
+
+    // 打开交换表单
     const exchange = () => {
-      router.push(`/stuff/exchange/${itemDetail.value.id}`)
+      showExchangeForm.value = true
+      exchangeForm.value.targetItemId = itemDetail.value.id
+    }
+
+    // 选择物品类型
+    const onItemTypeConfirm = ({ selectedOptions }: any) => {
+      exchangeForm.value.itemType = selectedOptions[0].value
+      showItemTypePopup.value = false
+    }
+
+    // 选择交换物品
+    const onItemConfirm = ({ selectedOptions }: any) => {
+      const selected = selectedOptions[0]
+      exchangeForm.value.itemId = selected.value
+      exchangeForm.value.itemTitle = selected.text
+      selectedItemTitle.value = selected.text
+      showItemListPopup.value = false
+    }
+
+    // 提交交换申请
+    const onExchangeSubmit = (values: any) => {
+      console.log('交换申请表单：', exchangeForm.value)
+      showToast('申请已提交')
+      showExchangeForm.value = false
     }
 
     return {
@@ -311,7 +464,17 @@ export default defineComponent({
       share,
       contactSeller,
       buy,
-      exchange
+      exchange,
+      showExchangeForm,
+      showItemTypePopup,
+      showItemListPopup,
+      exchangeForm,
+      selectedItemTitle,
+      itemTypeColumns,
+      myItemColumns,
+      onItemTypeConfirm,
+      onItemConfirm,
+      onExchangeSubmit
     }
   }
 })
@@ -510,5 +673,34 @@ export default defineComponent({
   padding: 0 12px;
   height: 28px;
   line-height: 26px;
+}
+
+.exchange-popup {
+  padding: 24px 16px;
+}
+
+.popup-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #323233;
+  margin-bottom: 20px;
+}
+
+.submit-button {
+  margin: 24px 16px;
+}
+
+:deep(.van-popup) {
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+:deep(.van-field__label) {
+  width: 6em !important;
+}
+
+:deep(.van-cell-group) {
+  margin: 0;
 }
 </style> 

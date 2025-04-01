@@ -142,8 +142,8 @@ export default defineComponent({
 
     const products = ref([
         {
-        "id": 2025032800001,
-        "userId": 2025032800001,
+        "id": "2025032800001",
+        "userId": "2025032800001",
         "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         "userNickname": "NPE",
         "itemTitle": "iphone 16",
@@ -157,7 +157,7 @@ export default defineComponent({
         "tradeMethod": "以物换物",
         "expectItem": "山地自行车",
         "transferTimes": 0,
-        "lastUserId": 2025032800001,
+        "lastUserId": "2025032800001",
         "blockchainId": "Hash2025032800001",
         "loveCount": 10,
         "collectionCount": 10,
@@ -165,8 +165,8 @@ export default defineComponent({
         "publishTime": "2025-03-28 12:10:00"
       },
       {
-        "id": 2025032800001,
-        "userId": 2025032800001,
+        "id": "2025032800001",
+        "userId": "2025032800001",
         "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         "userNickname": "NPE",
         "itemTitle": "iphone 16",
@@ -180,7 +180,7 @@ export default defineComponent({
         "tradeMethod": "人民币",
         "transferPrice": 10000,
         "transferTimes": 0,
-        "lastUserId": 2025032800001,
+        "lastUserId": "2025032800001",
         "blockchainId": "Hash2025032800001",
         "loveCount": 10,
         "collectionCount": 10,
@@ -188,8 +188,8 @@ export default defineComponent({
         "publishTime": "2025-03-28 12:10:00"
       },
       {
-        "id": 2025032800001,
-        "userId": 2025032800001,
+        "id": "2025032800001",
+        "userId": "2025032800001",
         "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         "userNickname": "NPE",
         "itemTitle": "iphone 16",
@@ -203,7 +203,7 @@ export default defineComponent({
         "tradeMethod": "积分",
         "transferPoints": 100,
         "transferTimes": 0,
-        "lastUserId": 2025032800001,
+        "lastUserId": "2025032800001",
         "blockchainId": "Hash2025032800001",
         "loveCount": 10,
         "collectionCount": 10,
@@ -211,8 +211,8 @@ export default defineComponent({
         "publishTime": "2025-03-28 12:10:00"
       },
       {
-        "id": 2025032800001,
-        "userId": 2025032800001,
+        "id": "2025032800001",
+        "userId": "2025032800001",
         "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         "userNickname": "NPE",
         "itemTitle": "iphone 16",
@@ -226,7 +226,7 @@ export default defineComponent({
         "tradeMethod": "人民币",
         "transferPrice": 100,
         "transferTimes": 0,
-        "lastUserId": 2025032800001,
+        "lastUserId": "2025032800001",
         "blockchainId": "Hash2025032800001",
         "loveCount": 10,
         "collectionCount": 10,
@@ -234,8 +234,8 @@ export default defineComponent({
         "publishTime": "2025-03-28 12:10:00"
       },
       {
-        "id": 2025032800001,
-        "userId": 2025032800001,
+        "id": "2025032800001",
+        "userId": "2025032800001",
         "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
         "userNickname": "NPE",
         "itemTitle": "iphone 16",
@@ -249,7 +249,7 @@ export default defineComponent({
         "tradeMethod": "人民币",
         "transferPrice": 100,
         "transferTimes": 0,
-        "lastUserId": 2025032800001,
+        "lastUserId": "2025032800001",
         "blockchainId": "Hash2025032800001",
         "loveCount": 10,
         "collectionCount": 10,

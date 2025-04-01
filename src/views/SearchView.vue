@@ -88,8 +88,8 @@ import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 type SearchResult = {
-            id: number,
-            userId: number,
+            id: string,
+            userId: string,
             userAvatar: string,
             userNickname: string,
             itemTitle: string,
@@ -162,8 +162,8 @@ export default defineComponent({
         // 这里应该调用实际的搜索API
         searchResults.value = [
           {
-            id: 2025032800001,
-            userId: 2025032800001,
+            id: '2025032800001',
+            userId: '2025032800001',
             userAvatar: "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
             userNickname: "NPE",
             itemTitle: "iphone 16",
