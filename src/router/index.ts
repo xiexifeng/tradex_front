@@ -100,6 +100,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/square/item/detail/:id',
     name: 'itemDetail',
     component: () => import(/* webpackChunkName: "itemDetail" */ '../views/square/ItemDetailView.vue')
+  },
+  {
+    path: '/stuff/detail/:id',
+    name: 'stuffDetail',
+    component: () => import(/* webpackChunkName: "stuffDetail" */ '../views/stuff/StuffDetailView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

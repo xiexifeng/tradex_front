@@ -42,6 +42,10 @@ import {
   DatePicker,
   AddressList,
   AddressEdit,
+  Collapse, 
+  CollapseItem,
+  Col,
+  Row,
 } from 'vant'
 
 const app = createApp(App)
@@ -82,6 +86,10 @@ const vantComponents = [
   DatePicker,
   AddressList,
   AddressEdit,
+  Collapse, 
+  CollapseItem,
+  Col,
+  Row,
 ]
 
 vantComponents.forEach(component => {
