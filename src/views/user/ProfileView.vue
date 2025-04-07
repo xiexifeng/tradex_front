@@ -105,14 +105,14 @@
             <!-- 表头 -->
             <van-row class="table-row">
               <van-col span="5" class="table-header">得分</van-col>
-              <van-col span="10" class="table-header">交易项</van-col>
-              <van-col span="9" class="table-header">评分时间</van-col>
+              <van-col span="6" class="table-header">交易项</van-col>
+              <van-col span="12" class="table-header">评分时间</van-col>
             </van-row>
             <!-- 表体 -->
             <van-row v-for="item in transactions" :key="item.tradeId" class="table-row">
               <van-col span="5" class="table-cell">{{ item.tradeScore }}</van-col>
-              <van-col span="10" class="table-cell">{{ item.tradeRemark }}</van-col>
-              <van-col span="9" class="table-cell">{{ item.scoreTime }}</van-col>
+              <van-col span="6" class="table-cell">{{ item.tradeRemark }}</van-col>
+              <van-col span="12" class="table-cell">{{ item.scoreTime }}</van-col>
             </van-row>
           </div>
         </van-collapse-item>

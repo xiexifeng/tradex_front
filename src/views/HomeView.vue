@@ -33,9 +33,9 @@
     <!-- 功能导航 -->
     <van-grid :column-num="4" :border="false" class="feature-grid">
       <van-grid-item icon="shop-o" text="全部商品" />
-      <van-grid-item icon="gift-o" text="特惠专区" />
+      <van-grid-item icon="gift-o" text="区块链验证" />
       <van-grid-item icon="medal-o" text="信用排行" />
-      <van-grid-item icon="balance-o" text="代币中心" />
+      <van-grid-item icon="balance-o" text="积分排行" />
     </van-grid>
 
     <!-- 商品列表 -->
