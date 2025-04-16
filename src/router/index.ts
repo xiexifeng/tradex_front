@@ -67,13 +67,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "tradeDetail" */ '../views/stuff/TradeDetailView.vue'),
     meta: { requiresAuth: true }
   },
-  { path: '/publish', name: 'Publish', component: () => import('../views/PublishV1.vue') },
-  { path: '/review', name: 'Review', component: () => import('../views/ReviewV1.vue') },
-  { path: '/trade/:id', name: 'TradeDetail', component: () => import('../views/TradeDetail.vue') },
-  { path: '/profile', name: 'Profile', component: () => import('../views/ProfileV1.vue') },
-  { path: '/merchant', name: 'Merchant', component: () => import('../views/MerchantV1.vue') },
-  { path: '/pay/:id', name: 'Pay', component: () => import('../views/PayV1.vue') },
-  { path: '/search', name: 'Search', component: () => import('../views/SearchV1.vue') },
   {
     path: '/user/settings',
     name: 'settings',
@@ -97,6 +90,32 @@ const routes: Array<RouteRecordRaw> = [
     name: 'addressEdit',
     component: () => import(/* webpackChunkName: "addressEdit" */ '../views/user/address/AddressEditView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import(/* webpackChunkName: "search" */ '../views/SearchView.vue')
+  },
+  {
+    path: '/square/item/detail/:id',
+    name: 'itemDetail',
+    component: () => import(/* webpackChunkName: "itemDetail" */ '../views/square/ItemDetailView.vue')
+  },
+  {
+    path: '/stuff/detail/:id',
+    name: 'stuffDetail',
+    component: () => import(/* webpackChunkName: "stuffDetail" */ '../views/stuff/StuffDetailView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import('@/views/notification/NotificationView.vue')
+  },
+  {
+    path: '/notification/detail/:id',
+    name: 'NotificationDetail',
+    component: () => import('@/views/notification/NotificationDetailView.vue')
   }
 ]
 

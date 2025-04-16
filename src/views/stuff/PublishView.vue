@@ -74,7 +74,7 @@
         </div>
 
         <!-- 物品原始价值 -->
-        <van-field
+        <!-- <van-field
           v-model="formData.originalPrice"
           type="digit"
           name="originalPrice"
@@ -84,7 +84,7 @@
             { pattern: /^\d+(\.\d{1,2})?$/, message: '请输入有效的价格' },
             { validator: validatePrice, message: '价格范围0-999999' }
           ]"
-        />
+        /> -->
 
         <!-- 物品折旧程度 -->
         <van-field
