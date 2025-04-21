@@ -1,0 +1,51 @@
+// 品牌主色调
+$primary-color: #1989fa;
+$primary-gradient: linear-gradient(135deg, #1989fa, #0066ff);
+
+// Vant 主题变量覆盖
+:root:root {
+  // 主题色
+  --van-primary-color: #{$primary-color};
+  --van-success-color: #07c160;
+  --van-danger-color: #ee0a24;
+  --van-warning-color: #ff976a;
+  
+  // 组件风格
+  --van-button-primary-background: #{$primary-gradient};
+  --van-button-primary-border-color: transparent;
+  
+  // 文字颜色
+  --van-text-color: #323233;
+  --van-text-color-2: #666666;
+  --van-text-color-3: #999999;
+  
+  // 背景色
+  --van-background: #f7f8fa;
+  --van-background-2: #ffffff;
+  
+  // 圆角
+  --van-radius-sm: 4px;
+  --van-radius-md: 8px;
+  --van-radius-lg: 12px;
+  
+  // 导航栏
+  --van-nav-bar-background: #{$primary-gradient};
+  --van-nav-bar-title-text-color: #ffffff;
+  --van-nav-bar-icon-color: #ffffff;
+  --van-nav-bar-text-color: #ffffff;
+  
+  // 标签页
+  --van-tab-active-text-color: #{$primary-color};
+  --van-tabs-bottom-bar-color: #{$primary-color};
+  
+  // 单元格
+  --van-cell-background: #ffffff;
+  --van-cell-border-color: #ebedf0;
+  
+  // 卡片
+  --van-card-background: #ffffff;
+  --van-card-radius: var(--van-radius-lg);
+  
+  // 标签
+  --van-tag-primary-color: #{$primary-color};
+} 

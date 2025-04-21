@@ -1,107 +1,124 @@
 <template>
-  <div class="home">
+  <div class="page-container">
     <!-- 顶部导航栏 -->
-    <van-nav-bar
-      title="区块链电商"
-      :right-text="userInfo ? '' : '登录'"
-      @click-right="onClickRight"
-    >
-      <template #right v-if="userInfo">
-        <van-icon name="user-o" size="18" @click="goToProfile"/>
+    <van-nav-bar class="custom-nav" title="区块链电商">
+      <template #right>
+        <template v-if="userInfo">
+          <van-icon name="user-o" size="20" class="nav-icon" @click="goToProfile"/>
+        </template>
+        <template v-else>
+          <span class="login-text" @click="onClickRight">登录</span>
+        </template>
       </template>
     </van-nav-bar>
 
     <!-- 搜索框 -->
-    <div class="search-box">
+    <div class="search-wrapper">
       <van-search
         v-model="searchValue"
-        placeholder="搜索商品"
+        placeholder="搜索你想要的商品"
         shape="round"
-        background="#f7f8fa"
+        background="transparent"
         readonly
         @click="onSearchClick"
-      />
+      >
+        <template #left-icon>
+          <van-icon name="search" size="18" color="#1989fa"/>
+        </template>
+      </van-search>
     </div>
 
     <!-- 轮播图 -->
-    <van-swipe class="banner" :autoplay="3000" indicator-color="#1989fa">
-      <van-swipe-item v-for="(image, index) in banners" :key="index">
-        <img :src="image" alt="banner">
-      </van-swipe-item>
-    </van-swipe>
+    <div class="banner-wrapper">
+      <van-swipe class="banner" :autoplay="3000" :show-indicators="false">
+        <van-swipe-item v-for="(image, index) in banners" :key="index">
+          <div class="banner-item">
+            <img :src="image" alt="banner">
+          </div>
+        </van-swipe-item>
+      </van-swipe>
+    </div>
 
     <!-- 功能导航 -->
-    <van-grid :column-num="4" :border="false" class="feature-grid">
-      <van-grid-item icon="shop-o" text="全部商品" />
-      <van-grid-item icon="gift-o" text="区块链验证" />
-      <van-grid-item icon="medal-o" text="信用排行" />
-      <van-grid-item icon="balance-o" text="积分排行" />
-    </van-grid>
+    <div class="feature-section">
+      <van-grid :column-num="4" :border="false" :gutter="10">
+        <van-grid-item v-for="(item, index) in features" :key="index" :icon="item.icon" :text="item.text" @click="item.action">
+          <template #icon>
+            <div class="feature-icon" :style="{ background: item.color }">
+              <van-icon :name="item.icon" size="24" color="#fff"/>
+            </div>
+          </template>
+          <template #text>
+            <span class="feature-text">{{ item.text }}</span>
+          </template>
+        </van-grid-item>
+      </van-grid>
+    </div>
 
     <!-- 商品列表 -->
-    <div class="product-section">
-      <van-divider
-        :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-      >
-        推荐商品
-      </van-divider>
-      
+    <div class="products-section">
       <!-- 筛选工具栏 -->
-      <van-dropdown-menu class="filter-toolbar">
-        <van-dropdown-item v-model="itemTypeFilter" :options="itemTypeOptions" />
-        <van-dropdown-item v-model="tradeMethodFilter" :options="tradeMethodOptions" />
-        <van-dropdown-item v-model="sortOrder" :options="sortOptions" />
-      </van-dropdown-menu>
-      
-      <div class="product-list">
-        <van-card
-          v-for="product in filteredProducts"
-          :key="product.id"
-          :price="product.tradeMethod === '人民币' ? product.transferPrice : product.tradeMethod === '积分' ? product.transferPoints : product.expectItem"
-          :currency="product.tradeMethod === '人民币' ? '¥' : product.tradeMethod === '积分' ? '积分' : ''"
-          :desc="product.itemDescription"
-          :title="product.itemTitle"
-          :thumb="product.firstImage"
-          class="product-card"
-        >
-          <template #tags>
-            <van-tag plain type="primary" class="product-tag">{{product.itemType}}</van-tag>
-            <van-tag plain type="success" class="product-tag">{{product.depreciation}}成新</van-tag>
-            <van-tag plain type="warning" class="product-tag">{{product.tradeMethod}}</van-tag>
-          </template>
-          <template #footer>
-            <div class="card-footer">
+      <van-sticky>
+        <div class="filter-bar">
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="itemTypeFilter" :options="itemTypeOptions" />
+            <van-dropdown-item v-model="tradeMethodFilter" :options="tradeMethodOptions" />
+            <van-dropdown-item v-model="sortOrder" :options="sortOptions" />
+          </van-dropdown-menu>
+        </div>
+      </van-sticky>
+
+      <!-- 商品列表 -->
+      <div class="products-grid">
+        <div v-for="product in filteredProducts" :key="product.id" class="product-card" @click="onViewClick(product.id)">
+          <div class="product-image">
+            <img :src="product.firstImage" :alt="product.itemTitle">
+            <div class="product-tags">
+              <van-tag round type="primary">{{ product.itemType }}</van-tag>
+              <van-tag round type="warning">{{ product.depreciation }}成新</van-tag>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">{{ product.itemTitle }}</h3>
+            <p class="product-desc">{{ product.itemDescription }}</p>
+            <div class="product-meta">
+              <div class="price-info">
+                <template v-if="product.tradeMethod === '人民币'">
+                  <span class="price">¥{{ product.transferPrice }}</span>
+                </template>
+                <template v-else-if="product.tradeMethod === '积分'">
+                  <span class="price">{{ product.transferPoints }}积分</span>
+                </template>
+                <template v-else>
+                  <span class="exchange">换{{ product.expectItem }}</span>
+                </template>
+              </div>
+              <div class="trade-method">
+                <van-tag plain :type="getTradeMethodType(product.tradeMethod)">
+                  {{ product.tradeMethod }}
+                </van-tag>
+              </div>
+            </div>
+            <div class="product-footer">
               <div class="user-info">
-                <span class="user-name">{{product.userNickname}}</span>
-                <span class="publish-time">{{product.publishTime}}</span>
+                <img :src="product.userAvatar" class="user-avatar">
+                <span class="user-name">{{ product.userNickname }}</span>
               </div>
-              <div class="product-stats">
-                <span><van-icon name="eye-o" /> {{product.viewCount}}</span>
-                <span><van-icon name="like-o" /> {{product.loveCount}}</span>
-                <span><van-icon name="star-o" /> {{product.collectionCount}}</span>
+              <div class="stats">
+                <span><van-icon name="eye-o" /> {{ product.viewCount }}</span>
+                <span><van-icon name="like-o" /> {{ product.loveCount }}</span>
+                <span><van-icon name="star-o" /> {{ product.collectionCount }}</span>
               </div>
             </div>
-            <div class="action-buttons">
-              <van-button v-if="product.tradeMethod !== '以物换物'" size="small" type="primary" @click="onBuyClick(product.id)">
-                购买
-              </van-button>
-              <van-button size="small" type="primary" @click="onViewClick(product.id)">
-                查看
-              </van-button>
-            </div>
-          </template>
-        </van-card>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- 底部导航栏 -->
     <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="home-o" to="/">
-        首页
-      </van-tabbar-item>
-      <van-tabbar-item icon="envelop-o" to="/notification">
-        消息
-      </van-tabbar-item>
+      <van-tabbar-item icon="home-o" to="/">首页</van-tabbar-item>
+      <van-tabbar-item icon="envelop-o" to="/notification">消息</van-tabbar-item>
       <van-tabbar-item to="/stuff/publish">
         <template #icon>
           <div class="publish-button">
@@ -109,18 +126,238 @@
           </div>
         </template>
       </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/stuff/trades">
-        交易列表
-      </van-tabbar-item>
-      <van-tabbar-item icon="user-o" to="/user/profile">
-        我的
-      </van-tabbar-item>
+      <van-tabbar-item icon="orders-o" to="/stuff/trades">交易</van-tabbar-item>
+      <van-tabbar-item icon="user-o" to="/user/profile">我的</van-tabbar-item>
     </van-tabbar>
-
-    <!-- 为底部导航腾出空间 -->
-    <div class="bottom-space"></div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+// 首先定义 mixins
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin multi-ellipsis($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.page-container {
+  min-height: 100vh;
+  background-color: #f7f8fa;
+  padding-bottom: 50px;
+}
+
+.custom-nav {
+  background: linear-gradient(135deg, #1989fa, #0066ff);
+  
+  :deep(.van-nav-bar__title), :deep(.nav-icon) {
+    color: #fff;
+  }
+  
+  .login-text {
+    color: #fff;
+    font-size: 14px;
+  }
+}
+
+.search-wrapper {
+  padding: 8px 12px;
+  background: #fff;
+  
+  :deep(.van-search) {
+    padding: 0;
+  }
+  
+  :deep(.van-search__content) {
+    background: #f5f6fa;
+  }
+}
+
+.banner-wrapper {
+  padding: 0 12px;
+  margin: 12px 0;
+  
+  .banner {
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .banner-item {
+      width: 100%;
+      height: 100%;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+.feature-section {
+  padding: 0 12px;
+  margin-bottom: 12px;
+  
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .feature-text {
+    font-size: 12px;
+    color: #323233;
+    margin-top: 4px;
+  }
+}
+
+.filter-bar {
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.products-grid {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  .product-image {
+    position: relative;
+    padding-top: 100%;
+    
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .product-tags {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      display: flex;
+      gap: 4px;
+    }
+  }
+  
+  .product-info {
+    padding: 12px;
+    
+    .product-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+      @include text-ellipsis;
+    }
+    
+    .product-desc {
+      font-size: 12px;
+      color: #666;
+      margin: 4px 0;
+      @include multi-ellipsis(2);
+    }
+    
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+      
+      .price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #ff6b6b;
+      }
+      
+      .exchange {
+        font-size: 14px;
+        color: #1989fa;
+      }
+    }
+    
+    .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f5f5f5;
+      
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        
+        .user-avatar {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+        }
+        
+        .user-name {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+      
+      .stats {
+        display: flex;
+        gap: 8px;
+        font-size: 12px;
+        color: #999;
+        
+        span {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+      }
+    }
+  }
+}
+
+.publish-button {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #1989fa, #0066ff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
+  
+  .van-icon {
+    color: #fff;
+  }
+}
+</style>
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
@@ -319,12 +556,48 @@ export default defineComponent({
       }
       // 处理购买逻辑
     }
-    const onViewClick = (productId: number) => {
+    const onViewClick = (productId: string) => {
       router.push(`/square/item/detail/${productId}`)
     }
 
     const onSearchClick = () => {
       router.push('/search')
+    }
+
+    const features = [
+      {
+        icon: 'shop-o',
+        text: '全部商品',
+        color: '#1989fa',
+        action: () => router.push('/square')
+      },
+      {
+        icon: 'gift-o',
+        text: '区块链验证',
+        color: '#07c160',
+        action: () => router.push('/blockchain')
+      },
+      {
+        icon: 'medal-o',
+        text: '信用排行',
+        color: '#ff976a',
+        action: () => router.push('/credit-rank')
+      },
+      {
+        icon: 'balance-o',
+        text: '积分排行',
+        color: '#ee0a24',
+        action: () => router.push('/points-rank')
+      }
+    ]
+
+    const getTradeMethodType = (method: string) => {
+      switch (method) {
+        case '人民币': return 'danger'
+        case '积分': return 'warning'
+        case '以物换物': return 'primary'
+        default: return 'default'
+      }
     }
 
     return {
@@ -344,185 +617,10 @@ export default defineComponent({
       itemTypeOptions,
       tradeMethodOptions,
       sortOptions,
-      filteredProducts
+      filteredProducts,
+      features,
+      getTradeMethodType
     }
   }
 })
 </script>
-
-<style scoped>
-.home {
-  min-height: 100vh;
-  background-color: #f7f8fa;
-}
-
-.search-box {
-  padding: 8px 0;
-}
-
-.banner {
-  height: 160px;
-  margin: 0 12px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.feature-grid {
-  margin: 12px 0;
-  background: linear-gradient(145deg, #ffffff, #f0f2f5);
-}
-
-.van-grid-item__icon {
-  color: #1989fa;
-}
-
-.product-section {
-  padding: 0 12px;
-}
-
-.van-card {
-  margin-bottom: 8px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.van-button--primary {
-  background: linear-gradient(135deg, #1989fa, #0066ff);
-  border: none;
-}
-
-.bottom-space {
-  height: 50px;
-}
-
-.publish-button {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1989fa, #0066ff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
-}
-
-.publish-button .van-icon {
-  color: white;
-}
-
-/* 调整底部导航样式 */
-:deep(.van-tabbar-item) {
-  color: #7d7e80;
-}
-
-:deep(.van-tabbar-item--active) {
-  color: #1989fa;
-}
-
-:deep(.van-tabbar-item__icon) {
-  font-size: 20px;
-}
-
-:deep(.van-tabbar-item:nth-child(3)) {
-  margin-top: -14px;
-}
-
-:deep(.van-tabbar-item:nth-child(3) .van-tabbar-item__text) {
-  margin-top: 4px;
-}
-
-.product-section {
-  padding: 0 12px;
-  transition: transform 0.3s ease;
-}
-
-.product-list {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.product-card {
-  margin-bottom: 12px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-size: 16px;
-}
-
-.product-tag {
-  margin-right: 4px;
-  margin-bottom: 4px;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.user-name {
-  font-size: 12px;
-  color: #323233;
-}
-
-.publish-time {
-  font-size: 10px;
-  color: #969799;
-  margin-top: 2px;
-}
-
-.product-stats {
-  display: flex;
-  gap: 8px;
-  color: #999;
-  font-size: 12px;
-}
-
-.product-stats span {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.filter-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 99;
-  background-color: #fff;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-:deep(.van-dropdown-menu__bar) {
-  box-shadow: none;
-}
-
-:deep(.van-dropdown-menu__item) {
-  justify-content: center;
-}
-
-:deep(.van-dropdown-menu__title) {
-  font-size: 13px;
-}
-</style>

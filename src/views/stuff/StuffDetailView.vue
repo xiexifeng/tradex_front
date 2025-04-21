@@ -379,91 +379,188 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .stuff-detail {
   min-height: 100vh;
   background-color: #f7f8fa;
   padding-bottom: 100px;
 }
 
+.detail-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  :deep(.van-nav-bar__content) {
+    background: linear-gradient(to right, #1989fa, #39a0ff);
+  }
+  
+  :deep(.van-nav-bar__title) {
+    color: #fff;
+  }
+  
+  :deep(.van-icon) {
+    color: #fff;
+  }
+  
+  :deep(.van-nav-bar__text) {
+    color: #fff;
+  }
+}
+
 .item-swipe {
   height: 300px;
+  background: #fff;
+  
+  :deep(.van-swipe__indicator) {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.6);
+  }
+  
+  :deep(.van-swipe__indicator--active) {
+    width: 12px;
+    background: #fff;
+    border-radius: 3px;
+  }
 }
 
 .info-group {
   margin: 12px;
   border-radius: 12px;
   overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  
+  .item-status {
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+    
+    &.active { background: #e8fff3; color: #07c160; }
+    &.auditing { background: #fff7e8; color: #ff976a; }
+    &.inactive { background: #fef0f0; color: #ee0a24; }
+  }
+  
+  .item-id {
+    font-size: 13px;
+    color: #969799;
+  }
+  
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #323233;
+    padding: 16px;
+    line-height: 1.4;
+  }
+  
+  .tags {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 16px;
+    flex-wrap: wrap;
+    
+    .van-tag {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  }
 }
 
-.status-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.item-status {
-  font-size: 14px;
-  padding: 4px 12px;
+.blockchain-group,
+.desc-group,
+.trade-group {
+  margin: 12px;
   border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #323233;
+    border-bottom: 1px solid #f5f5f5;
+    
+    .van-icon {
+      color: #1989fa;
+    }
+  }
+  
+  .blockchain-info,
+  .trade-info {
+    :deep(.van-cell) {
+      padding: 16px;
+    }
+    
+    :deep(.van-cell::after) {
+      display: none;
+    }
+    
+    :deep(.van-cell__title) {
+      color: #969799;
+      font-size: 14px;
+      width: 100px;
+      flex: none;
+    }
+    
+    :deep(.van-cell__value) {
+      color: #323233;
+      font-size: 14px;
+      text-align: left;
+    }
+    
+    :deep(.van-cell__value--alone) {
+      color: #323233;
+    }
+  }
+  
+  .description {
+    padding: 16px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
 }
 
-.item-status.owned { background: #e8f3ff; color: #1989fa; }
-.item-status.transferring { background: #fff7e8; color: #ff976a; }
-.item-status.rejected { background: #fef0f0; color: #ee0a24; }
-.item-status.available { background: #e8fff3; color: #07c160; }
-.item-status.trading { background: #f0f9eb; color: #67c23a; }
-.item-status.transferred { background: #f4f4f5; color: #909399; }
-.item-status.destroyed { background: #666666; color: #ffffff; }
-
-.status-active { background: #1b983c; color: #ffffff; }
-.status-auditing { background: #d7ea08; color: #ffffff; }
-.status-inactive { background: #f0fef5b6; color: #ee0a24; }
-
-.item-id {
-  font-size: 13px;
-  color: #969799;
-}
-
-/* 其他样式保持与ItemDetailView一致 */
-.title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-  padding: 12px 16px;
-}
-
-.tags {
-  display: flex;
-  gap: 8px;
-  padding: 0 16px 12px;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #323233;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.interaction-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #969799;
+.stats-group {
+  margin: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .interaction-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #969799;
+      font-size: 14px;
+      
+      .van-icon {
+        font-size: 16px;
+      }
+    }
+  }
 }
 
 .bottom-bar {
@@ -476,40 +573,57 @@ export default defineComponent({
   display: flex;
   gap: 12px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  
+  .van-button {
+    flex: 1;
+    height: 40px;
+    font-size: 15px;
+    font-weight: 500;
+    
+    &--primary {
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      border: none;
+      
+      &.van-button--plain {
+        background: #fff;
+        border: 1px solid #1989fa;
+        color: #1989fa;
+      }
+    }
+  }
 }
 
-:deep(.van-button--primary) {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-  border: none;
-}
-
-:deep(.van-button--danger) {
-  background: linear-gradient(to right, #ee0a24, #ff6034);
-  border: none;
-}
-
+// 弹出层样式
 .transfer-popup {
   padding: 24px 16px;
-}
-
-.popup-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 20px;
-}
-
-.submit-button {
-  margin: 24px 16px;
-}
-
-:deep(.van-field__label) {
-  width: 6em !important;
-}
-
-:deep(.van-popup) {
-  max-height: 90%;
-  overflow-y: auto;
+  
+  .popup-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #323233;
+    margin-bottom: 24px;
+  }
+  
+  :deep(.van-field) {
+    padding: 16px 0;
+  }
+  
+  :deep(.van-field__label) {
+    width: 90px;
+    color: #323233;
+  }
+  
+  .submit-button {
+    margin-top: 24px;
+    
+    .van-button {
+      height: 44px;
+      font-size: 16px;
+      font-weight: 500;
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      border: none;
+    }
+  }
 }
 </style> 

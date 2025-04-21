@@ -1,117 +1,251 @@
 <template>
   <div class="publish">
+    <!-- 顶部导航栏 -->
     <van-nav-bar
       title="发布物品"
       left-arrow
       @click-left="onClickLeft"
-      right-text="发布"
-      @click-right="onSubmit"
-    />
+      class="publish-nav"
+    >
+      <template #right>
+        <van-button 
+          type="primary" 
+          size="small" 
+          round 
+          class="publish-btn"
+          @click="onSubmit"
+        >
+          发布
+        </van-button>
+      </template>
+    </van-nav-bar>
 
-    <div class="publish-form">
+    <div class="publish-content">
       <van-form @submit="onSubmit" :show-error=true ref="formRef">
-        <!-- 物品名称 -->
-        <van-field
-          v-model="formData.name"
-          name="name"
-          label="物品名称"
-          placeholder="请输入物品名称(1-50字)"
-          :rules="[
-            { required: true, message: '请填写物品名称' }
-          ]"
-        />
-
-        <!-- 物品类型 -->
-        <van-field
-          v-model="formData.clazzText"
-          is-link
-          readonly
-          name="clazz"
-          label="物品类型"
-          placeholder="请选择物品类型"
-          @click="showTypePopup = true"
-          :rules="[{ required: true, message: '请选择物品类型' }]"
-        />
-        <van-popup v-model:show="showTypePopup" position="bottom">
-          <van-picker
-            :columns="columns"
-            @confirm="onConfirm"
-            @cancel="showTypePopup = false"
-            show-toolbar
-            title="选择物品类型"
+        <!-- 图片上传区域 -->
+        <div class="upload-card">
+          <div class="section-title">
+            <van-icon name="photo-o" />
+            <span>物品图片</span>
+            <span class="subtitle">（最多5张）</span>
+          </div>
+          <van-uploader
+            v-model="formData.images"
+            :max-count="5"
+            :after-read="afterRead"
+            multiple
+            :rules="[{ required: true, message: '请上传至少1张图片' }]"
+            upload-text="上传图片"
+            class="custom-uploader"
           />
-        </van-popup>
-
-        <!-- 物品描述 -->
-        <van-field
-          v-model="formData.description"
-          name="description"
-          label="物品描述"
-          type="textarea"
-          rows="3"
-          autosize
-          placeholder="请描述物品的详细信息(1-200字)"
-          :rules="[
-            { required: true, message: '请填写物品描述' }
-          ]"
-        />
-
-        <!-- 物品图片 -->
-        <div class="upload-images">
-          <van-field name="images" label="物品图片">
-            <template #input>
-              <van-uploader
-                v-model="formData.images"
-                :max-count="5"
-                :after-read="afterRead"
-                multiple
-                :rules="[
-                  { required: true, message: '请上传至少1张图片' },
-                ]"
-              />
-            </template>
-          </van-field>
         </div>
 
-        <!-- 物品原始价值 -->
-        <!-- <van-field
-          v-model="formData.originalPrice"
-          type="digit"
-          name="originalPrice"
-          label="原始价值"
-          placeholder="请输入物品原始价值(选填)"
-          :rules="[
-            { pattern: /^\d+(\.\d{1,2})?$/, message: '请输入有效的价格' },
-            { validator: validatePrice, message: '价格范围0-999999' }
-          ]"
-        /> -->
-
-        <!-- 物品折旧程度 -->
-        <van-field
-          v-model="formData.depreciation"
-          type="number"
-          name="depreciation"
-          label="折旧程度"
-        >
-          <template #input>
-            <van-rate 
-              v-model="formData.depreciation"
-              :count="10"
-              color="#ffd21e"
-              void-icon="star"
-              void-color="#eee"
+        <!-- 基本信息卡片 -->
+        <div class="info-card">
+          <div class="section-title">
+            <van-icon name="description" />
+            <span>基本信息</span>
+          </div>
+          
+          <van-cell-group inset class="form-group">
+            <van-field
+              v-model="formData.name"
+              name="name"
+              label="物品名称"
+              placeholder="请输入物品名称(1-50字)"
+              :rules="[{ required: true, message: '请填写物品名称' }]"
             />
-          </template>
-        </van-field>
-        <div class="submit-btn">
-          <van-button round block type="primary" native-type="submit">
-            发布
-          </van-button>
+
+            <van-field
+              v-model="formData.clazzText"
+              is-link
+              readonly
+              name="clazz"
+              label="物品类型"
+              placeholder="请选择物品类型"
+              @click="showTypePopup = true"
+              :rules="[{ required: true, message: '请选择物品类型' }]"
+            />
+
+            <van-field
+              v-model="formData.description"
+              name="description"
+              label="物品描述"
+              type="textarea"
+              rows="3"
+              autosize
+              placeholder="请描述物品的详细信息(1-200字)"
+              :rules="[{ required: true, message: '请填写物品描述' }]"
+            />
+
+            <div class="depreciation-field">
+              <span class="field-label">折旧程度</span>
+              <van-rate 
+                v-model="formData.depreciation"
+                :count="10"
+                color="#ffd21e"
+                void-icon="star"
+                void-color="#eee"
+              />
+              <span class="rate-text">{{ formData.depreciation }}成新</span>
+            </div>
+          </van-cell-group>
         </div>
       </van-form>
     </div>
+
+    <!-- 物品类型选择弹出层 -->
+    <van-popup v-model:show="showTypePopup" position="bottom" round>
+      <van-picker
+        :columns="columns"
+        @confirm="onConfirm"
+        @cancel="showTypePopup = false"
+        show-toolbar
+        title="选择物品类型"
+      />
+    </van-popup>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.publish {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-bottom: 32px;
+}
+
+.publish-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  :deep(.van-nav-bar__content) {
+    background: linear-gradient(to right, #1989fa, #39a0ff);
+    
+    .van-nav-bar__title,
+    .van-icon {
+      color: #fff;
+    }
+    
+    .van-nav-bar__left .van-icon {
+      color: #fff;
+    }
+  }
+  
+  .publish-btn {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    
+    &:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.publish-content {
+  padding: 16px;
+}
+
+.upload-card,
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #323233;
+  
+  .van-icon {
+    color: #1989fa;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+    color: #969799;
+    font-weight: normal;
+  }
+}
+
+.custom-uploader {
+  :deep(.van-uploader__wrapper) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  :deep(.van-uploader__upload) {
+    margin: 0;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    
+    &:active {
+      background-color: #e8e8e8;
+    }
+  }
+  
+  :deep(.van-uploader__preview) {
+    margin: 0;
+    
+    .van-uploader__preview-image {
+      border-radius: 8px;
+    }
+  }
+}
+
+.form-group {
+  background: transparent;
+  
+  :deep(.van-cell) {
+    padding: 16px 0;
+    background: transparent;
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    &::after {
+      display: none;
+    }
+  }
+  
+  :deep(.van-field__label) {
+    width: 6em;
+    color: #323233;
+  }
+}
+
+.depreciation-field {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  
+  .field-label {
+    width: 6em;
+    color: #323233;
+  }
+  
+  :deep(.van-rate) {
+    margin: 0 8px;
+  }
+  
+  .rate-text {
+    font-size: 14px;
+    color: #969799;
+  }
+}
+</style>
 
 <script lang="ts">
 import { defineComponent, ref, reactive, onMounted } from 'vue'
@@ -229,35 +363,4 @@ export default defineComponent({
     }
   }
 })
-</script>
-
-<style scoped>
-.publish {
-  min-height: 100vh;
-  background-color: #f7f8fa;
-}
-
-.publish-form {
-  padding: 12px;
-}
-
-.upload-images {
-  padding: 16px 0;
-}
-
-:deep(.van-field__label) {
-  width: 6em !important;
-}
-
-:deep(.van-uploader) {
-  padding: 10px 0;
-}
-
-:deep(.van-uploader__upload) {
-  background-color: #ffffff;
-}
-
-:deep(.van-rate) {
-  margin: 5px 0;
-}
-</style> 
+</script> 

@@ -74,16 +74,16 @@
               </div>
 
               <div class="trade-footer">
-                <van-button size="small" type="primary" plain hairline @click="viewDetail(trade)">
+                <van-button size="small" type="primary" @click="viewDetail(trade)">
                   查看详情
                 </van-button>
                 <template v-if="trade.tradeStatus === 'trading'">
                   <template v-if="trade.fromUserId === userInfo.userId && trade.tradeMethod === '以物换物'">
                     <van-button size="small" type="primary" @click="acceptTrade(trade)">接受交易</van-button>
-                    <van-button size="small" type="danger" plain hairline @click="rejectTrade(trade)">拒绝交易</van-button>
+                    <van-button size="small" type="danger" @click="rejectTrade(trade)">拒绝交易</van-button>
                   </template>
                   <template v-if="trade.fromUserId !== userInfo.userId">
-                    <van-button size="small" type="danger" plain hairline @click="cancelTrade(trade)">取消交易</van-button>
+                    <van-button size="small" type="danger" @click="cancelTrade(trade)">取消交易</van-button>
                     <template v-if="trade.tradeMethod !== '以物换物'">
                       <van-button size="small" type="primary" @click="goPayTrade(trade)">去支付</van-button>
                     </template>
@@ -92,7 +92,7 @@
                 <template v-if="trade.tradeStatus === 'accepted'">
                   <van-button size="small" type="success" @click="confirmTrade(trade)">确认交易</van-button>
                   <template v-if="trade.fromUserId !== userInfo.userId && trade.tradeMethod !== '以物换物'">
-                    <van-button size="small" type="warning" plain hairline @click="refundTrade(trade)">发起退款</van-button>
+                    <van-button size="small" type="warning" @click="refundTrade(trade)">发起退款</van-button>
                   </template>
                 </template>
               </div>
@@ -534,207 +534,481 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+// 工具 mixins - 必须放在最前面
+@mixin text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .trade-list {
   min-height: 100vh;
   background-color: #f7f8fa;
   padding-bottom: 50px;
 }
 
+// 导航栏样式优化
 .nav-bar {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-}
-
-:deep(.nav-bar .van-nav-bar__title) {
-  color: #fff;
-}
-
-:deep(.nav-bar .van-icon) {
-  color: #fff;
-}
-
-.trade-tabs {
   position: sticky;
   top: 0;
-  z-index: 99;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  
+  :deep(.van-nav-bar__content) {
+    background: linear-gradient(to right, #1989fa, #39a0ff);
+  }
+  
+  :deep(.van-nav-bar__title) {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  :deep(.van-icon) {
+    color: #fff;
+  }
 }
 
+// 标签页样式优化
+.trade-tabs {
+  position: sticky;
+  top: 46px;
+  z-index: 99;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  
+  :deep(.van-tabs__wrap) {
+    padding: 0 12px;
+    height: 48px;
+    
+    .van-tabs__nav {
+      background: transparent;
+      padding: 6px 0;
+      
+      &::before {
+        display: none;
+      }
+    }
+    
+    .van-tab {
+      flex: none;
+      min-width: 66px;
+      padding: 0 12px;
+      font-size: 14px;
+      color: #666;
+      line-height: 36px;
+      transition: all 0.3s ease;
+      position: relative;
+      
+      &--active {
+        color: #1989fa;
+        font-weight: 500;
+        transform: scale(1.05);
+      }
+      
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 12px;
+        background: #ebedf0;
+        opacity: 0.6;
+      }
+    }
+    
+    .van-tabs__line {
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      height: 3px;
+      border-radius: 3px;
+      bottom: 8px;
+      transition: all 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+  }
+  
+  :deep(.van-tabs__content) {
+    .van-tab__pane {
+      animation: fadeIn 0.3s ease-out;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.8;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 列表内容区域
 .trade-list-content {
   padding: 12px;
 }
 
+// 交易卡片样式优化
 .trade-item {
   margin-bottom: 12px;
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+  
+  &:active {
+    transform: scale(0.99);
+  }
+  
+  // 卡片头部
+  .trade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f5f5f5;
+    
+    .trade-status {
+      font-size: 14px;
+      font-weight: 500;
+      
+      &.trading { 
+        color: #1989fa;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #1989fa;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+      &.accepted { 
+        color: #07c160;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #07c160;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+      &.completed { 
+        color: #ff976a;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #ff976a;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+      &.cancelled { 
+        color: #969799;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #969799;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+      &.rejected { 
+        color: #ee0a24;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #ee0a24;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+      &.refunded { 
+        color: #7232dd;
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #7232dd;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+    }
+    
+    .trade-type {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 500;
+      
+      &.sell {
+        color: #ee0a24;
+        background: rgba(238, 10, 36, 0.1);
+      }
+      
+      &.buy {
+        color: #07c160;
+        background: rgba(7, 193, 96, 0.1);
+      }
+    }
+  }
+  
+  // 卡片内容
+  .trade-content {
+    display: flex;
+    padding: 16px;
+    
+    .trade-image {
+      width: 90px;
+      height: 90px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-right: 12px;
+      flex-shrink: 0;
+      
+      :deep(img) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .trade-info {
+      flex: 1;
+      min-width: 0;
+      
+      .trade-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #323233;
+        margin-bottom: 8px;
+        @include text-ellipsis;
+      }
+      
+      .trade-id {
+        font-size: 12px;
+        color: #969799;
+        margin-bottom: 8px;
+      }
+      
+      .trade-price {
+        margin-bottom: 12px;
+        
+        .label {
+          font-size: 13px;
+          color: #969799;
+        }
+        
+        .value {
+          font-size: 16px;
+          color: #ee0a24;
+          font-weight: 500;
+          margin-left: 4px;
+        }
+      }
+      
+      .trade-score {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        
+        .score-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          .label {
+            font-size: 12px;
+            color: #969799;
+          }
+          
+          :deep(.van-rate) {
+            display: inline-flex;
+            
+            .van-icon {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // 卡片底部
+  .trade-footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #f5f5f5;
+    justify-content: flex-end;
+    
+    :deep(.van-button) {
+      height: 32px;
+      padding: 0 16px;
+      font-size: 13px;
+      border-radius: 16px;
+      
+      // 移除默认边框样式
+      &::before {
+        display: none;
+      }
+    }
+    
+    // 主要按钮样式
+    :deep(.van-button--primary) {
+      &.van-button--plain {
+        background: rgba(25, 137, 250, 0.05);
+        border: 1px solid #1989fa;
+        color: #1989fa;
+        
+        &:active {
+          background: rgba(25, 137, 250, 0.1);
+        }
+      }
+      
+      &:not(.van-button--plain) {
+        background: linear-gradient(to right, #1989fa, #39a0ff);
+        border: none;
+        color: #fff;
+      }
+    }
+    
+    // 危险按钮样式
+    :deep(.van-button--danger) {
+      &.van-button--plain {
+        background: rgba(238, 10, 36, 0.05);
+        border: 1px solid #ee0a24;
+        color: #ee0a24;
+        
+        &:active {
+          background: rgba(238, 10, 36, 0.1);
+        }
+      }
+      
+      &:not(.van-button--plain) {
+        background: linear-gradient(to right, #ff6034, #ee0a24);
+        border: none;
+        color: #fff;
+      }
+    }
+    
+    // 警告按钮样式
+    :deep(.van-button--warning) {
+      &.van-button--plain {
+        background: rgba(255, 151, 106, 0.05);
+        border: 1px solid #ff976a;
+        color: #ff976a;
+        
+        &:active {
+          background: rgba(255, 151, 106, 0.1);
+        }
+      }
+      
+      &:not(.van-button--plain) {
+        background: linear-gradient(to right, #ffa666, #ff976a);
+        border: none;
+        color: #fff;
+      }
+    }
+    
+    // 成功按钮样式
+    :deep(.van-button--success) {
+      background: linear-gradient(to right, #07c160, #06ae56);
+      border: none;
+      color: #fff;
+      
+      &:active {
+        opacity: 0.9;
+      }
+    }
+  }
 }
 
-.trade-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #f5f5f5;
+// 下拉刷新和加载更多
+:deep(.van-pull-refresh),
+:deep(.van-list) {
+  min-height: calc(100vh - 100px);
+  background: transparent;
+  
+  .van-pull-refresh__track {
+    background: transparent;
+  }
+  
+  .van-list__loading,
+  .van-list__finished-text,
+  .van-pull-refresh__loading,
+  .van-pull-refresh__success-text {
+    color: #969799;
+    font-size: 13px;
+    padding: 16px 0;
+  }
 }
 
-.trade-status {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.trade-status.trading { color: #1989fa; }
-.trade-status.accepted { color: #07c160; }
-.trade-status.completed { color: #ff976a; }
-.trade-status.cancelled { color: #969799; }
-.trade-status.rejected { color: #ee0a24; }
-.trade-status.refunded { color: #7232dd; }
-
-.trade-type {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.trade-type.sell {
-  color: #ee0a24;
-  background: #fff1f0;
-}
-
-.trade-type.buy {
-  color: #07c160;
-  background: #f0fff3;
-}
-
-.trade-content {
-  display: flex;
-  padding: 12px;
-}
-
-.trade-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  margin-right: 12px;
-}
-
-.trade-info {
-  flex: 1;
-}
-
-.trade-title {
-  font-size: 15px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 4px;
-}
-
-.trade-id {
-  font-size: 12px;
-  color: #969799;
-  margin-bottom: 8px;
-}
-
-.trade-price {
-  margin-bottom: 8px;
-}
-
-.trade-price .label {
-  font-size: 13px;
-  color: #969799;
-}
-
-.trade-price .value {
-  font-size: 15px;
-  color: #ee0a24;
-  font-weight: 500;
-}
-
-.trade-score {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.score-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.score-item .label {
-  font-size: 12px;
-  color: #969799;
-}
-
-.trade-footer {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  border-top: 1px solid #f5f5f5;
-  justify-content: flex-end;
-}
-
-:deep(.van-button--small) {
-  padding: 0 16px;
-  height: 32px;
-  font-size: 13px;
-}
-
-:deep(.van-button--primary) {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-  border: none;
-}
-
-:deep(.van-button--success) {
-  background: linear-gradient(to right, #07c160, #06ae56);
-  border: none;
-}
-
-:deep(.van-rate) {
-  display: inline-flex;
-}
-
-.bottom-space {
-  height: 50px;
-}
+// 底部导航栏
 .publish-button {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #1989fa, #0066ff);
+  background: linear-gradient(135deg, #1989fa, #39a0ff);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 4px;
   box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
+  
+  .van-icon {
+    color: white;
+  }
 }
 
-.publish-button .van-icon {
-  color: white;
+:deep(.van-tabbar) {
+  border-top: 1px solid #f5f5f5;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  
+  .van-tabbar-item {
+    color: #7d7e80;
+    
+    &--active {
+      color: #1989fa;
+    }
+    
+    &__icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    
+    &:nth-child(3) {
+      margin-top: -14px;
+    }
+    
+    &:nth-child(3) .van-tabbar-item__text {
+      margin-top: 4px;
+    }
+  }
 }
 
-/* 调整底部导航样式 */
-:deep(.van-tabbar-item) {
-  color: #7d7e80;
+.bottom-space {
+  height: 50px;
 }
-
-:deep(.van-tabbar-item--active) {
-  color: #1989fa;
-}
-
-:deep(.van-tabbar-item__icon) {
-  font-size: 20px;
-}
-
-:deep(.van-tabbar-item:nth-child(3)) {
-  margin-top: -14px;
-}
-
-:deep(.van-tabbar-item:nth-child(3) .van-tabbar-item__text) {
-  margin-top: 4px;
-}
-
 </style> 

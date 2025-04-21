@@ -1,144 +1,212 @@
 <template>
-  <div class="item-detail">
-    <van-nav-bar
-      title="物品详情"
-      left-arrow
-      @click-left="onClickLeft"
-      class="detail-nav"
-    />
-    
-    <!-- 图片轮播 -->
-    <van-swipe class="item-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item v-for="(image, index) in itemDetail.itemImageList" :key="index">
-        <van-image :src="image" fit="cover" width="100%" height="100%" />
-      </van-swipe-item>
-    </van-swipe>
+  <div class="page-container">
+    <!-- 顶部区域（导航栏+轮播）整合为一个视觉区块 -->
+    <div class="header-section">
+      <van-nav-bar
+        title="物品详情"
+        left-arrow
+        @click-left="onClickLeft"
+        class="detail-nav"
+      >
+        <template #right>
+          <van-icon name="share-o" size="20" class="nav-icon" @click="share"/>
+        </template>
+      </van-nav-bar>
 
-    <!-- 基本信息 -->
-    <van-cell-group inset class="info-group">
-      <div class="price-row">
-        <template v-if="itemDetail.tradeMethod === '人民币'">
-          <span class="price">¥{{ itemDetail.transferPrice }}</span>
-        </template>
-        <template v-else-if="itemDetail.tradeMethod === '积分'">
-          <span class="price">{{ itemDetail.transferPoints }}积分</span>
-        </template>
-        <template v-else>
-          <span class="price">期望物品：{{ itemDetail.expectItem }}</span>
-        </template>
-        <van-tag round type="warning" size="medium">{{ itemDetail.tradeMethod }}</van-tag>
+      <div class="swipe-container">
+        <van-swipe class="item-swipe" :autoplay="3000">
+          <van-swipe-item v-for="(image, index) in itemDetail.itemImageList" :key="index">
+            <van-image :src="image" fit="cover" width="100%" height="100%" />
+          </van-swipe-item>
+          <template #indicator="{ active, total }">
+            <div class="custom-indicator">
+              <van-icon name="photograph" class="indicator-icon" />
+              <span>{{ active + 1 }}/{{ total }}</span>
+            </div>
+          </template>
+        </van-swipe>
       </div>
-      <div class="title">{{ itemDetail.itemTitle }}</div>
-      <div class="tags">
-        <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
-        <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
-        <van-tag round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
-      </div>
-    </van-cell-group>
+    </div>
 
-     <!-- 卖家信息 -->
-     <van-cell-group inset class="seller-group">
+    <!-- 主要内容区 -->
+    <div class="content-section">
+      <!-- 价格和交易方式突出显示 -->
+      <div class="price-card">
+        <div class="price-main">
+          <template v-if="itemDetail.tradeMethod === '人民币'">
+            <span class="currency">¥</span>
+            <span class="amount">{{ itemDetail.transferPrice }}</span>
+          </template>
+          <template v-else-if="itemDetail.tradeMethod === '积分'">
+            <span class="amount">{{ itemDetail.transferPoints }}</span>
+            <span class="unit">积分</span>
+          </template>
+          <template v-else>
+            <div class="exchange-info">
+              <span class="exchange-label">期望交换</span>
+              <span class="exchange-target">{{ itemDetail.expectItem }}</span>
+            </div>
+          </template>
+        </div>
+        <van-tag 
+          round 
+          :type="getTradeMethodType(itemDetail.tradeMethod)" 
+          size="medium"
+          class="trade-method-tag"
+        >
+          {{ itemDetail.tradeMethod }}
+        </van-tag>
+      </div>
+
+      <!-- 商品基本信息卡片 -->
+      <div class="info-card">
+        <h1 class="title">{{ itemDetail.itemTitle }}</h1>
+        <div class="blockchain-info">
+          <van-icon name="certificate" />
+          <span class="blockchain-label">区块链ID：</span>
+          <span class="blockchain-value">{{ itemDetail.blockchainId }}</span>
+        </div>
+        <div class="tags-row">
+          <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
+          <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
+          <van-tag round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
+        </div>
+        <div class="item-stats">
+          <div class="stat-box">
+            <van-icon name="eye-o" />
+            <span class="stat-value">{{ itemDetail.viewCount }}</span>
+            <span class="stat-label">浏览</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="like-o" />
+            <span class="stat-value">{{ itemDetail.loveCount }}</span>
+            <span class="stat-label">点赞</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="star-o" />
+            <span class="stat-value">{{ itemDetail.collectionCount }}</span>
+            <span class="stat-label">收藏</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="exchange" />
+            <span class="stat-value">{{ itemDetail.transferTimes }}</span>
+            <span class="stat-label">转让</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卖家信息卡片改版 -->
       <div class="seller-card">
-        <div class="seller-info">
-          <van-image
-            round
-            width="50"
-            height="50"
-            :src="itemDetail.avatarUrl"
-          />
-          <div class="seller-details">
-            <div class="seller-name">{{ itemDetail.nickname }}</div>
+        <div class="seller-main">
+          <div class="seller-avatar">
+            <van-image
+              round
+              width="60"
+              height="60"
+              :src="itemDetail.avatarUrl"
+            />
+            <div class="seller-badge">
+              <van-icon name="shield-o" />
+            </div>
+          </div>
+          <div class="seller-info">
+            <div class="seller-name-row">
+              <span class="seller-name">{{ itemDetail.nickname }}</span>
+              <van-tag type="primary" size="small" plain>认证用户</van-tag>
+            </div>
             <div class="seller-score">
               <van-rate v-model="itemDetail.userDetail.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
-              <span>{{ itemDetail.userDetail.tradeScore }}分</span>
+              <span class="score-text">{{ itemDetail.userDetail.tradeScore }}分</span>
+            </div>
+            <div class="blockchain-id">
+              <van-icon name="certificate" />
+              <span>区块链ID: {{ itemDetail.userDetail.blockchainId }}</span>
             </div>
           </div>
         </div>
-        <div class="seller-blockchain">
-          <van-icon name="shield-o" />
-          <span class="blockchain-id">区块链ID: {{ itemDetail.userDetail.blockchainId }}</span>
+        <van-button 
+          round 
+          type="primary" 
+          plain 
+          icon="chat-o" 
+          class="contact-button"
+          @click="contactSeller"
+        >
+          联系卖家
+        </van-button>
+      </div>
+
+      <!-- 商品描述卡片 -->
+      <div class="desc-card">
+        <div class="section-title">
+          <van-icon name="description" />
+          <span>商品描述</span>
+        </div>
+        <div class="description-content">
+          {{ itemDetail.itemDescription }}
         </div>
       </div>
-    </van-cell-group>
 
-    <!-- 物品描述 -->
-    <van-cell-group inset class="desc-group">
-      <div class="section-title">
-        <van-icon name="description" />
-        <span>物品描述</span>
-      </div>
-      <div class="description">{{ itemDetail.itemDescription }}</div>
-    </van-cell-group>
-
-    <!-- 交易信息 -->
-    <van-cell-group inset class="trade-group">
-      <div class="section-title">
-        <van-icon name="transaction" />
-        <span>交易信息</span>
-      </div>
-      <div class="trade-info">
-        <van-cell title="联系人" :value="itemDetail.contactInfo.linkman" />
-        <van-cell title="联系电话" :value="itemDetail.contactInfo.phone" />
-        <van-cell title="交付方式" :value="itemDetail.deliveryMethod" />
-        <van-cell title="交付地址" :value="itemDetail.contactInfo.address" />
-        <van-cell title="物品区块链ID" :value="itemDetail.blockchainId" />
-        <van-cell title="物品转让次数" :value="itemDetail.transferTimes + '次'" />
-        <div class="interaction-stats">
-          <div class="stat-item">
-            <van-icon name="eye-o" />
-            <span>{{ itemDetail.viewCount }}</span>
+      <!-- 交易信息卡片 -->
+      <div class="trade-card">
+        <div class="section-title">
+          <van-icon name="transaction" />
+          <span>交易信息</span>
+        </div>
+        <div class="trade-grid">
+          <div class="trade-item">
+            <span class="item-label">联系人</span>
+            <span class="item-value">{{ itemDetail.contactInfo.linkman }}</span>
           </div>
-          <div class="stat-item">
-            <van-icon name="like-o" />
-            <span>{{ itemDetail.loveCount }}</span>
+          <div class="trade-item">
+            <span class="item-label">联系电话</span>
+            <span class="item-value">{{ itemDetail.contactInfo.phone }}</span>
           </div>
-          <div class="stat-item">
-            <van-icon name="star-o" />
-            <span>{{ itemDetail.collectionCount }}</span>
+          <div class="trade-item">
+            <span class="item-label">交付方式</span>
+            <span class="item-value">{{ itemDetail.deliveryMethod }}</span>
+          </div>
+          <div class="trade-item">
+            <span class="item-label">交付地址</span>
+            <span class="item-value">{{ itemDetail.contactInfo.address }}</span>
           </div>
         </div>
       </div>
-    </van-cell-group>
+    </div>
 
-    <!-- 底部操作栏 -->
+    <!-- 底部操作栏改版 -->
     <div class="bottom-bar">
-      <div class="action-icons">
+      <div class="action-group">
         <div class="action-item" @click="toggleLike">
-          <van-icon :name="isLiked ? 'like' : 'like-o'" :class="{ active: isLiked }" />
-          <span>点赞</span>
+          <div class="action-icon" :class="{ active: isLiked }">
+            <van-icon :name="isLiked ? 'like' : 'like-o'" />
+          </div>
+          <span>{{ isLiked ? '已点赞' : '点赞' }}</span>
         </div>
         <div class="action-item" @click="toggleCollect">
-          <van-icon :name="isCollected ? 'star' : 'star-o'" :class="{ active: isCollected }" />
-          <span>收藏</span>
-        </div>
-        <div class="action-item" @click="share">
-          <van-icon name="share-o" />
-          <span>分享</span>
+          <div class="action-icon" :class="{ active: isCollected }">
+            <van-icon :name="isCollected ? 'star' : 'star-o'" />
+          </div>
+          <span>{{ isCollected ? '已收藏' : '收藏' }}</span>
         </div>
       </div>
       <div class="button-group">
         <van-button 
-          v-if="itemDetail.tradeMethod !== '以物换物'"
           type="primary" 
-          round
+          round 
           block 
-          @click="buy"
+          :loading="isSubmitting"
+          @click="itemDetail.tradeMethod === '以物换物' ? exchange() : buy()"
         >
-          立即购买
-        </van-button>
-        <van-button 
-          v-else
-          type="primary" 
-          round
-          block 
-          @click="exchange"
-        >
-          发起交换
+          <template #icon>
+            <van-icon :name="itemDetail.tradeMethod === '以物换物' ? 'exchange' : 'cash-back-record'" />
+          </template>
+          {{ itemDetail.tradeMethod === '以物换物' ? '发起交换' : '立即购买' }}
         </van-button>
       </div>
     </div>
 
-    <!-- 交换申请弹出层 -->
+    <!-- 交换表单弹出层 -->
     <van-popup
       v-model:show="showExchangeForm"
       position="bottom"
@@ -454,6 +522,16 @@ export default defineComponent({
       showExchangeForm.value = false
     }
 
+    // 添加交易方式类型判断方法
+    const getTradeMethodType = (method: string) => {
+      switch (method) {
+        case '人民币': return 'danger'
+        case '积分': return 'warning'
+        case '以物换物': return 'primary'
+        default: return 'default'
+      }
+    }
+
     return {
       itemDetail,
       isLiked,
@@ -474,147 +552,358 @@ export default defineComponent({
       myItemColumns,
       onItemTypeConfirm,
       onItemConfirm,
-      onExchangeSubmit
+      onExchangeSubmit,
+      getTradeMethodType,
+      isSubmitting: ref(false)
     }
   }
 })
 </script>
 
-<style scoped>
-.item-detail {
+<style lang="scss" scoped>
+.page-container {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background-color: #f8f9fa;
   padding-bottom: 60px;
 }
 
-.detail-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: transparent;
+.header-section {
+  position: relative;
+  height: 420px;
+  background: #000;
+  
+  .detail-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    
+    :deep(.van-nav-bar__content) {
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      
+      .van-nav-bar__title,
+      .van-icon {
+        color: #fff;
+      }
+    }
+  }
+
+  .swipe-container {
+    height: 100%;
+    
+    .item-swipe {
+      height: 100%;
+      
+      :deep(.van-image) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .custom-indicator {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      .indicator-icon {
+        font-size: 16px;
+      }
+    }
+  }
 }
 
-.item-swipe {
-  height: 375px;
-  margin-top: -46px;
-}
-
-.info-group {
-  margin: 12px;
+.content-section {
+  margin-top: -20px;
+  position: relative;
+  z-index: 1;
+  border-radius: 20px 20px 0 0;
+  background: #f8f9fa;
   padding: 16px;
-  border-radius: 12px;
 }
 
-.price-row {
+.price-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  
+  .price-main {
+    display: flex;
+    align-items: baseline;
+    
+    .currency {
+      font-size: 20px;
+      color: #ee0a24;
+      margin-right: 2px;
+    }
+    
+    .amount {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ee0a24;
+    }
+    
+    .unit {
+      font-size: 16px;
+      color: #ee0a24;
+      margin-left: 4px;
+    }
+    
+    .exchange-info {
+      .exchange-label {
+        font-size: 14px;
+        color: #969799;
+        margin-right: 8px;
+      }
+      
+      .exchange-target {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1989fa;
+      }
+    }
+  }
+  
+  .trade-method-tag {
+    font-size: 14px;
+    padding: 6px 16px;
+  }
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 12px;
-}
-
-.price {
-  font-size: 28px;
-  font-weight: bold;
-  color: #ee0a24;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #323233;
-  line-height: 1.4;
-}
-
-.tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.seller-group {
-  margin: 12px;
-  border-radius: 12px;
-  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #323233;
+    margin: 0 0 12px;
+    line-height: 1.4;
+  }
+  
+  .blockchain-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    
+    .van-icon {
+      font-size: 16px;
+      color: #1989fa;
+    }
+    
+    .blockchain-label {
+      font-size: 14px;
+      color: #969799;
+    }
+    
+    .blockchain-value {
+      font-size: 14px;
+      color: #1989fa;
+      flex: 1;
+      word-break: break-all;
+    }
+  }
+  
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .item-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f5f5f5;
+    
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      
+      .van-icon {
+        font-size: 20px;
+        color: #1989fa;
+      }
+      
+      .stat-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #323233;
+      }
+      
+      .stat-label {
+        font-size: 12px;
+        color: #969799;
+      }
+    }
+  }
 }
 
 .seller-card {
-  padding: 16px;
-}
-
-.seller-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .seller-main {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    .seller-avatar {
+      position: relative;
+      
+      .seller-badge {
+        position: absolute;
+        right: -4px;
+        bottom: -4px;
+        width: 20px;
+        height: 20px;
+        background: #1989fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .van-icon {
+          color: #fff;
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .seller-info {
+      flex: 1;
+      
+      .seller-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        .seller-name {
+          font-size: 18px;
+          font-weight: bold;
+          color: #323233;
+        }
+      }
+      
+      .seller-score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        .score-text {
+          font-size: 14px;
+          color: #ffd21e;
+        }
+      }
+      
+      .blockchain-id {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #969799;
+        
+        .van-icon {
+          color: #1989fa;
+        }
+      }
+    }
+  }
+  
+  .contact-button {
+    width: 100%;
+    height: 40px;
+  }
 }
 
-.seller-details {
-  flex: 1;
-}
-
-.seller-name {
-  font-size: 16px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 4px;
-}
-
-.seller-score {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #969799;
-  font-size: 12px;
-}
-
-.seller-blockchain {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #969799;
-  font-size: 13px;
-  padding-top: 12px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.desc-group,
-.trade-group {
-  margin: 12px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #323233;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.description {
-  padding: 16px;
-  color: #666;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.interaction-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #969799;
+.desc-card,
+.trade-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #323233;
+    
+    .van-icon {
+      color: #1989fa;
+    }
+  }
+  
+  .description-content {
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  
+  .trade-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    
+    .trade-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+      
+      .item-label {
+        font-size: 13px;
+        color: #969799;
+      }
+      
+      .item-value {
+        font-size: 14px;
+        color: #323233;
+        
+        &.blockchain {
+          color: #1989fa;
+          word-break: break-all;
+        }
+      }
+    }
+  }
 }
 
 .bottom-bar {
@@ -626,81 +915,63 @@ export default defineComponent({
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.action-icons {
-  display: flex;
-  gap: 24px;
-}
-
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #666;
-}
-
-.action-item span {
-  font-size: 12px;
-}
-
-.van-icon {
-  font-size: 24px;
-}
-
-.van-icon.active {
-  color: #ee0a24;
-}
-
-.button-group {
-  flex: 1;
-  margin-left: 16px;
-}
-
-:deep(.van-button--primary) {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-  border: none;
-}
-
-:deep(.van-cell) {
-  padding: 12px 16px;
-}
-
-:deep(.van-tag--medium) {
-  padding: 0 12px;
-  height: 28px;
-  line-height: 26px;
-}
-
-.exchange-popup {
-  padding: 24px 16px;
-}
-
-.popup-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 20px;
-}
-
-.submit-button {
-  margin: 24px 16px;
-}
-
-:deep(.van-popup) {
-  max-height: 90%;
-  overflow-y: auto;
-}
-
-:deep(.van-field__label) {
-  width: 6em !important;
-}
-
-:deep(.van-cell-group) {
-  margin: 0;
+  
+  .action-group {
+    display: flex;
+    gap: 24px;
+  }
+  
+  .action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    .action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f7f8fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      
+      .van-icon {
+        font-size: 24px;
+        color: #666;
+      }
+      
+      &.active {
+        background: #fee;
+        
+        .van-icon {
+          color: #ee0a24;
+        }
+      }
+    }
+    
+    span {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+  
+  .button-group {
+    flex: 1;
+    
+    :deep(.van-button--primary) {
+      background: linear-gradient(to right, #ff6034, #ee0a24);
+      border: none;
+      height: 44px;
+      
+      .van-icon {
+        font-size: 18px;
+        margin-right: 4px;
+      }
+    }
+  }
 }
 </style> 

@@ -1,8 +1,9 @@
 <template>
   <div class="profile">
+    <!-- 顶部导航栏 -->
     <van-nav-bar
       title="我的"
-      class="custom-nav"
+      class="profile-nav"
     >
       <template #left>
         <van-icon name="setting-o" size="20" class="nav-icon" @click="goToSettings"/>
@@ -15,30 +16,35 @@
       </template>
     </van-nav-bar>
 
-    <div class="user-profile">
+    <div class="profile-content">
       <!-- 用户信息卡片 -->
       <div class="user-card">
         <div class="user-header">
-          <van-image
-            round
-            width="80"
-            height="80"
-            :src="user.avatarUrl"
-            class="avatar"
-          />
+          <div class="avatar-wrapper">
+            <van-image
+              round
+              width="80"
+              height="80"
+              :src="user.avatarUrl"
+              class="avatar"
+            />
+            <div class="user-badge">
+              <van-icon name="shield-o" />
+            </div>
+          </div>
           <div class="user-info">
             <div class="nickname">
               {{ user.nickname }}
-              <span :class="['gender-icon', user.gender === '男' ? 'male' : 'female']">
+              <span :class="['gender-tag', user.gender === '男' ? 'male' : 'female']">
                 {{ user.gender === '男' ? '♂' : '♀' }}
               </span>
             </div>
-            <div class="user-id">
-              <span>平台ID: {{ user.userId }}</span>
-              <van-icon name="qr" size="16"/>
+            <div class="user-meta">
+              <span class="user-id">ID: {{ user.userId }}</span>
+              <van-icon name="qr" class="qr-icon"/>
             </div>
             <div class="location">
-              <van-icon name="location-o" size="14"/>
+              <van-icon name="location-o"/>
               <span>{{ user.ipAddress }}</span>
             </div>
           </div>
@@ -56,7 +62,7 @@
         <div class="user-brief">{{ user.brief || '这个人很懒，什么都没写~' }}</div>
       </div>
 
-      <!-- 用户数据统计 -->
+      <!-- 数据统计卡片 -->
       <div class="stats-card">
         <div class="stat-item">
           <span class="stat-value">{{ user.followers }}</span>
@@ -76,129 +82,165 @@
         </div>
       </div>
 
-      <!-- 区块链信息 -->
+      <!-- 区块链信息卡片 -->
       <div class="blockchain-card">
-        <div class="blockchain-header">
-          <van-icon name="shield-o" size="18"/>
+        <div class="section-title">
+          <van-icon name="shield-o"/>
           <span>区块链信息</span>
         </div>
         <div class="blockchain-content">
           <div class="blockchain-item">
-            <span class="label">区块链ID</span>
-            <span class="value">{{ user.blockchainId }}</span>
-          </div>
-          <div class="blockchain-item">
-            <span class="label">信用评分</span>
-            <span class="value score">
-              {{ user.tradeScore }}
-              <van-rate v-model="user.tradeScore" size="12" readonly allow-half void-icon="star" void-color="#eee"/>
-            </span>
+            <div class="blockchain-row">
+              <van-icon name="certificate" class="cert-icon"/>
+              <span class="label">区块链ID</span>
+              <span class="value">{{ user.blockchainId }}</span>
+            </div>
+            <div class="blockchain-row">
+              <van-icon name="star" class="star-icon"/>
+              <span class="label">信用评分</span>
+              <div class="score-wrapper">
+                <span class="score">{{ user.tradeScore }}</span>
+                <van-rate 
+                  v-model="user.tradeScore" 
+                  size="12" 
+                  readonly 
+                  allow-half 
+                  void-icon="star" 
+                  void-color="#eee"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 在区块链信息卡片后添加 -->
-      <van-collapse v-model="activeNames" accordion class="records-collapse">
-        <!-- 综合评分记录 -->
+      <!-- 交易记录卡片 -->
+      <van-collapse v-model="activeNames" accordion class="records-card">
         <van-collapse-item :title="`综合评分：${user.tradeScore}`" name="1">
-          <div class="table-container">
-            <!-- 表头 -->
-            <van-row class="table-row">
-              <van-col span="5" class="table-header">得分</van-col>
-              <van-col span="6" class="table-header">交易项</van-col>
-              <van-col span="12" class="table-header">评分时间</van-col>
-            </van-row>
-            <!-- 表体 -->
-            <van-row v-for="item in transactions" :key="item.tradeId" class="table-row">
-              <van-col span="5" class="table-cell">{{ item.tradeScore }}</van-col>
-              <van-col span="6" class="table-cell">{{ item.tradeRemark }}</van-col>
-              <van-col span="12" class="table-cell">{{ item.scoreTime }}</van-col>
-            </van-row>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <span class="col-score">得分</span>
+              <span class="col-item">交易项</span>
+              <span class="col-time">评分时间</span>
+            </div>
+            <div class="table-body">
+              <div v-for="item in transactions" :key="item.tradeId" class="table-row">
+                <span class="col-score">{{ item.tradeScore }}</span>
+                <span class="col-item">{{ item.tradeRemark }}</span>
+                <span class="col-time">{{ item.scoreTime }}</span>
+              </div>
+            </div>
           </div>
         </van-collapse-item>
 
-        <!-- 积分使用记录 -->
         <van-collapse-item :title="`积分余额：${pointsAccount.pointsBalance}`" name="2">
-          <div class="table-container">
-            <!-- 表头 -->
-            <van-row class="table-row">
-              <van-col span="6" class="table-header">变动</van-col>
-              <van-col span="6" class="table-header">类型</van-col>
-              <van-col span="12" class="table-header">时间</van-col>
-            </van-row>
-            <!-- 表体 -->
-            <van-row v-for="item in usages" :key="item.id" class="table-row">
-              <van-col span="6" class="table-cell" :class="{ 'points-increase': item.pointsChange > 0, 'points-decrease': item.pointsChange < 0 }">
-                {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
-              </van-col>
-              <van-col span="6" class="table-cell">{{ item.transactionType }}</van-col>
-              <van-col span="12" class="table-cell">{{ item.transactionTime }}</van-col>
-            </van-row>
+          <div class="table-wrapper">
+            <div class="table-header">
+              <span class="col-points">变动</span>
+              <span class="col-type">类型</span>
+              <span class="col-time">时间</span>
+            </div>
+            <div class="table-body">
+              <div v-for="item in usages" :key="item.id" class="table-row">
+                <span :class="['col-points', item.pointsChange > 0 ? 'increase' : 'decrease']">
+                  {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
+                </span>
+                <span class="col-type">{{ item.transactionType }}</span>
+                <span class="col-time">{{ item.transactionTime }}</span>
+              </div>
+            </div>
           </div>
         </van-collapse-item>
       </van-collapse>
 
       <!-- 物品管理标签页 -->
-      <van-tabs 
-        v-model:active="activeTab" 
-        sticky 
-        animated
-        swipeable
-        class="items-tabs"
-      >
-        <van-tab 
-          v-for="status in statusList" 
-          :key="status.value" 
-          :title="status.text"
+      <div class="items-section">
+        <van-tabs 
+          v-model:active="activeTab" 
+          sticky 
+          animated
+          swipeable
+          class="custom-tabs"
         >
-          <template v-if="getFilteredItems(status.value).length">
-            <van-card
-              v-for="item in getFilteredItems(status.value)"
-              :key="item.id"
-              :title="item.itemTitle"
-              :thumb="item.firstImage"
-              :tag="item.blockchainId"
-            >
-              <template #desc>
-                <div class="item-info">
-                  <span class="item-id">编号: {{ item.id }}</span>
-                  <span :class="['item-status', `status-${item.transferStatus}`]">
-                    {{ getStatusText(item.transferStatus) }}
-                  </span>
-                  <span :class="['item-status', `status-${item.status}`]">
-                    {{ getItemStatusText(item.status) }}
-                  </span>
-                </div>
-              </template>
-              <template #footer>
-                <div class="action-buttons">
-                  <!-- 根据不同状态显示不同按钮 -->
-                  <template v-if="item.transferStatus === 'owned'">
-                    <van-button v-if="item.status === 'active'" size="small" type="primary" @click="viewStuffDetails(item)">
-                      发起出让
-                    </van-button>
+          <van-tab 
+            v-for="status in statusList" 
+            :key="status.value" 
+            :title="status.text"
+          >
+            <template v-if="getFilteredItems(status.value).length">
+              <div class="items-grid">
+                <van-card
+                  v-for="item in getFilteredItems(status.value)"
+                  :key="item.id"
+                  :title="item.itemTitle"
+                  :thumb="item.firstImage"
+                  class="item-card"
+                >
+                  <template #tags>
+                    <div class="item-tags">
+                      <van-tag round :type="getStatusTagType(item.status)">
+                        {{ getItemStatusText(item.status) }}
+                      </van-tag>
+                      <van-tag round :type="getTransferTagType(item.transferStatus)">
+                        {{ getStatusText(item.transferStatus) }}
+                      </van-tag>
+                    </div>
                   </template>
-                  <template v-if="item.transferStatus === 'transferring'">
-                    <van-button size="small" plain type="primary" @click="cancelTransfer(item)">
-                      取消出让
-                    </van-button>
-                    <van-button size="small" type="primary" @click="viewOffers(item)">
-                      查看报价
-                    </van-button>
+                  <template #desc>
+                    <div class="item-desc">
+                      <span class="item-id">编号: {{ item.id }}</span>
+                      <span class="blockchain-id">{{ item.blockchainId }}</span>
+                    </div>
                   </template>
-                 
-                  <van-button size="small" type="primary" @click="viewStuffDetails(item)">
-                      物品详情
-                  </van-button>
-                </div>
-              </template>
-            </van-card>
-          </template>
-          <template v-else>
-            <van-empty description="暂无物品" />
-          </template>
-        </van-tab>
-      </van-tabs>
+                  <template #footer>
+                    <div class="action-buttons">
+                      <template v-if="item.transferStatus === 'owned'">
+                        <van-button 
+                          v-if="item.status === 'active'" 
+                          size="small" 
+                          type="primary" 
+                          plain
+                          @click="viewStuffDetails(item)"
+                        >
+                          发起出让
+                        </van-button>
+                      </template>
+                      <template v-if="item.transferStatus === 'transferring'">
+                        <van-button 
+                          size="small" 
+                          plain 
+                          type="danger" 
+                          @click="cancelTransfer(item)"
+                        >
+                          取消出让
+                        </van-button>
+                        <van-button 
+                          size="small" 
+                          type="primary" 
+                          @click="viewOffers(item)"
+                        >
+                          查看报价
+                        </van-button>
+                      </template>
+                      <van-button 
+                        size="small" 
+                        type="primary" 
+                        plain
+                        @click="viewStuffDetails(item)"
+                      >
+                        物品详情
+                      </van-button>
+                    </div>
+                  </template>
+                </van-card>
+              </div>
+            </template>
+            <template v-else>
+              <van-empty description="暂无物品" />
+            </template>
+          </van-tab>
+        </van-tabs>
+      </div>
     </div>
   </div>
 
@@ -422,6 +464,26 @@ export default defineComponent({
     const viewStuffDetails = (item: any) => {
       router.push(`/stuff/detail/${item.id}`)
     }
+
+    // 添加标签类型判断方法
+    const getStatusTagType = (status: string) => {
+      const typeMap: Record<string, string> = {
+        active: 'success',
+        auditing: 'warning',
+        inactive: 'danger'
+      }
+      return typeMap[status] || 'default'
+    }
+
+    const getTransferTagType = (status: string) => {
+      const typeMap: Record<string, string> = {
+        owned: 'primary',
+        transferring: 'warning',
+        transferred: 'default'
+      }
+      return typeMap[status] || 'default'
+    }
+
     return {
       onClickLeft,
       openCamera,
@@ -437,6 +499,8 @@ export default defineComponent({
       viewOffers,
       viewStuffDetails,
       getItemStatusText,
+      getStatusTagType,
+      getTransferTagType,
     }
   },
   data() {
@@ -493,225 +557,438 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .profile {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background-color: #f8f9fa;
+  padding-bottom: 50px;
 }
 
-.custom-nav {
-  background: linear-gradient(135deg, #ff6034, #ee0a24);
+.profile-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  :deep(.van-nav-bar__content) {
+    background: linear-gradient(to right, #1989fa, #39a0ff);
+    
+    .van-nav-bar__title,
+    .van-icon {
+      color: #fff;
+    }
+  }
 }
 
-:deep(.van-nav-bar__title) {
-  color: #fff;
-}
-
-.nav-icon {
-  color: #fff;
+.profile-content {
+  padding: 16px;
 }
 
 .user-card {
-  margin: 12px;
-  padding: 20px;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.user-header {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.avatar {
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.user-info {
-  flex: 1;
-  margin-left: 16px;
-}
-
-.nickname {
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.gender-icon {
-  font-size: 14px;
-  padding: 2px 6px;
-  border-radius: 12px;
-}
-
-.gender-icon.male {
-  background: #e8f3ff;
-  color: #1989fa;
-}
-
-.gender-icon.female {
-  background: #ffd8e6;
-  color: #ff2c7d;
-}
-
-.user-id, .location {
-  color: #969799;
-  font-size: 13px;
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.edit-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.user-brief {
-  margin-top: 16px;
-  color: #666;
-  font-size: 14px;
-  line-height: 1.5;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .user-header {
+    display: flex;
+    gap: 16px;
+    position: relative;
+  }
+  
+  .avatar-wrapper {
+    position: relative;
+    
+    .user-badge {
+      position: absolute;
+      right: -4px;
+      bottom: -4px;
+      width: 20px;
+      height: 20px;
+      background: #1989fa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .van-icon {
+        color: #fff;
+        font-size: 12px;
+      }
+    }
+  }
+  
+  .avatar {
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-info {
+    flex: 1;
+    
+    .nickname {
+      font-size: 20px;
+      font-weight: bold;
+      color: #323233;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .gender-tag {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      
+      &.male {
+        background: #e8f3ff;
+        color: #1989fa;
+      }
+      
+      &.female {
+        background: #ffd8e6;
+        color: #ff2c7d;
+      }
+    }
+    
+    .user-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      
+      .user-id {
+        font-size: 14px;
+        color: #969799;
+      }
+      
+      .qr-icon {
+        color: #1989fa;
+      }
+    }
+    
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #969799;
+      font-size: 13px;
+    }
+  }
+  
+  .edit-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  
+  .user-brief {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f5f5f5;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
 }
 
 .stats-card {
-  margin: 12px;
-  padding: 16px;
   background: #fff;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-around;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #323233;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #969799;
+    }
+  }
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #969799;
-}
-
-.blockchain-card {
-  margin: 12px;
+.blockchain-card,
+.records-card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.blockchain-header {
-  padding: 16px;
-  border-bottom: 1px solid #f5f5f5;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #323233;
-  font-size: 16px;
-  font-weight: bold;
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #323233;
+    border-bottom: 1px solid #f5f5f5;
+    
+    .van-icon {
+      color: #1989fa;
+    }
+  }
 }
 
 .blockchain-content {
-  padding: 16px;
+  padding: 20px;
+  
+  .blockchain-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .cert-icon,
+    .star-icon {
+      color: #1989fa;
+      font-size: 16px;
+    }
+    
+    .label {
+      width: 80px;
+      color: #969799;
+      font-size: 14px;
+    }
+    
+    .value {
+      flex: 1;
+      color: #323233;
+      font-size: 14px;
+    }
+    
+    .score-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .score {
+        color: #ffd21e;
+        font-weight: bold;
+      }
+    }
+  }
 }
 
-.blockchain-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+.table-wrapper {
+  .table-header {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px;
+    padding: 12px 16px;
+    background: #f7f8fa;
+    font-size: 13px;
+    color: #323233;
+    font-weight: bold;
+  }
+  
+  .table-body {
+    .table-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 120px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #666;
+      border-bottom: 1px solid #f5f5f5;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+  
+  .increase {
+    color: #07c160;
+  }
+  
+  .decrease {
+    color: #ee0a24;
+  }
 }
 
-.blockchain-item .label {
-  color: #666;
-  font-size: 14px;
+.items-section {
+  margin: 0 -16px;
+  
+  .custom-tabs {
+    :deep(.van-tabs__wrap) {
+      height: 48px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    :deep(.van-tabs__nav) {
+      padding: 6px 0;
+      
+      &::before {
+        display: none;
+      }
+    }
+    
+    :deep(.van-tab) {
+      font-size: 14px;
+      color: #666;
+      line-height: 36px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    :deep(.van-tab--active) {
+      color: #1989fa;
+      font-weight: 500;
+      transform: scale(1.05);
+    }
+    
+    :deep(.van-tabs__line) {
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      height: 3px;
+      border-radius: 3px;
+      bottom: 8px;
+      transition: all 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+  }
 }
 
-.blockchain-item .value {
-  color: #323233;
-  font-size: 14px;
+.items-grid {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  
+  .item-card {
+    margin: 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    
+    :deep(.van-card__header) {
+      position: relative;
+    }
+    
+    :deep(.van-card__thumb) {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    :deep(.van-card__content) {
+      padding-left: 12px;
+    }
+    
+    :deep(.van-card__title) {
+      font-size: 15px;
+      font-weight: bold;
+      color: #323233;
+      margin-bottom: 8px;
+    }
+    
+    .item-tags {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      
+      .van-tag {
+        padding: 2px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+      }
+    }
+    
+    .item-desc {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      
+      .item-id {
+        font-size: 12px;
+        color: #969799;
+        display: flex;
+        align-items: center;
+        
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          background: #969799;
+          border-radius: 50%;
+          margin-right: 6px;
+        }
+      }
+      
+      .blockchain-id {
+        font-size: 12px;
+        color: #1989fa;
+        background: #e8f3ff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        word-break: break-all;
+        display: flex;
+        align-items: center;
+        
+        &::before {
+          content: '区块链ID: ';
+          color: #969799;
+          margin-right: 4px;
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .action-buttons {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      
+      .van-button {
+        height: 28px;
+        padding: 0 12px;
+        
+        &--plain {
+          background: #fff;
+        }
+      }
+    }
+  }
 }
 
-.blockchain-item .score {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.items-tabs {
-  margin-top: 12px;
+// 添加空状态样式
+:deep(.van-empty) {
+  padding: 32px 0;
   background: #fff;
+  border-radius: 12px;
+  margin: 12px;
 }
 
-:deep(.van-tabs__line) {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-}
-
-:deep(.van-tab--active) {
-  color: #ee0a24;
-  font-weight: bold;
-}
-
-/* 保持原有的列表样式 */
-.user-profile {
-  padding: 16px;
-  background-color: #f7f8fa;
-}
-
-.van-empty {
-  margin-top: 16px;
-}
-
-.item-info {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.item-id {
-  color: #969799;
-  font-size: 12px;
-}
-
-.item-status {
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.status-owned { background: #e8f3ff; color: #1989fa; }
-.status-transferring { background: #fff7e8; color: #ff976a; }
-.status-rejected { background: #fef0f0; color: #ee0a24; }
-.status-available { background: #e8fff3; color: #07c160; }
-.status-trading { background: #f0f9eb; color: #67c23a; }
-.status-transferred { background: #ffffff; color: #909399; }
-.status-destroyed { background: #666666; color: #ffffff; }
-
-.status-active { background: #1b983c; color: #ffffff; }
-.status-auditing { background: #d7ea08; color: #ffffff; }
-.status-inactive { background: #f0fef5b6; color: #ee0a24; }
-
-.bottom-space {
-  height: 50px;
-}
 .publish-button {
   width: 44px;
   height: 44px;
@@ -722,83 +999,9 @@ export default defineComponent({
   justify-content: center;
   margin-bottom: 4px;
   box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
-}
-
-.publish-button .van-icon {
-  color: white;
-}
-
-/* 调整底部导航样式 */
-:deep(.van-tabbar-item) {
-  color: #7d7e80;
-}
-
-:deep(.van-tabbar-item--active) {
-  color: #1989fa;
-}
-
-:deep(.van-tabbar-item__icon) {
-  font-size: 20px;
-}
-
-:deep(.van-tabbar-item:nth-child(3)) {
-  margin-top: -14px;
-}
-
-:deep(.van-tabbar-item:nth-child(3) .van-tabbar-item__text) {
-  margin-top: 4px;
-}
-
-.records-collapse {
-  margin: 12px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.table-row {
-  display: flex;
-  width: 100%;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.table-header {
-  background-color: #f7f8fa;
-  font-weight: bold;
-  padding: 12px 8px;
-  font-size: 13px;
-  color: #323233;
-  text-align: center;
-}
-
-.table-cell {
-  padding: 12px 8px;
-  font-size: 13px;
-  color: #666;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.points-increase {
-  color: #07c160;
-}
-
-.points-decrease {
-  color: #ee0a24;
-}
-
-:deep(.van-collapse-item__title) {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-:deep(.van-collapse-item__content) {
-  padding: 0;
+  
+  .van-icon {
+    color: #fff;
+  }
 }
 </style>
