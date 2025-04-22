@@ -78,17 +78,31 @@
               :rules="[{ required: true, message: '请填写物品描述' }]"
             />
 
-            <div class="depreciation-field">
-              <span class="field-label">折旧程度</span>
-              <van-rate 
-                v-model="formData.depreciation"
-                :count="10"
-                color="#ffd21e"
-                void-icon="star"
-                void-color="#eee"
-              />
-              <span class="rate-text">{{ formData.depreciation }}成新</span>
-            </div>
+            <van-field
+              class="depreciation-field"
+              label="折旧程度"
+              name="depreciation"
+              :rules="[{ required: true, message: '请选择折旧程度' }]"
+            >
+              <template #input>
+                <div class="depreciation-input">
+                  <van-slider 
+                    v-model="formData.depreciation" 
+                    :min="1" 
+                    :max="10"
+                    :step="1"
+                    bar-height="4px"
+                    active-color="#07c160"
+                  >
+                    <template #button>
+                      <div class="custom-button">
+                        {{ formData.depreciation }}成新
+                      </div>
+                    </template>
+                  </van-slider>
+                </div>
+              </template>
+            </van-field>
           </van-cell-group>
         </div>
       </van-form>
@@ -133,14 +147,38 @@
   }
   
   .publish-btn {
+    position: relative;
     height: 32px;
     padding: 0 16px;
+    background: linear-gradient(135deg, #29e075, #14dd89);
+    border: none;
+    font-weight: 500;
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(41, 224, 117, 0.3);
+    transition: all 0.3s ease;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background: #ee0a24;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      animation: pulse 2s infinite;
+    }
     
     &:active {
-      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0.95);
+      opacity: 0.9;
+    }
+    
+    :deep(.van-button__content) {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   }
 }
@@ -227,22 +265,65 @@
 }
 
 .depreciation-field {
-  display: flex;
-  align-items: center;
-  padding: 16px 0;
-  
-  .field-label {
+  :deep(.van-field__label) {
     width: 6em;
     color: #323233;
   }
   
-  :deep(.van-rate) {
-    margin: 0 8px;
+  :deep(.van-field__value) {
+    flex: 1;
+    padding: 8px 0;
   }
   
-  .rate-text {
-    font-size: 14px;
-    color: #969799;
+  .depreciation-input {
+    width: 100%;
+    padding: 8px 16px 8px 0;
+    
+    :deep(.van-slider) {
+      margin: 12px 0;
+      
+      .custom-button {
+        position: absolute;
+        top: -30px;
+        transform: translateX(-50%);
+        min-width: 48px;
+        height: 24px;
+        padding: 0 8px;
+        color: #fff;
+        font-size: 12px;
+        line-height: 24px;
+        text-align: center;
+        background-color: #07c160;
+        border-radius: 100px;
+        white-space: nowrap;
+      }
+      
+      .van-slider__bar {
+        background: linear-gradient(to right, #95ec89, #07c160);
+      }
+      
+      .van-slider__button {
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(238, 10, 36, 0.4);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(238, 10, 36, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(238, 10, 36, 0);
   }
 }
 </style>
