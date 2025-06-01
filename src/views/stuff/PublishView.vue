@@ -333,8 +333,7 @@ import { defineComponent, ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showDialog, FormInstance } from 'vant'
 import type { UploaderFileListItem } from 'vant'
-
-
+import { uploadFile, publishItem } from '@/api/stuff'
 
 export default defineComponent({
   name: 'PublishView',
@@ -370,7 +369,6 @@ export default defineComponent({
       router.back()
     }
 
-
     // 选择物品类型
     const onConfirm = (selectedItem:any) => {
       console.log(selectedItem)
@@ -387,43 +385,75 @@ export default defineComponent({
     }
 
     // 处理图片上传
-    const afterRead = (file: UploaderFileListItem | UploaderFileListItem[]) => {
-      // 这里应该调用后端API上传图片
-      console.log('上传图片:', file)
+    const afterRead = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
+      try {
+        if (Array.isArray(file)) {
+          // 多文件上传
+          for (const item of file) {
+            if (item.file) {
+              const res = await uploadFile(item.file);
+              if (res.success && res.data) {
+                item.url = res.data; // 更新图片预览地址
+              }
+            }
+          }
+        } else {
+          // 单文件上传
+          if (file.file) {
+            const res = await uploadFile(file.file);
+            if (res.success && res.data) {
+              file.url = res.data; // 更新图片预览地址
+            }
+          }
+        }
+      } catch (error) {
+        console.error('上传图片失败:', error);
+        showToast('上传图片失败');
+      }
     }
-
 
     // 提交表单
     const onSubmit = async () => {
-      if (!formRef.value) return
-      console.log(formRef.value)
+      if (!formRef.value) return;
+      
       try {
-        await formRef.value.validate()
+        await formRef.value.validate();
 
         if (formData.images.length === 0) {
-          showToast('请至少上传一张图片')
-          return
+          showToast('请至少上传一张图片');
+          return;
         }
+
+        // 确认对话框
         await showDialog({
           title: '确认提交',
           message: '确定要发布吗？',
           showCancelButton: true,
-        })
+        });
         
-        // 这里调用API提交转让申请
-        console.log('提交的数据:', {
-          ...formData
-        })
-        showToast('发布成功')
-        router.back()
+        // 准备提交数据
+        const submitData = {
+          itemTitle: formData.name,
+          itemType: formData.clazzText,
+          itemImageList: formData.images.map(img => img.url || ''),
+          itemDescription: formData.description,
+          depreciation: formData.depreciation
+        };
+
+        // 调用发布接口
+        const res = await publishItem(submitData);
+        
+        if (res.success) {
+          showToast('发布成功');
+          router.back();
+        }
       } catch (error) {
-        console.error('表单验证失败:', error)
+        console.error('发布失败:', error);
         showDialog({
           title: '发布失败',
           message: '请稍后重试'
-        })
+        });
       }
-      
     }
 
     onMounted(() => {

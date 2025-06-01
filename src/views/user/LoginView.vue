@@ -133,7 +133,7 @@ const togglePasswordVisibility = () => {
 };
 
 const onClickLeft = () => {
-  router.back();
+  router.push('/');
 };
 
 // 发送验证码
