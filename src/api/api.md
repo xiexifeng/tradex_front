@@ -155,8 +155,8 @@ curl -X POST http://47.122.125.199/tradex/client/item/publish \
         "firstImage": "https://loremflickr.com/400/400?lock=4083905544130397",
         "itemImageList": null,
         "depreciation": 1,
-        "status": 0,
-        "transferStatus": 0,
+        "status": "auditing",
+        "transferStatus": "own",
         "transferTimes": 0,
         "lastUserId": "2025042300003",
         "blockchainId": null
@@ -164,4 +164,91 @@ curl -X POST http://47.122.125.199/tradex/client/item/publish \
 }
 ```
 
+## 查询我的物品列表
 
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/item/list-mine \
+-H "Content-Type: application/json" \
+-d '
+{
+  "pageNo": 1,
+  "pageSize": 10,
+  "status": 'all',
+  "itemTitle": "iphone"
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": [
+        {
+            "id": "2025052800001",
+            "userId": "2025042300003",
+            "itemTitle": "iphone",
+            "itemType": "voluptate",
+            "itemDescription": "very good",
+            "firstImage": "http://47.122.125.199/tradex/basic/oss/previewFile/601eefec-9737-4717-ac7d-9f2f1f16f8d2.png",
+            "itemImageList": ["http://47.122.125.199/tradex/basic/oss/previewFile/601eefec-9737-4717-ac7d-9f2f1f16f8d2.png"],
+            "depreciation": 1,
+            "status": "auditing",
+            "transferStatus": "own",
+            "transferTimes": 0,
+            "lastUserId": "2025042300003",
+            "blockchainId": "hds9232332222"
+        }
+    ]
+}
+
+```
+
+## 我的物品详情
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/item/detail/{itemId} \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d 'phoneNumbers=17338789999&verifyCode=888999'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+        "id": "2025060100003",
+        "userId": "2025052500001",
+        "itemTitle": "iPhone",
+        "itemType": "电子产品",
+        "itemDescription": null,
+        "firstImage": "http://47.122.125.199/tradex/basic/oss/previewFile/a3904477-858e-4e09-bf5a-78bc204915f7.png",
+        "itemImageList": null,
+        "depreciation": 5,
+        "status": "auditing",
+        "transferStatus": "owned",
+        "transferTimes": 0,
+        "lastUserId": "2025052500001",
+        "blockchainId": null,
+        "loveCount": 0,
+        "collectionCount": 0,
+        "viewCount": 0,
+        "tradeMethod": null,
+        "transferPrice": null,
+        "transferPoints": null,
+        "expectItem": null,
+        "contactInfo": null,
+        "deliveryMethod": null
+    }
+}
+
+```

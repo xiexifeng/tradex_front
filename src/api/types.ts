@@ -31,3 +31,33 @@ export interface LoginResponse {
   username: string;
   userContext: UserInfo;
 }
+
+// 基础物品接口
+export interface Item {
+  id: string;
+  userId: string;
+  itemTitle: string;
+  itemType: string;
+  itemDescription: string;
+  firstImage: string;
+  itemImageList: string[];
+  depreciation: number;
+  status: string;
+  transferStatus: string;
+  transferTimes: number;
+  lastUserId: string;
+  blockchainId: string;
+}
+
+// 物品详情接口，继承自Item
+export interface ItemDetail extends Item {
+  loveCount: number;
+  collectionCount: number;
+  viewCount: number;
+  tradeMethod: string;
+  transferPrice: number;
+  transferPoints: number;
+  expectItem: string;
+  contactInfo: string;
+  deliveryMethod: string;
+}

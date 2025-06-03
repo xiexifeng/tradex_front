@@ -161,83 +161,93 @@
           animated
           swipeable
           class="custom-tabs"
+          @change="onTabChange"
         >
           <van-tab 
             v-for="status in statusList" 
             :key="status.value" 
             :title="status.text"
           >
-            <template v-if="getFilteredItems(status.value).length">
-              <div class="items-grid">
-                <van-card
-                  v-for="item in getFilteredItems(status.value)"
-                  :key="item.id"
-                  :title="item.itemTitle"
-                  :thumb="item.firstImage"
-                  class="item-card"
-                >
-                  <template #tags>
-                    <div class="item-tags">
-                      <van-tag round :type="getStatusTagType(item.status)">
-                        {{ getItemStatusText(item.status) }}
-                      </van-tag>
-                      <van-tag round :type="getTransferTagType(item.transferStatus)">
-                        {{ getStatusText(item.transferStatus) }}
-                      </van-tag>
-                    </div>
-                  </template>
-                  <template #desc>
-                    <div class="item-desc">
-                      <span class="item-id">编号: {{ item.id }}</span>
-                      <span class="blockchain-id">{{ item.blockchainId }}</span>
-                    </div>
-                  </template>
-                  <template #footer>
-                    <div class="action-buttons">
-                      <template v-if="item.transferStatus === 'owned'">
-                        <van-button 
-                          v-if="item.status === 'active'" 
-                          size="small" 
-                          type="primary" 
-                          plain
-                          @click="viewStuffDetails(item)"
-                        >
-                          发起出让
-                        </van-button>
+            <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+              <van-list
+                v-model:loading="loading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="loadItems(status.value)"
+              >
+                <template v-if="getFilteredItems(status.value).length">
+                  <div class="items-grid">
+                    <van-card
+                      v-for="item in getFilteredItems(status.value)"
+                      :key="item.id"
+                      :title="item.itemTitle"
+                      :thumb="item.firstImage"
+                      class="item-card"
+                    >
+                      <template #tags>
+                        <div class="item-tags">
+                          <van-tag round :type="getStatusTagType(item.status)">
+                            {{ getItemStatusText(item.status) }}
+                          </van-tag>
+                          <van-tag round :type="getTransferTagType(item.transferStatus)">
+                            {{ getStatusText(item.transferStatus) }}
+                          </van-tag>
+                        </div>
                       </template>
-                      <template v-if="item.transferStatus === 'transferring'">
-                        <van-button 
-                          size="small" 
-                          plain 
-                          type="danger" 
-                          @click="cancelTransfer(item)"
-                        >
-                          取消出让
-                        </van-button>
-                        <van-button 
-                          size="small" 
-                          type="primary" 
-                          @click="viewOffers(item)"
-                        >
-                          查看报价
-                        </van-button>
+                      <template #desc>
+                        <div class="item-desc">
+                          <span class="item-id">编号: {{ item.id }}</span>
+                          <span class="blockchain-id">{{ item.blockchainId }}</span>
+                        </div>
                       </template>
-                      <van-button 
-                        size="small" 
-                        type="primary" 
-                        plain
-                        @click="viewStuffDetails(item)"
-                      >
-                        物品详情
-                      </van-button>
-                    </div>
-                  </template>
-                </van-card>
-              </div>
-            </template>
-            <template v-else>
-              <van-empty description="暂无物品" />
-            </template>
+                      <template #footer>
+                        <div class="action-buttons">
+                          <template v-if="item.transferStatus === 'own'">
+                            <van-button 
+                              v-if="item.status === 'active'" 
+                              size="small" 
+                              type="primary" 
+                              plain
+                              @click="viewStuffDetails(item)"
+                            >
+                              发起出让
+                            </van-button>
+                          </template>
+                          <template v-if="item.transferStatus === 'transferring'">
+                            <van-button 
+                              size="small" 
+                              plain 
+                              type="danger" 
+                              @click="cancelTransfer(item)"
+                            >
+                              取消出让
+                            </van-button>
+                            <van-button 
+                              size="small" 
+                              type="primary" 
+                              @click="viewOffers(item)"
+                            >
+                              查看报价
+                            </van-button>
+                          </template>
+                          <van-button 
+                            size="small" 
+                            type="primary" 
+                            plain
+                            @click="viewStuffDetails(item)"
+                          >
+                            物品详情
+                          </van-button>
+                        </div>
+                      </template>
+                    </van-card>
+                  </div>
+                </template>
+                <template v-else>
+                  <van-empty description="暂无物品" />
+                </template>
+              </van-list>
+            </van-pull-refresh>
           </van-tab>
         </van-tabs>
       </div>
@@ -272,9 +282,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import {  showDialog, showToast,Collapse, CollapseItem, Col, Row } from 'vant'
+import { defineComponent, ref, onMounted } from 'vue'
+import { showDialog, showToast, Collapse, CollapseItem, Col, Row } from 'vant'
 import { useRouter } from 'vue-router'
+import { getMyItems, getItemDetail } from '@/api/stuff'
+import type { Item } from '@/api/types'
+
 type UserInfo = {
   "userId": string,
   "nickname": string,
@@ -308,98 +321,23 @@ export default defineComponent({
     const onShare = () => {
       showToast('分享')
     }
-    const activeTab = ref(0)
-    const activeNames = ref(['1']); // 默认展开的折叠项
     const router = useRouter()
-    // const activeTab = ref(0)
+    const activeTab = ref(0)
+    const activeNames = ref(['1'])
+    const items = ref<Item[]>([])
+    const loading = ref(false)
+    const finished = ref(false)
+    const refreshing = ref(false)
+    const pageNo = ref(1)
+    const pageSize = ref(10)
 
     // 状态列表
     const statusList = [
       { text: '我的物品', value: 'all' },
-      { text: '拥有', value: 'owned' },
+      { text: '拥有', value: 'own' },
       { text: '转让中', value: 'transferring' },
       { text: '已转让', value: 'transferred' }
     ]
-
-    // 模拟物品数据
-    const items = ref([
-        {
-            "id": "2025032500010",
-            "userId": "20250324000001",
-            "itemTitle": "iphone 18",
-            "itemType": "电子产品",
-            "itemDescription": "刚买2个月，iphone正版",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "itemImageList": null,
-            "depreciation": 9,
-            "status": "active",
-            "transferStatus": "owned",
-            "transferTimes": 0,
-            "lastUserId": "20250324000001",
-            "blockchainId": "Hash0x000002244"
-        },
-        {
-            "id": "2025032500011",
-            "userId": "20250324000001",
-            "itemTitle": "iphone 19",
-            "itemType": "电子产品",
-            "itemDescription": "刚买2个月，iphone正版",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "itemImageList": null,
-            "depreciation": 9,
-            "status": "auditing",
-            "transferStatus": "owned",
-            "transferTimes": 0,
-            "lastUserId": "20250324000001",
-            "blockchainId": "Hash0x000002244"
-        },
-        {
-            "id": "2025032500012",
-            "userId": "20250324000001",
-            "itemTitle": "iphone 19",
-            "itemType": "电子产品",
-            "itemDescription": "刚买2个月，iphone正版",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "itemImageList": null,
-            "depreciation": 9,
-            "status": "inactive",
-            "transferStatus": "owned",
-            "transferTimes": 0,
-            "lastUserId": "20250324000001",
-            "blockchainId": "Hash0x000002244"
-        },
-        {
-            "id": "2025032500013",
-            "userId": "20250324000001",
-            "itemTitle": "iphone 19",
-            "itemType": "电子产品",
-            "itemDescription": "刚买2个月，iphone正版",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "itemImageList": null,
-            "depreciation": 9,
-            "status": "active",
-            "transferStatus": "transferring",
-            "transferTimes": 0,
-            "lastUserId": "20250324000001",
-            "blockchainId": "Hash0x000002244"
-        },
-        {
-            "id": "2025032500013",
-            "userId": "20250324000001",
-            "itemTitle": "iphone 19",
-            "itemType": "电子产品",
-            "itemDescription": "刚买2个月，iphone正版",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "itemImageList": null,
-            "depreciation": 9,
-            "status": "active",
-            "transferStatus": "transferred",
-            "transferTimes": 0,
-            "lastUserId": "20250324000001",
-            "blockchainId": "Hash0x000002244"
-        }
-      // ... 其他测试数据
-    ])
 
     // 获取状态文本
     const getStatusText = (status: string) => {
@@ -421,53 +359,82 @@ export default defineComponent({
       return statusMap[status] || status
     }
 
+    // 加载物品列表
+    const loadItems = async (status: string) => {
+      if (loading.value) return
+      loading.value = true
+      
+      try {
+        const params = {
+          pageNo: pageNo.value,
+          pageSize: pageSize.value,
+          status: status === 'all' ? undefined : status
+        }
+        
+        const res = await getMyItems(params)
+        if (res.success) {
+          if (pageNo.value === 1) {
+            items.value = res.data
+          } else {
+            items.value.push(...res.data)
+          }
+          
+          // 判断是否加载完成
+          finished.value = res.data.length < pageSize.value
+          pageNo.value++
+        }
+      } catch (error) {
+        console.error('加载物品列表失败:', error)
+        showToast('加载失败')
+      } finally {
+        loading.value = false
+      }
+    }
+
     // 根据状态筛选物品
     const getFilteredItems = (status: string) => {
       if (status === 'all') return items.value
       return items.value.filter(item => item.transferStatus === status)
     }
 
-    // 操作方法
-    const initiateTransfer = (item: any) => {
-      // showDialog({
-      //   title: '确认出让',
-      //   message: '确定要发起出让申请吗？',
-      //   showCancelButton: true,
-      // }).then(() => {
-      //   // 调用API发起出让
-      //   showToast('已提交出让申请')
-      // })
-      router.push('/stuff/transfer/' + item.id)
-    }
-
-
-    const cancelTransfer = (item: any) => {
-      showDialog({
-        title: '取消出让',
-        message: '确定要取消出让申请吗？',
-        showCancelButton: true,
-      }).then(() => {
-        item.transferStatus='owned'
-        // 调用API取消出让
+    // 取消出让
+    const cancelTransfer = async (item: Item) => {
+      try {
+        await showDialog({
+          title: '取消出让',
+          message: '确定要取消出让申请吗？',
+          showCancelButton: true,
+        })
+        // TODO: 调用取消出让接口
         showToast('已取消出让申请')
-      })
+        onRefresh() // 刷新列表
+      } catch (error) {
+        console.error('取消出让失败:', error)
+      }
     }
 
-
-
-    const viewOffers = (item: any) => {
+    // 查看报价
+    const viewOffers = (item: Item) => {
       router.push(`/stuff/offers/${item.id}`)
     }
 
-
-
-    const viewStuffDetails = (item: any) => {
-      router.push(`/stuff/detail/${item.id}`)
+    // 查看物品详情
+    const viewStuffDetails = async (item: any) => {
+      router.push({
+            path: `/stuff/detail/${item.id}`
+          })
+    }
+    // 下拉刷新
+    const onRefresh = () => {
+      pageNo.value = 1
+      finished.value = false
+      loadItems(statusList[activeTab.value].value)
+      refreshing.value = false
     }
 
-    // 添加标签类型判断方法
-    const getStatusTagType = (status: string) => {
-      const typeMap: Record<string, string> = {
+    // 标签类型
+    const getStatusTagType = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
+      const typeMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
         active: 'success',
         auditing: 'warning',
         inactive: 'danger'
@@ -475,14 +442,26 @@ export default defineComponent({
       return typeMap[status] || 'default'
     }
 
-    const getTransferTagType = (status: string) => {
-      const typeMap: Record<string, string> = {
-        owned: 'primary',
+    const getTransferTagType = (status: string): 'primary' | 'warning' | 'default' => {
+      const typeMap: Record<string, 'primary' | 'warning' | 'default'> = {
+        own: 'primary',
         transferring: 'warning',
         transferred: 'default'
       }
       return typeMap[status] || 'default'
     }
+
+    // 监听标签页切换
+    const onTabChange = (index: number) => {
+      const status = statusList[index].value
+      pageNo.value = 1
+      finished.value = false
+      loadItems(status)
+    }
+
+    onMounted(() => {
+      loadItems('all')
+    })
 
     return {
       onClickLeft,
@@ -492,15 +471,20 @@ export default defineComponent({
       activeNames,
       statusList,
       items,
+      loading,
+      finished,
+      refreshing,
       getStatusText,
       getFilteredItems,
-      initiateTransfer,
-      cancelTransfer,
-      viewOffers,
       viewStuffDetails,
       getItemStatusText,
       getStatusTagType,
       getTransferTagType,
+      loadItems,
+      onTabChange,
+      onRefresh,
+      cancelTransfer,
+      viewOffers
     }
   },
   data() {

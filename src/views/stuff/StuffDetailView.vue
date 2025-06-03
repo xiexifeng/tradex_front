@@ -26,25 +26,25 @@
       <div class="tags">
         <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
         <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
-        <van-tag round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
+        <van-tag v-if="itemDetail.deliveryMethod" round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
       </div>
     </van-cell-group>
 
     <!-- 区块链信息 -->
-    <van-cell-group inset class="blockchain-group">
+    <van-cell-group inset class="blockchain-group" v-if="itemDetail.blockchainId || itemDetail.transferTimes > 0 || itemDetail.lastUserId">
       <div class="section-title">
         <van-icon name="shield-o" />
         <span>区块链信息</span>
       </div>
       <div class="blockchain-info">
-        <van-cell title="区块链ID" :value="itemDetail.blockchainId" />
-        <van-cell title="转让次数" :value="`${itemDetail.transferTimes}次`" />
-        <van-cell title="最后持有人" :value="itemDetail.lastUserId" />
+        <van-cell v-if="itemDetail.blockchainId" title="区块链ID" :value="itemDetail.blockchainId" />
+        <van-cell v-if="itemDetail.transferTimes > 0" title="转让次数" :value="`${itemDetail.transferTimes}次`" />
+        <van-cell v-if="itemDetail.lastUserId" title="最后持有人" :value="itemDetail.lastUserId" />
       </div>
     </van-cell-group>
 
     <!-- 物品描述 -->
-    <van-cell-group inset class="desc-group">
+    <van-cell-group inset class="desc-group" v-if="itemDetail.itemDescription">
       <div class="section-title">
         <van-icon name="description" />
         <span>物品描述</span>
@@ -53,39 +53,39 @@
     </van-cell-group>
 
     <!-- 交易设置 -->
-    <van-cell-group inset class="trade-group" v-if="itemDetail.transferStatus === 'transferring'">
+    <van-cell-group inset class="trade-group" v-if="itemDetail.transferStatus === 'transferring' && itemDetail.tradeMethod">
       <div class="section-title">
         <van-icon name="transaction" />
         <span>交易设置</span>
       </div>
       <div class="trade-info">
         <van-cell title="交易方式" :value="itemDetail.tradeMethod" />
-        <template v-if="itemDetail.tradeMethod === '人民币'">
+        <template v-if="itemDetail.tradeMethod === '人民币' && itemDetail.transferPrice">
           <van-cell title="转让价格" :value="`¥${itemDetail.transferPrice}`" />
         </template>
-        <template v-else-if="itemDetail.tradeMethod === '积分'">
+        <template v-else-if="itemDetail.tradeMethod === '积分' && itemDetail.transferPoints">
           <van-cell title="所需积分" :value="`${itemDetail.transferPoints}积分`" />
         </template>
-        <template v-else>
+        <template v-else-if="itemDetail.tradeMethod === '以物换物' && itemDetail.expectItem">
           <van-cell title="期望物品" :value="itemDetail.expectItem" />
         </template>
-        <van-cell title="交付方式" :value="itemDetail.deliveryMethod" />
-        <van-cell title="联系方式" :value="itemDetail.contactInfo" />
+        <van-cell v-if="itemDetail.deliveryMethod" title="交付方式" :value="itemDetail.deliveryMethod" />
+        <van-cell v-if="itemDetail.contactInfo" title="联系方式" :value="itemDetail.contactInfo" />
       </div>
     </van-cell-group>
 
     <!-- 互动数据 -->
-    <van-cell-group inset class="stats-group">
+    <van-cell-group inset class="stats-group" v-if="itemDetail.viewCount > 0 || itemDetail.loveCount > 0 || itemDetail.collectionCount > 0">
       <div class="interaction-stats">
-        <div class="stat-item">
+        <div class="stat-item" v-if="itemDetail.viewCount > 0">
           <van-icon name="eye-o" />
           <span>{{ itemDetail.viewCount }}</span>
         </div>
-        <div class="stat-item">
+        <div class="stat-item" v-if="itemDetail.loveCount > 0">
           <van-icon name="like-o" />
           <span>{{ itemDetail.loveCount }}</span>
         </div>
-        <div class="stat-item">
+        <div class="stat-item" v-if="itemDetail.collectionCount > 0">
           <van-icon name="star-o" />
           <span>{{ itemDetail.collectionCount }}</span>
         </div>
@@ -230,39 +230,58 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineComponent, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { showDialog, showToast } from 'vant'
+import { getItemDetail } from '@/api/stuff'
+import type { ItemDetail } from '@/api/types'
 
 export default defineComponent({
   setup() {
     const router = useRouter()
+    const route = useRoute()
+    const itemId = route.params.id as string
     
-    // 模拟物品详情数据
-    const itemDetail = ref({
-      id: '2025032500010',
-      status: 'active',
-      transferStatus: 'owned', // owned, transfferring transferred
-      itemTitle: 'iPhone 16',
-      itemType: '电子产品',
-      itemDescription: '刚买2个月 32G 9成新',
-      firstImage: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-      itemImageList: ['https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg'],
-      depreciation: 9,
+    // 物品详情数据
+    const itemDetail = ref<ItemDetail>({
+      id: '',
+      userId: '',
+      itemTitle: '',
+      itemType: '',
+      itemDescription: '',
+      firstImage: '',
+      itemImageList: [],
+      depreciation: 0,
+      status: '',
+      transferStatus: '',
       transferTimes: 0,
-      lastUserId: '20250324000002',
-      blockchainId: 'Hash0030343jkjlkj',
-      loveCount: 10,
-      collectionCount: 10,
-      viewCount: 10,
-      tradeMethod: '人民币',
-      transferPrice: 100.0000,
-      transferPoints: null,
-      expectItem: null,
-      contactInfo: '13800001234',
-      exchangeApplyCount: null,
-      deliveryMethod: '同城自取'
+      lastUserId: '',
+      blockchainId: '',
+      loveCount: 0,
+      collectionCount: 0,
+      viewCount: 0,
+      tradeMethod: '',
+      transferPrice: 0,
+      transferPoints: 0,
+      expectItem: '',
+      contactInfo: '',
+      deliveryMethod: ''
     })
+
+    // 获取物品详情
+    const fetchItemDetail = async () => {
+      try {
+        const res = await getItemDetail(itemId)
+        if (res.success) {
+          itemDetail.value = res.data
+        } else {
+          showToast(res.desc || '获取物品详情失败')
+        }
+      } catch (error) {
+        console.error('获取物品详情失败:', error)
+        showToast('获取物品详情失败')
+      }
+    }
 
     const getStatusText = (status: string) => {
       const statusMap: Record<string, string> = {
@@ -272,7 +291,7 @@ export default defineComponent({
       }
       return statusMap[status] || status
     }
-    // 获取物品状态文本
+
     const getItemStatusText = (status: string) => {
       const statusMap: Record<string, string> = {
         active: '有效',
@@ -281,6 +300,7 @@ export default defineComponent({
       }
       return statusMap[status] || status
     }
+
     const onClickLeft = () => {
       router.back()
     }
@@ -298,7 +318,6 @@ export default defineComponent({
       expectItem: '',
       contactInfo: ''
     })
-
 
     const deliveryColumns = [
       { text: '同城自取', value: '同城自取' },
@@ -325,27 +344,37 @@ export default defineComponent({
       showTradeMethodPicker.value = false
     }
 
-    const onTransferSubmit = (values: any) => {
-      console.log('提交的数据:', values)
-      showDialog({
-        title: '确认提交',
-        message: '确定要发起出让申请吗？',
-        showCancelButton: true,
-      }).then(() => {
+    const onTransferSubmit = async (values: any) => {
+      try {
+        await showDialog({
+          title: '确认提交',
+          message: '确定要发起出让申请吗？',
+          showCancelButton: true,
+        })
+        
+        // TODO: 调用出让接口
         showToast('提交成功')
         showTransferForm.value = false
-        router.push('/stuff/list')
-      })
+        await fetchItemDetail() // 刷新物品详情
+      } catch (error) {
+        console.error('提交失败:', error)
+      }
     }
 
-    const cancelTransfer = () => {
-      showDialog({
-        title: '取消出让',
-        message: '确定要取消出让申请吗？',
-        showCancelButton: true,
-      }).then(() => {
+    const cancelTransfer = async () => {
+      try {
+        await showDialog({
+          title: '取消出让',
+          message: '确定要取消出让申请吗？',
+          showCancelButton: true,
+        })
+        
+        // TODO: 调用取消出让接口
         showToast('已取消出让申请')
-      })
+        await fetchItemDetail() // 刷新物品详情
+      } catch (error) {
+        console.error('取消出让失败:', error)
+      }
     }
 
     const viewOffers = () => {
@@ -355,6 +384,10 @@ export default defineComponent({
     const viewTradeDetails = () => {
       router.push(`/stuff/trade/${itemDetail.value.id}`)
     }
+
+    onMounted(() => {
+      fetchItemDetail()
+    })
 
     return {
       itemDetail,
