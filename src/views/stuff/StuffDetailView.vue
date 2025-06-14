@@ -99,7 +99,7 @@
 
     <!-- 底部操作栏 -->
     <div class="bottom-bar">
-      <template v-if="itemDetail.transferStatus === 'own'">
+      <template v-if="itemDetail.transferStatus === 'own' && itemDetail.status === 'active'">
         <van-button type="primary" block round @click="initiateTransfer">
           发起出让
         </van-button>

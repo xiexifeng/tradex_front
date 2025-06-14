@@ -37,7 +37,7 @@
         @load="onLoad"
       >
         <div class="products-grid">
-          <div v-for="product in filteredResults" 
+          <div v-for="product in items" 
                :key="product.id" 
                class="product-card" 
                @click="onViewClick(product.id)"
@@ -54,10 +54,10 @@
               <p class="product-desc">{{ product.itemDescription }}</p>
               <div class="product-meta">
                 <div class="price-info">
-                  <template v-if="product.tradeMethod === '人民币'">
+                  <template v-if="product.tradeMethod === 'ITEM_TO_MONEY'">
                     <span class="price">¥{{ product.transferPrice }}</span>
                   </template>
-                  <template v-else-if="product.tradeMethod === '积分'">
+                  <template v-else-if="product.tradeMethod === 'ITEM_TO_POINTS'">
                     <span class="price">{{ product.transferPoints }}积分</span>
                   </template>
                   <template v-else>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="trade-method">
                   <van-tag plain :type="getTradeMethodType(product.tradeMethod)">
-                    {{ product.tradeMethod }}
+                    {{ getValueText(product.tradeMethod, 'tradeMethod') }}
                   </van-tag>
                 </div>
               </div>
@@ -384,86 +384,35 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue'
+import { defineComponent, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-
-// 修改 SearchResult 类型定义
-interface SearchResult {
-  id: string
-  userId: string
-  userAvatar: string
-  userNickname: string
-  itemTitle: string
-  itemType: string
-  itemDescription: string
-  firstImage: string
-  depreciation: number
-  tradeMethod: string
-  expectItem?: string
-  transferPrice?: number
-  transferPoints?: number
-  loveCount: number
-  collectionCount: number
-  viewCount: number
-  publishTime: string
-}
+import { useItemList } from '@/composables/useItemList'
+import { getValueText } from '@/constants/stuff'
 
 export default defineComponent({
   name: 'SearchView',
   setup() {
     const router = useRouter()
     const searchValue = ref('')
-    const loading = ref(false)
-    const finished = ref(false)
-    const searchResults = ref<SearchResult[]>([])
     const searchHistory = ref<string[]>([])
 
-    // 添加筛选相关的状态
-    const itemTypeFilter = ref('all')
-    const tradeMethodFilter = ref('all')
-    const sortOrder = ref('newest')
-
-    const itemTypeOptions = [
-      { text: '全部类型', value: 'all' },
-      { text: '数码手机', value: '数码手机' },
-      { text: '电脑办公', value: '电脑办公' },
-      { text: '服装配饰', value: '服装配饰' },
-      { text: '图书音像', value: '图书音像' },
-      { text: '其他', value: '其他' },
-    ]
-
-    const tradeMethodOptions = [
-      { text: '全部交易', value: 'all' },
-      { text: '人民币', value: '人民币' },
-      { text: '积分', value: '积分' },
-      { text: '以物换物', value: '以物换物' },
-    ]
-
-    const sortOptions = [
-      { text: '最新发布', value: 'newest' },
-      { text: '价格最低', value: 'price_asc' },
-      { text: '价格最高', value: 'price_desc' },
-    ]
-
-    // 添加筛选逻辑
-    const filteredResults = computed(() => {
-      return searchResults.value.filter(product => {
-        const typeMatch = itemTypeFilter.value === 'all' || product.itemType === itemTypeFilter.value
-        const methodMatch = tradeMethodFilter.value === 'all' || product.tradeMethod === tradeMethodFilter.value
-        return typeMatch && methodMatch
-      }).sort((a, b) => {
-        switch (sortOrder.value) {
-          case 'price_asc':
-            return ((a.transferPrice || 0) - (b.transferPrice || 0))
-          case 'price_desc':
-            return ((b.transferPrice || 0) - (a.transferPrice || 0))
-          case 'newest':
-          default:
-            return new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime()
-        }
-      })
-    })
+    // 使用物品列表组合式函数
+    const {
+      loading,
+      finished,
+      items,
+      itemTypeFilter,
+      tradeMethodFilter,
+      sortOrder,
+      itemTypeOptions,
+      tradeMethodOptions,
+      sortOptions,
+      getTradeMethodType,
+      loadItems,
+      resetList,
+      loadMore
+    } = useItemList()
 
     // 从本地存储加载搜索历史
     onMounted(() => {
@@ -497,40 +446,21 @@ export default defineComponent({
     const onSearch = () => {
       if (!searchValue.value.trim()) return
       
-      finished.value = false
-      searchResults.value = []
+      resetList()
       saveHistory(searchValue.value)
-      onLoad()
+      loadItems({
+        pageNo: 1,
+        pageSize: 10,
+        searchKey: searchValue.value,
+        itemType: itemTypeFilter.value,
+        tradeMethod: tradeMethodFilter.value,
+        sortBy: sortOrder.value
+      })
     }
 
-    // 加载搜索结果
+    // 加载更多
     const onLoad = () => {
-      loading.value = true
-      // 模拟API调用
-      setTimeout(() => {
-        // 这里应该调用实际的搜索API
-        searchResults.value = [
-          {
-            id: '2025032800001',
-            userId: '2025032800001',
-            userAvatar: "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-            userNickname: "NPE",
-            itemTitle: "iphone 16",
-            itemType: "数码手机",
-            itemDescription: "刚买2个月 32G 9成新",
-            firstImage: "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            depreciation: 9,
-            tradeMethod: "以物换物",
-            expectItem: "山地自行车",
-            loveCount: 10,
-            collectionCount: 10,
-            viewCount: 10,
-            publishTime: "2025-03-28 12:10:00"
-          }
-        ]
-        loading.value = false
-        finished.value = true
-      }, 1000)
+      loadMore(searchValue.value)
     }
 
     const onCancel = () => {
@@ -539,10 +469,6 @@ export default defineComponent({
 
     const onFocus = () => {
       // 获取焦点时的处理
-    }
-
-    const onBuyClick = (productId: number) => {
-      router.push('/login')
     }
 
     const onViewClick = (productId: string) => {
@@ -561,21 +487,24 @@ export default defineComponent({
       '显示器'
     ])
 
-    // 添加交易方式类型判断方法
-    const getTradeMethodType = (method: string) => {
-      switch (method) {
-        case '人民币': return 'danger'
-        case '积分': return 'warning'
-        case '以物换物': return 'primary'
-        default: return 'default'
-      }
-    }
+    // 监听筛选条件变化
+    watch([itemTypeFilter, tradeMethodFilter, sortOrder], () => {
+      resetList()
+      loadItems({
+        pageNo: 1,
+        pageSize: 10,
+        searchKey: searchValue.value,
+        itemType: itemTypeFilter.value,
+        tradeMethod: tradeMethodFilter.value,
+        sortBy: sortOrder.value
+      })
+    })
 
     return {
       searchValue,
       loading,
       finished,
-      searchResults,
+      items,
       searchHistory,
       onSearch,
       onCancel,
@@ -583,7 +512,6 @@ export default defineComponent({
       onLoad,
       clearHistory,
       onHistoryClick,
-      onBuyClick,
       onViewClick,
       hotSearches,
       getTradeMethodType,
@@ -593,7 +521,7 @@ export default defineComponent({
       itemTypeOptions,
       tradeMethodOptions,
       sortOptions,
-      filteredResults
+      getValueText
     }
   }
 })

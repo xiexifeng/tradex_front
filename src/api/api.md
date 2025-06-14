@@ -304,5 +304,57 @@ curl -X POST http://47.122.125.199/tradex/client/item/cancel-transfer \
     "desc": "请求成功",
     "data": null
 }
+```
+
+## 查询交易广场-转让中物品列表
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/square/list-item \
+-H "Content-Type: application/json" \
+-d '
+{
+  "pageNo": 1,
+  "pageSize": 10,
+  "searchKey": '自行车',
+  "itemType": "all",
+  "tradeMethod": "ITEM_TO_ITEM",
+  "sortBy": "newest|price_asc|price_desc"
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": [
+        {
+            "id": "2025052800001",
+            "userId": "2025042300003",
+            "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+            "userNickname": "NPE",
+            "itemTitle": "iphone",
+            "itemType": "电子产品",
+            "itemDescription": "very good",
+            "firstImage": "http://47.122.125.199/tradex/basic/oss/previewFile/601eefec-9737-4717-ac7d-9f2f1f16f8d2.png",
+            "depreciation": 1,
+            "transferTimes": 0,
+            "lastUserId": "2025042300003",
+            "blockchainId": "hds9232332222",
+            "loveCount": 0,
+            "collectionCount": 0,
+            "viewCount": 10,
+            "tradeMethod": "ITEM_TO_POINTS",
+            "transferPrice": null,
+            "transferPoints": 10,
+            "expectItem": null,
+            "publishTime": 1744790484000
+        }
+    ]
+}
 
 ```

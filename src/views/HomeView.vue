@@ -70,7 +70,7 @@
 
       <!-- 商品列表 -->
       <div class="products-grid">
-        <div v-for="product in filteredProducts" :key="product.id" class="product-card" @click="onViewClick(product.id)">
+        <div v-for="product in items" :key="product.id" class="product-card" @click="onViewClick(product.id)">
           <div class="product-image">
             <img :src="product.firstImage" :alt="product.itemTitle">
             <div class="product-tags">
@@ -83,10 +83,10 @@
             <p class="product-desc">{{ product.itemDescription }}</p>
             <div class="product-meta">
               <div class="price-info">
-                <template v-if="product.tradeMethod === '人民币'">
+                <template v-if="product.tradeMethod === 'ITEM_TO_MONEY'">
                   <span class="price">¥{{ product.transferPrice }}</span>
                 </template>
-                <template v-else-if="product.tradeMethod === '积分'">
+                <template v-else-if="product.tradeMethod === 'ITEM_TO_POINTS'">
                   <span class="price">{{ product.transferPoints }}积分</span>
                 </template>
                 <template v-else>
@@ -95,7 +95,7 @@
               </div>
               <div class="trade-method">
                 <van-tag plain :type="getTradeMethodType(product.tradeMethod)">
-                  {{ product.tradeMethod }}
+                  {{ getValueText(product.tradeMethod, 'tradeMethod') }}
                 </van-tag>
               </div>
             </div>
@@ -360,8 +360,10 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useItemList } from '@/composables/useItemList'
+import { getValueText } from '@/constants/stuff'
 
 export default defineComponent({
   name: 'HomeView',
@@ -371,175 +373,27 @@ export default defineComponent({
     const userInfo = ref(1) // 实际项目中从vuex或pinia获取
     const activeTab = ref(0)
 
+    // 使用物品列表组合式函数
+    const {
+      loading,
+      finished,
+      items,
+      itemTypeFilter,
+      tradeMethodFilter,
+      sortOrder,
+      itemTypeOptions,
+      tradeMethodOptions,
+      sortOptions,
+      getTradeMethodType,
+      loadItems,
+      loadMore
+    } = useItemList()
+
     // 模拟数据
     const banners = ref([
       'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
       'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg'
     ])
-
-    const products = ref([
-        {
-        "id": "2025032800001",
-        "userId": "2025032800001",
-        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "userNickname": "NPE",
-        "itemTitle": "iphone 16",
-        "itemType": "数码手机",
-        "itemDescription": "刚买2个月 32G 9成新",
-        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        "itemImageList": [
-          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-        ],
-        "depreciation": 9,
-        "tradeMethod": "以物换物",
-        "expectItem": "山地自行车",
-        "transferTimes": 0,
-        "lastUserId": "2025032800001",
-        "blockchainId": "Hash2025032800001",
-        "loveCount": 10,
-        "collectionCount": 10,
-        "viewCount": 10,
-        "publishTime": "2025-03-28 12:10:00"
-      },
-      {
-        "id": "2025032800001",
-        "userId": "2025032800001",
-        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "userNickname": "NPE",
-        "itemTitle": "iphone 16",
-        "itemType": "数码手机",
-        "itemDescription": "刚买2个月 32G 9成新",
-        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        "itemImageList": [
-          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-        ],
-        "depreciation": 9,
-        "tradeMethod": "人民币",
-        "transferPrice": 10000,
-        "transferTimes": 0,
-        "lastUserId": "2025032800001",
-        "blockchainId": "Hash2025032800001",
-        "loveCount": 10,
-        "collectionCount": 10,
-        "viewCount": 10,
-        "publishTime": "2025-03-28 12:10:00"
-      },
-      {
-        "id": "2025032800001",
-        "userId": "2025032800001",
-        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "userNickname": "NPE",
-        "itemTitle": "iphone 16",
-        "itemType": "数码手机",
-        "itemDescription": "刚买2个月 32G 9成新",
-        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        "itemImageList": [
-          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-        ],
-        "depreciation": 9,
-        "tradeMethod": "积分",
-        "transferPoints": 100,
-        "transferTimes": 0,
-        "lastUserId": "2025032800001",
-        "blockchainId": "Hash2025032800001",
-        "loveCount": 10,
-        "collectionCount": 10,
-        "viewCount": 10,
-        "publishTime": "2025-03-28 12:10:00"
-      },
-      {
-        "id": "2025032800001",
-        "userId": "2025032800001",
-        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "userNickname": "NPE",
-        "itemTitle": "iphone 16",
-        "itemType": "数码手机",
-        "itemDescription": "刚买2个月 32G 9成新",
-        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        "itemImageList": [
-          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-        ],
-        "depreciation": 9,
-        "tradeMethod": "人民币",
-        "transferPrice": 100,
-        "transferTimes": 0,
-        "lastUserId": "2025032800001",
-        "blockchainId": "Hash2025032800001",
-        "loveCount": 10,
-        "collectionCount": 10,
-        "viewCount": 10,
-        "publishTime": "2025-03-28 12:10:00"
-      },
-      {
-        "id": "2025032800001",
-        "userId": "2025032800001",
-        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "userNickname": "NPE",
-        "itemTitle": "iphone 16",
-        "itemType": "数码手机",
-        "itemDescription": "刚买2个月 32G 9成新刚买2个月 32G 9成新 刚买2个月 32G 9成新 ",
-        "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        "itemImageList": [
-          "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-        ],
-        "depreciation": 9,
-        "tradeMethod": "人民币",
-        "transferPrice": 100,
-        "transferTimes": 0,
-        "lastUserId": "2025032800001",
-        "blockchainId": "Hash2025032800001",
-        "loveCount": 10,
-        "collectionCount": 10,
-        "viewCount": 10,
-        "publishTime": "2025-03-28 12:10:00"
-      }
-    ])
-
-    // 筛选选项
-    const itemTypeFilter = ref('all')
-    const tradeMethodFilter = ref('all')
-    const sortOrder = ref('newest')
-
-    const itemTypeOptions = [
-      { text: '全部类型', value: 'all' },
-      { text: '数码手机', value: '数码手机' },
-      { text: '电脑办公', value: '电脑办公' },
-      { text: '服装配饰', value: '服装配饰' },
-      { text: '图书音像', value: '图书音像' },
-      { text: '其他', value: '其他' },
-    ]
-
-    const tradeMethodOptions = [
-      { text: '全部交易', value: 'all' },
-      { text: '人民币', value: '人民币' },
-      { text: '积分', value: '积分' },
-      { text: '以物换物', value: '以物换物' },
-    ]
-
-    const sortOptions = [
-      { text: '最新发布', value: 'newest' },
-      { text: '价格最低', value: 'price_asc' },
-      { text: '价格最高', value: 'price_desc' },
-    ]
-
-    // 过滤后的商品列表
-    const filteredProducts = computed(() => {
-      return products.value.filter(product => {
-        const typeMatch = itemTypeFilter.value === 'all' || product.itemType === itemTypeFilter.value
-        const methodMatch = tradeMethodFilter.value === 'all' || product.tradeMethod === tradeMethodFilter.value
-        return typeMatch && methodMatch
-      }).sort((a, b) => {
-        switch (sortOrder.value) {
-          case 'price_asc':
-            return (a.transferPrice || 0) - (b.transferPrice || 0)
-          case 'price_desc':
-            return (b.transferPrice || 0) - (a.transferPrice || 0)
-          case 'newest':
-          default:
-            return new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime()
-        }
-      })
-    })
 
     const onClickRight = () => {
       router.push('/login')
@@ -549,13 +403,6 @@ export default defineComponent({
       router.push('/user/profile')
     }
 
-    const onBuyClick = (productId: number) => {
-      if (!userInfo.value) {
-        router.push('/login')
-        return
-      }
-      // 处理购买逻辑
-    }
     const onViewClick = (productId: string) => {
       router.push(`/square/item/detail/${productId}`)
     }
@@ -591,25 +438,37 @@ export default defineComponent({
       }
     ]
 
-    const getTradeMethodType = (method: string) => {
-      switch (method) {
-        case '人民币': return 'danger'
-        case '积分': return 'warning'
-        case '以物换物': return 'primary'
-        default: return 'default'
-      }
-    }
+    // 初始加载数据
+    loadItems({
+      pageNo: 1,
+      pageSize: 10,
+      itemType: itemTypeFilter.value,
+      tradeMethod: tradeMethodFilter.value,
+      sortBy: sortOrder.value
+    })
+
+    // 监听筛选条件变化
+    watch([itemTypeFilter, tradeMethodFilter, sortOrder], () => {
+      loadItems({
+        pageNo: 1,
+        pageSize: 10,
+        itemType: itemTypeFilter.value,
+        tradeMethod: tradeMethodFilter.value,
+        sortBy: sortOrder.value
+      })
+    })
 
     return {
       searchValue,
       userInfo,
       banners,
-      products,
+      loading,
+      finished,
+      items,
       onClickRight,
       goToProfile,
-      onBuyClick,
-      activeTab,
       onViewClick,
+      activeTab,
       onSearchClick,
       itemTypeFilter,
       tradeMethodFilter,
@@ -617,9 +476,10 @@ export default defineComponent({
       itemTypeOptions,
       tradeMethodOptions,
       sortOptions,
-      filteredProducts,
       features,
-      getTradeMethodType
+      getTradeMethodType,
+      loadMore,
+      getValueText
     }
   }
 })

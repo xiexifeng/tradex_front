@@ -61,3 +61,35 @@ export interface ItemDetail extends Item {
   contactInfo: string;
   deliveryMethod: string;
 }
+
+export interface ListSquareItemsParams {
+  pageNo: number;
+  pageSize: number;
+  searchKey?: string;
+  itemType?: string;
+  tradeMethod?: string;
+  sortBy?: string;
+}
+
+export interface ListSquareItemsResponse {
+  id: string;
+  userId: string;
+  userAvatar: string;
+  userNickname: string;
+  itemTitle: string;
+  itemType: string;
+  itemDescription: string;
+  firstImage: string;
+  depreciation: number;
+  transferTimes: number;
+  lastUserId: string;
+  blockchainId: string;
+  loveCount: number;
+  collectionCount: number;
+  viewCount: number;
+  tradeMethod: string;
+  transferPrice: number | null;
+  transferPoints: number | null;
+  expectItem: string | null;
+  publishTime: number;
+}
