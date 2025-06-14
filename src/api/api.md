@@ -214,8 +214,7 @@ curl -X POST http://47.122.125.199/tradex/client/item/list-mine \
 
 ```bash
 curl -X POST http://47.122.125.199/tradex/client/item/detail/{itemId} \
--H "Content-Type: application/x-www-form-urlencoded" \
--d 'phoneNumbers=17338789999&verifyCode=888999'
+-H "Content-Type: application/json" 
 ```
 
 **响应：**
@@ -249,6 +248,36 @@ curl -X POST http://47.122.125.199/tradex/client/item/detail/{itemId} \
         "contactInfo": null,
         "deliveryMethod": null
     }
+}
+
+```
+
+## 发起我的物品转让
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/item/transfer \
+-H "Content-Type: application/json" \
+-d '{
+    "itemId": "2025060100003",
+    "tradeMethod": "ITEM_TO_ITEM",
+    "transferPrice": 0,
+    "transferPoints": 0,
+    "expectItem": "string",
+    "contactInfo": "string",
+    "deliveryMethod": "SAME_CITY_BY_SELF"
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
 }
 
 ```

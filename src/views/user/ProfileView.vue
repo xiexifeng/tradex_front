@@ -342,7 +342,7 @@ export default defineComponent({
     // 获取状态文本
     const getStatusText = (status: string) => {
       const statusMap: Record<string, string> = {
-        owned: '拥有',
+        own: '拥有',
         transferring: '转让中',
         transferred: '已转让'
       }

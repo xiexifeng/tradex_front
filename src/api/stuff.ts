@@ -45,3 +45,20 @@ export const getMyItems = async (params: {
 export const getItemDetail = async (itemId: string): Promise<ApiResponse<ItemDetail>> => {
   return request.post(`/client/item/detail/${itemId}`);
 };
+
+// 发起物品转让
+export const transferItem = async (data: {
+  itemId: string;
+  tradeMethod: string;
+  transferPrice: number;
+  transferPoints: number;
+  expectItem: string;
+  contactInfo: string;
+  deliveryMethod: string;
+}): Promise<ApiResponse> => {
+  return request.post('/client/item/transfer', data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};

@@ -18,7 +18,12 @@
     <van-cell-group inset class="info-group">
       <div class="status-row">
         <div class="item-status" :class="itemDetail.status">
-          {{ getItemStatusText(itemDetail.status) }}
+          <template v-if="itemDetail.transferStatus === 'own'">
+            {{ getItemStatusText(itemDetail.status) }}
+          </template>
+          <template v-else-if="itemDetail.transferStatus !== 'own'">
+            {{ getStatusText(itemDetail.transferStatus) }}
+          </template>
         </div>
         <div class="item-id">物品编号: {{ itemDetail.id }}</div>
       </div>
@@ -26,7 +31,7 @@
       <div class="tags">
         <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
         <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
-        <van-tag v-if="itemDetail.deliveryMethod" round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
+        <van-tag v-if="itemDetail.deliveryMethod" round plain type="warning" size="medium">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</van-tag>
       </div>
     </van-cell-group>
 
@@ -59,17 +64,17 @@
         <span>交易设置</span>
       </div>
       <div class="trade-info">
-        <van-cell title="交易方式" :value="itemDetail.tradeMethod" />
-        <template v-if="itemDetail.tradeMethod === '人民币' && itemDetail.transferPrice">
+        <van-cell title="交易方式" :value="getValueText(itemDetail.tradeMethod, 'tradeMethod')" />
+        <template v-if="itemDetail.tradeMethod === 'ITEM_TO_MONEY' && itemDetail.transferPrice">
           <van-cell title="转让价格" :value="`¥${itemDetail.transferPrice}`" />
         </template>
-        <template v-else-if="itemDetail.tradeMethod === '积分' && itemDetail.transferPoints">
+        <template v-else-if="itemDetail.tradeMethod === 'ITEM_TO_POINTS' && itemDetail.transferPoints">
           <van-cell title="所需积分" :value="`${itemDetail.transferPoints}积分`" />
         </template>
-        <template v-else-if="itemDetail.tradeMethod === '以物换物' && itemDetail.expectItem">
+        <template v-else-if="itemDetail.tradeMethod === 'ITEM_TO_ITEM' && itemDetail.expectItem">
           <van-cell title="期望物品" :value="itemDetail.expectItem" />
         </template>
-        <van-cell v-if="itemDetail.deliveryMethod" title="交付方式" :value="itemDetail.deliveryMethod" />
+        <van-cell v-if="itemDetail.deliveryMethod" title="交付方式" :value="getValueText(itemDetail.deliveryMethod, 'deliveryMethod')" />
         <van-cell v-if="itemDetail.contactInfo" title="联系方式" :value="itemDetail.contactInfo" />
       </div>
     </van-cell-group>
@@ -94,7 +99,7 @@
 
     <!-- 底部操作栏 -->
     <div class="bottom-bar">
-      <template v-if="itemDetail.transferStatus === 'owned'">
+      <template v-if="itemDetail.transferStatus === 'own'">
         <van-button type="primary" block round @click="initiateTransfer">
           发起出让
         </van-button>
@@ -128,7 +133,7 @@
         <van-form @submit="onTransferSubmit">
           <!-- 交付方式 -->
           <van-field
-            v-model="transferForm.deliveryMethod"
+            v-model="transferForm.deliveryMethodText"
             name="deliveryMethod"
             label="交付方式"
             placeholder="请选择交付方式"
@@ -140,7 +145,7 @@
 
           <!-- 交易方式 -->
           <van-field
-            v-model="transferForm.tradeMethod"
+            v-model="transferForm.tradeMethodText"
             name="tradeMethod"
             label="交易方式"
             placeholder="请选择交易方式"
@@ -151,7 +156,7 @@
           />
 
           <!-- 根据交易方式显示不同的输入框 -->
-          <template v-if="transferForm.tradeMethod === '人民币'">
+          <template v-if="transferForm.tradeMethodText === '人民币'">
             <van-field
               v-model="transferForm.transferPrice"
               name="transferPrice"
@@ -164,7 +169,7 @@
             </van-field>
           </template>
 
-          <template v-if="transferForm.tradeMethod === '积分'">
+          <template v-if="transferForm.tradeMethodText === '积分'">
             <van-field
               v-model="transferForm.transferPoints"
               name="transferPoints"
@@ -175,7 +180,7 @@
             />
           </template>
 
-          <template v-if="transferForm.tradeMethod === '以物换物'">
+          <template v-if="transferForm.tradeMethodText === '以物换物'">
             <van-field
               v-model="transferForm.expectItem"
               name="expectItem"
@@ -233,8 +238,9 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showDialog, showToast } from 'vant'
-import { getItemDetail } from '@/api/stuff'
+import { getItemDetail, transferItem } from '@/api/stuff'
 import type { ItemDetail } from '@/api/types'
+import { getValueText, DELIVERY_COLUMNS, TRADE_METHOD_COLUMNS } from '@/constants/stuff'
 
 export default defineComponent({
   setup() {
@@ -284,21 +290,11 @@ export default defineComponent({
     }
 
     const getStatusText = (status: string) => {
-      const statusMap: Record<string, string> = {
-        owned: '拥有',
-        transferring: '转让中',
-        transferred: '已转让'
-      }
-      return statusMap[status] || status
+      return getValueText(status, 'status')
     }
 
     const getItemStatusText = (status: string) => {
-      const statusMap: Record<string, string> = {
-        active: '有效',
-        auditing: '审核中',
-        inactive: '无效'
-      }
-      return statusMap[status] || status
+      return getValueText(status, 'itemStatus')
     }
 
     const onClickLeft = () => {
@@ -312,22 +308,18 @@ export default defineComponent({
 
     const transferForm = ref({
       deliveryMethod: '',
+      deliveryMethodText: '',
       tradeMethod: '',
+      tradeMethodText: '',
       transferPrice: '',
       transferPoints: '',
       expectItem: '',
       contactInfo: ''
     })
 
-    const deliveryColumns = [
-      { text: '同城自取', value: '同城自取' },
-      { text: '快递邮寄', value: '快递邮寄' }
-    ]
-    const tradeMethodColumns = [
-      { text: '人民币', value: '人民币' },
-      { text: '积分', value: '积分' },
-      { text: '以物换物', value: '以物换物' }
-    ]
+    // 使用导入的常量
+    const deliveryColumns = DELIVERY_COLUMNS
+    const tradeMethodColumns = TRADE_METHOD_COLUMNS
 
     // 修改发起转让方法
     const initiateTransfer = () => {
@@ -336,11 +328,13 @@ export default defineComponent({
 
     const onDeliveryConfirm = ({ selectedOptions }: any) => {
       transferForm.value.deliveryMethod = selectedOptions[0].value
+      transferForm.value.deliveryMethodText = selectedOptions[0].text
       showDeliveryPicker.value = false
     }
 
     const onTradeMethodConfirm = ({ selectedOptions }: any) => {
       transferForm.value.tradeMethod = selectedOptions[0].value
+      transferForm.value.tradeMethodText = selectedOptions[0].text
       showTradeMethodPicker.value = false
     }
 
@@ -352,12 +346,28 @@ export default defineComponent({
           showCancelButton: true,
         })
         
-        // TODO: 调用出让接口
-        showToast('提交成功')
-        showTransferForm.value = false
-        await fetchItemDetail() // 刷新物品详情
+        // 构建请求参数
+        const params = {
+          itemId: itemDetail.value.id,
+          tradeMethod: transferForm.value.tradeMethod,
+          transferPrice: transferForm.value.tradeMethod === 'ITEM_TO_MONEY' ? Number(values.transferPrice) : 0,
+          transferPoints: transferForm.value.tradeMethod === 'ITEM_TO_POINTS' ? Number(values.transferPoints) : 0,
+          expectItem: transferForm.value.tradeMethod === 'ITEM_TO_ITEM' ? values.expectItem : '',
+          contactInfo: values.contactInfo,
+          deliveryMethod: transferForm.value.deliveryMethod
+        }
+
+        const res = await transferItem(params)
+        if (res.success) {
+          showToast('提交成功')
+          showTransferForm.value = false
+          await fetchItemDetail() // 刷新物品详情
+        } else {
+          showToast(res.desc || '提交失败')
+        }
       } catch (error) {
         console.error('提交失败:', error)
+        showToast('提交失败')
       }
     }
 
@@ -391,6 +401,7 @@ export default defineComponent({
 
     return {
       itemDetail,
+      getValueText,
       getStatusText,
       getItemStatusText,
       onClickLeft,
