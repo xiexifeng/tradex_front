@@ -105,7 +105,7 @@
         </van-button>
       </template>
       <template v-if="itemDetail.transferStatus === 'transferring'">
-        <van-button type="primary" block round plain @click="cancelTransfer">
+        <van-button type="primary" block round plain @click="cancelTransferShow">
           取消出让
         </van-button>
         <van-button type="primary" block round @click="viewOffers">
@@ -156,7 +156,7 @@
           />
 
           <!-- 根据交易方式显示不同的输入框 -->
-          <template v-if="transferForm.tradeMethodText === '人民币'">
+          <template v-if="transferForm.tradeMethod === 'ITEM_TO_MONEY'">
             <van-field
               v-model="transferForm.transferPrice"
               name="transferPrice"
@@ -169,7 +169,7 @@
             </van-field>
           </template>
 
-          <template v-if="transferForm.tradeMethodText === '积分'">
+          <template v-if="transferForm.tradeMethod === 'ITEM_TO_POINTS'">
             <van-field
               v-model="transferForm.transferPoints"
               name="transferPoints"
@@ -180,7 +180,7 @@
             />
           </template>
 
-          <template v-if="transferForm.tradeMethodText === '以物换物'">
+          <template v-if="transferForm.tradeMethod === 'ITEM_TO_ITEM'">
             <van-field
               v-model="transferForm.expectItem"
               name="expectItem"
@@ -231,6 +231,13 @@
         title="选择交易方式"
       />
     </van-popup>
+
+    <!-- 取消转让弹窗 -->
+    <cancel-transfer-dialog
+      v-model="showCancelTransfer"
+      :item-id="itemDetail.id"
+      @success="onCancelTransferSuccess"
+    />
   </div>
 </template>
 
@@ -241,8 +248,12 @@ import { showDialog, showToast } from 'vant'
 import { getItemDetail, transferItem } from '@/api/stuff'
 import type { ItemDetail } from '@/api/types'
 import { getValueText, DELIVERY_COLUMNS, TRADE_METHOD_COLUMNS } from '@/constants/stuff'
+import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 
 export default defineComponent({
+  components: {
+    CancelTransferDialog
+  },
   setup() {
     const router = useRouter()
     const route = useRoute()
@@ -305,6 +316,7 @@ export default defineComponent({
     const showTransferForm = ref(false)
     const showDeliveryPicker = ref(false)
     const showTradeMethodPicker = ref(false)
+    const showCancelTransfer = ref(false)
 
     const transferForm = ref({
       deliveryMethod: '',
@@ -371,20 +383,12 @@ export default defineComponent({
       }
     }
 
-    const cancelTransfer = async () => {
-      try {
-        await showDialog({
-          title: '取消出让',
-          message: '确定要取消出让申请吗？',
-          showCancelButton: true,
-        })
-        
-        // TODO: 调用取消出让接口
-        showToast('已取消出让申请')
-        await fetchItemDetail() // 刷新物品详情
-      } catch (error) {
-        console.error('取消出让失败:', error)
-      }
+    const cancelTransferShow = () => {
+      showCancelTransfer.value = true
+    }
+
+    const onCancelTransferSuccess = async () => {
+      await fetchItemDetail() // 刷新物品详情
     }
 
     const viewOffers = () => {
@@ -406,18 +410,20 @@ export default defineComponent({
       getItemStatusText,
       onClickLeft,
       initiateTransfer,
-      cancelTransfer,
+      cancelTransferShow,
       viewOffers,
       viewTradeDetails,
       showTransferForm,
       showDeliveryPicker,
       showTradeMethodPicker,
+      showCancelTransfer,
       transferForm,
       deliveryColumns,
       tradeMethodColumns,
       onDeliveryConfirm,
       onTradeMethodConfirm,
-      onTransferSubmit
+      onTransferSubmit,
+      onCancelTransferSuccess
     }
   }
 })

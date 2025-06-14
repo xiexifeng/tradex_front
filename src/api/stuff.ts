@@ -62,3 +62,15 @@ export const transferItem = async (data: {
     }
   });
 };
+
+// 取消物品转让
+export const cancelTransfer = async (data: {
+  itemId: string;
+  cancelReason: string;
+}): Promise<ApiResponse> => {
+  return request.post('/client/item/cancel-transfer', data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};

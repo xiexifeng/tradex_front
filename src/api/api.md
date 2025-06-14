@@ -234,7 +234,7 @@ curl -X POST http://47.122.125.199/tradex/client/item/detail/{itemId} \
         "itemImageList": null,
         "depreciation": 5,
         "status": "auditing",
-        "transferStatus": "owned",
+        "transferStatus": "own",
         "transferTimes": 0,
         "lastUserId": "2025052500001",
         "blockchainId": null,
@@ -267,6 +267,31 @@ curl -X POST http://47.122.125.199/tradex/client/item/transfer \
     "expectItem": "string",
     "contactInfo": "string",
     "deliveryMethod": "SAME_CITY_BY_SELF"
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```
+
+## 取消我的物品转让
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/item/cancel-transfer \
+-H "Content-Type: application/json" \
+-d '{
+    "itemId": "2025060100003",
+    "cancelReason": "我不想交易了，还有用"
 }'
 ```
 

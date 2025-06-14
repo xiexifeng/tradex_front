@@ -216,9 +216,9 @@
                           <template v-if="item.transferStatus === 'transferring'">
                             <van-button 
                               size="small" 
-                              plain 
+                              plain
                               type="danger" 
-                              @click="cancelTransfer(item)"
+                              @click="showCancelDialog(item.id)"
                             >
                               取消出让
                             </van-button>
@@ -279,14 +279,21 @@
 
     <!-- 为底部导航腾出空间 -->
     <div class="bottom-space"></div>
+
+    <cancel-transfer-dialog
+      v-model="showCancelTransfer"
+      :item-id="currentItemId"
+      @success="onCancelSuccess"
+    />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { showDialog, showToast, Collapse, CollapseItem, Col, Row } from 'vant'
 import { useRouter } from 'vue-router'
-import { getMyItems, getItemDetail } from '@/api/stuff'
+import { getMyItems } from '@/api/stuff'
 import type { Item } from '@/api/types'
+import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 
 type UserInfo = {
   "userId": string,
@@ -309,6 +316,9 @@ type UserInfo = {
 }
 
 export default defineComponent({
+  components: {
+    CancelTransferDialog
+  },
   setup() {
     const onClickLeft = () => {
       showToast('点击设置')
@@ -330,6 +340,8 @@ export default defineComponent({
     const refreshing = ref(false)
     const pageNo = ref(1)
     const pageSize = ref(10)
+    const showCancelTransfer = ref(false)
+    const currentItemId = ref('')
 
     // 状态列表
     const statusList = [
@@ -396,23 +408,6 @@ export default defineComponent({
       if (status === 'all') return items.value
       return items.value.filter(item => item.transferStatus === status)
     }
-
-    // 取消出让
-    const cancelTransfer = async (item: Item) => {
-      try {
-        await showDialog({
-          title: '取消出让',
-          message: '确定要取消出让申请吗？',
-          showCancelButton: true,
-        })
-        // TODO: 调用取消出让接口
-        showToast('已取消出让申请')
-        onRefresh() // 刷新列表
-      } catch (error) {
-        console.error('取消出让失败:', error)
-      }
-    }
-
     // 查看报价
     const viewOffers = (item: Item) => {
       router.push(`/stuff/offers/${item.id}`)
@@ -459,6 +454,18 @@ export default defineComponent({
       loadItems(status)
     }
 
+    const showCancelDialog = (itemId: string) => {
+      currentItemId.value = itemId
+      showCancelTransfer.value = true
+    }
+
+    const onCancelSuccess = () => {
+      console.log('activeTab.value' + activeTab.value)
+      console.log('statusList.activeTab.value' + statusList[activeTab.value].value)
+      // 刷新列表数据
+      onRefresh()
+    }
+
     onMounted(() => {
       loadItems('all')
     })
@@ -483,8 +490,11 @@ export default defineComponent({
       loadItems,
       onTabChange,
       onRefresh,
-      cancelTransfer,
-      viewOffers
+      viewOffers,
+      showCancelTransfer,
+      currentItemId,
+      showCancelDialog,
+      onCancelSuccess
     }
   },
   data() {
