@@ -33,11 +33,11 @@
       <!-- 价格和交易方式突出显示 -->
       <div class="price-card">
         <div class="price-main">
-          <template v-if="itemDetail.tradeMethod === '人民币'">
+          <template v-if="itemDetail.tradeMethod === TRADE_METHOD_MAP.ITEM_TO_MONEY">
             <span class="currency">¥</span>
             <span class="amount">{{ itemDetail.transferPrice }}</span>
           </template>
-          <template v-else-if="itemDetail.tradeMethod === '积分'">
+          <template v-else-if="itemDetail.tradeMethod === TRADE_METHOD_MAP.ITEM_TO_POINTS">
             <span class="amount">{{ itemDetail.transferPoints }}</span>
             <span class="unit">积分</span>
           </template>
@@ -54,7 +54,7 @@
           size="medium"
           class="trade-method-tag"
         >
-          {{ itemDetail.tradeMethod }}
+          {{ getValueText(itemDetail.tradeMethod, 'tradeMethod') }}
         </van-tag>
       </div>
 
@@ -69,7 +69,7 @@
         <div class="tags-row">
           <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
           <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
-          <van-tag round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
+          <van-tag round plain type="warning" size="medium">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</van-tag>
         </div>
         <div class="item-stats">
           <div class="stat-box">
@@ -103,7 +103,7 @@
               round
               width="60"
               height="60"
-              :src="itemDetail.avatarUrl"
+              :src="itemDetail.userAvatar"
             />
             <div class="seller-badge">
               <van-icon name="shield-o" />
@@ -111,16 +111,16 @@
           </div>
           <div class="seller-info">
             <div class="seller-name-row">
-              <span class="seller-name">{{ itemDetail.nickname }}</span>
+              <span class="seller-name">{{ itemDetail.userNickname }}</span>
               <van-tag type="primary" size="small" plain>认证用户</van-tag>
             </div>
             <div class="seller-score">
-              <van-rate v-model="itemDetail.userDetail.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
-              <span class="score-text">{{ itemDetail.userDetail.tradeScore }}分</span>
+              <van-rate v-model="itemDetail.userExt.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
+              <span class="score-text">{{ itemDetail.userExt.tradeScore }}分</span>
             </div>
             <div class="blockchain-id">
               <van-icon name="certificate" />
-              <span>区块链ID: {{ itemDetail.userDetail.blockchainId }}</span>
+              <span>区块链ID: {{ itemDetail.userExt.blockchainId }}</span>
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@
           </div>
           <div class="trade-item">
             <span class="item-label">交付方式</span>
-            <span class="item-value">{{ itemDetail.deliveryMethod }}</span>
+            <span class="item-value">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</span>
           </div>
           <div class="trade-item">
             <span class="item-label">交付地址</span>
@@ -196,12 +196,12 @@
           round 
           block 
           :loading="isSubmitting"
-          @click="itemDetail.tradeMethod === '以物换物' ? exchange() : buy()"
+          @click="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? exchange() : buy()"
         >
           <template #icon>
-            <van-icon :name="itemDetail.tradeMethod === '以物换物' ? 'exchange' : 'cash-back-record'" />
+            <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
           </template>
-          {{ itemDetail.tradeMethod === '以物换物' ? '发起交换' : '立即购买' }}
+          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
         </van-button>
       </div>
     </div>
@@ -299,50 +299,19 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-type ItemDetail = {
-      id: string,
-      userId: string,
-      nickname: string,
-      avatarUrl: string,
-      itemTitle: string,
-      itemType: string,
-      itemDescription: string,
-      firstImage: string,
-      itemImageList: string[],
-      depreciation: number,
-      transferTimes: number,
-      lastUserId: string,
-      blockchainId: string,
-      loveCount: number,
-      collectionCount: number,
-      viewCount: number,
-      tradeMethod: string,
-      transferPrice: number,
-      transferPoints: number,
-      expectItem: string,
-      contactInfo: {
-        linkman: string,
-        phone: string,
-        address: string
-      },
-      exchangeApplyCount: number,
-      deliveryMethod: string,
-      isLiked: boolean,
-      isCollected: boolean,
-      userDetail: {
-        tradeScore: number,
-        blockchainId: string
-      }
-    }
+import { getSquareItemDetail } from '@/api/stuff'
+import { TRADE_METHOD_MAP, DELIVERY_METHOD_MAP, getValueText } from '@/constants/stuff'
+import type { SquareItemDetail } from '@/api/types'
+
 type ExchangeForm = {
-      targetItemId: string,
-      linkman: string,
-      phone: string,
-      itemId: string,
-      itemTitle: string,
-      itemType: string,
-      remark: string
-    }  
+  targetItemId: string,
+  linkman: string,
+  phone: string,
+  itemId: string,
+  itemTitle: string,
+  itemType: string,
+  remark: string
+}  
 
 export default defineComponent({
   name: 'ItemDetailView',
@@ -351,12 +320,13 @@ export default defineComponent({
     const route = useRoute()
     const isLiked = ref(false)
     const isCollected = ref(false)
+    const loading = ref(false)
 
-    const itemDetail = ref<ItemDetail>({
+    const itemDetail = ref<SquareItemDetail>({
       id: '0',
       userId: '0',
-      nickname: '',
-      avatarUrl: '',
+      userAvatar: '',
+      userNickname: '',
       itemTitle: '',
       itemType: '',
       itemDescription: '',
@@ -373,6 +343,11 @@ export default defineComponent({
       transferPrice: 0,
       transferPoints: 0,
       expectItem: '',
+      publishTime: 0,
+      userExt: {
+        blockchainId: '',
+        tradeScore: 0
+      },
       contactInfo: {
         linkman: '',
         phone: '',
@@ -381,54 +356,33 @@ export default defineComponent({
       exchangeApplyCount: 0,
       deliveryMethod: '',
       isLiked: false,
-      isCollected: false,
-      userDetail: {
-        tradeScore: 0,
-        blockchainId: ''
-      }
+      isCollected: false
     })
 
     onMounted(async () => {
-      // 这里应该调用API获取物品详情
-      // 模拟API调用
-      itemDetail.value = {
-        id: '2025032500010',
-        userId: '20250324000002',
-        nickname: "NPE",
-        avatarUrl: "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        itemTitle: "iphone 16",
-        itemType: "电子产品",
-        itemDescription: "刚买2个月 32G 9成新",
-        firstImage: "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        itemImageList: ["https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg","https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"],
-        depreciation: 9,
-        transferTimes: 0,
-        lastUserId: '20250324000002',
-        blockchainId: "Hash0030343jkjlkj",
-        loveCount: 10,
-        collectionCount: 10,
-        viewCount: 10,
-        tradeMethod: "以物换物",
-        transferPrice: 190.0000,
-        transferPoints: 0,
-        expectItem: "ipad 10",
-        contactInfo: {
-          linkman: '张先生',
-          phone: '13800008888',
-          address: '深圳市南山区xx小区'
-        },
-        exchangeApplyCount: 0,
-        deliveryMethod: "同城自取",
-        isLiked: true,
-        isCollected: false,
-        userDetail: {
-          tradeScore: 8.9,
-          blockchainId: 'Hash0x99eeieidd'
-        }
-
+      const itemId = route.params.id as string
+      if (!itemId) {
+        showToast('物品ID不存在')
+        router.back()
+        return
       }
-      isLiked.value = itemDetail.value.isLiked
-      isCollected.value = itemDetail.value.isCollected
+
+      loading.value = true
+      try {
+        const res = await getSquareItemDetail(itemId)
+        if (res.success) {
+          itemDetail.value = res.data
+          isLiked.value = itemDetail.value.isLiked
+          isCollected.value = itemDetail.value.isCollected
+        } else {
+          showToast(res.desc || '获取物品详情失败')
+        }
+      } catch (error) {
+        console.error('获取物品详情失败:', error)
+        showToast('获取物品详情失败')
+      } finally {
+        loading.value = false
+      }
     })
 
     const onClickLeft = () => {
@@ -450,11 +404,13 @@ export default defineComponent({
     }
 
     const contactSeller = () => {
-      showToast(`联系方式：${itemDetail.value.contactInfo}`)
+      showToast(`联系方式：${itemDetail.value.contactInfo.phone}`)
     }
 
     const buy = () => {
-      if (itemDetail.value.tradeMethod === '人民币') {
+      if (itemDetail.value.tradeMethod === 'ITEM_TO_MONEY') {
+        router.push(`/stuff/transfer/${itemDetail.value.id}`)
+      } else if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
         router.push(`/stuff/transfer/${itemDetail.value.id}`)
       } else {
         router.push(`/stuff/exchange/${itemDetail.value.id}`)
@@ -525,9 +481,9 @@ export default defineComponent({
     // 添加交易方式类型判断方法
     const getTradeMethodType = (method: string) => {
       switch (method) {
-        case '人民币': return 'danger'
-        case '积分': return 'warning'
-        case '以物换物': return 'primary'
+        case 'ITEM_TO_MONEY': return 'danger'
+        case 'ITEM_TO_POINTS': return 'warning'
+        case 'ITEM_TO_ITEM': return 'primary'
         default: return 'default'
       }
     }
@@ -554,7 +510,9 @@ export default defineComponent({
       onItemConfirm,
       onExchangeSubmit,
       getTradeMethodType,
-      isSubmitting: ref(false)
+      isSubmitting: ref(false),
+      TRADE_METHOD_MAP,
+      getValueText
     }
   }
 })

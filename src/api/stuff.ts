@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse } from './types';
+import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail } from './types';
 
 // 上传文件到 OSS
 export const uploadFile = async (file: File): Promise<ApiResponse<string>> => {
@@ -40,8 +40,6 @@ export const getMyItems = async (params: {
     }
   });
 };
-
-
 
 // 获取物品详情
 export const getItemDetail = async (itemId: string): Promise<ApiResponse<ItemDetail>> => {
@@ -84,5 +82,9 @@ export const listSquareItems = async (params: ListSquareItemsParams): Promise<Ap
       'Content-Type': 'application/json'
     }
   });
+};
 
+// 获取交易广场物品详情
+export const getSquareItemDetail = async (itemId: string): Promise<ApiResponse<SquareItemDetail>> => {
+  return request.post(`/client/square/detail-item/${itemId}`);
 };

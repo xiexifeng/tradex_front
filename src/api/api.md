@@ -358,3 +358,61 @@ curl -X POST http://47.122.125.199/tradex/client/square/list-item \
 }
 
 ```
+
+## 查询交易广场-转让中物品详情
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/square/detail-item/{itemId} \
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+        "id": "2025061700001",
+        "userId": "2025061600001",
+        "userAvatar": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
+        "userNickname": "NPE",
+        "itemTitle": "吉娃娃",
+        "itemType": "衣服",
+        "itemDescription": "很好的",
+        "firstImage": "http://127.0.0.1:8099/tradex/basic/oss/previewFile/aca4bd93-9dba-4fec-81b0-361923b933e9.png",
+        "depreciation": 5,
+        "transferTimes": 0,
+        "lastUserId": "2025061600001",
+        "blockchainId": "hasheljklfjsdfjk",
+        "loveCount": 0,
+        "collectionCount": 0,
+        "viewCount": 0,
+        "tradeMethod": "ITEM_TO_ITEM",
+        "transferPrice": 0,
+        "transferPoints": 0,
+        "expectItem": "玩具车",
+        "publishTime": 1744790484000,
+        "itemImageList": [
+            "http://127.0.0.1:8099/tradex/basic/oss/previewFile/aca4bd93-9dba-4fec-81b0-361923b933e9.png"
+        ],
+        "userExt": {
+            "blockchainId":"2222",
+            "tradeScore": 15
+        },
+        "contactInfo": {
+            "linkman": "张三",
+            "phone": "17322449888",
+            "address": "龙华万家"
+        },
+        "exchangeApplyCount": 0,
+        "deliveryMethod": "SAME_CITY_BY_SELF",
+        "isLiked": false,
+        "isCollected": false
+    }
+}
+
+```

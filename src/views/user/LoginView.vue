@@ -108,6 +108,7 @@ import { showToast } from 'vant';
 import { useRouter } from 'vue-router';
 import { userApi } from '@/api/user';
 import { useUserStore } from '@/store/modules/user';
+import type { LoginResponse } from '@/api/types';
 
 const router = useRouter();
 const activeTab = ref(0);
@@ -169,7 +170,7 @@ const onPasswordSubmit = (values: any) => {
 const onCodeSubmit = async (values: any) => {
   try {
     const res = await userApi.loginByCode(values.phone, values.code);
-    const { token, userContext } = res.data;
+    const { token, userContext } = (res.data as unknown) as LoginResponse;
     
     userStore.setToken(token);
     userStore.setUserInfo(userContext);

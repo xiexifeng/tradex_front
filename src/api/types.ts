@@ -93,3 +93,41 @@ export interface ListSquareItemsResponse {
   expectItem: string | null;
   publishTime: number;
 }
+
+// 交易广场物品详情接口
+export interface SquareItemDetail {
+  id: string;
+  userId: string;
+  userAvatar: string;
+  userNickname: string;
+  itemTitle: string;
+  itemType: string;
+  itemDescription: string;
+  firstImage: string;
+  depreciation: number;
+  transferTimes: number;
+  lastUserId: string;
+  blockchainId: string;
+  loveCount: number;
+  collectionCount: number;
+  viewCount: number;
+  tradeMethod: string;
+  transferPrice: number;
+  transferPoints: number;
+  expectItem: string;
+  publishTime: number;
+  itemImageList: string[];
+  userExt: {
+    blockchainId: string;
+    tradeScore: number;
+  };
+  contactInfo: {
+    linkman: string;
+    phone: string;
+    address: string;
+  };
+  exchangeApplyCount: number;
+  deliveryMethod: string;
+  isLiked: boolean;
+  isCollected: boolean;
+}
