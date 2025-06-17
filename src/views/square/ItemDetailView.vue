@@ -33,11 +33,11 @@
       <!-- 价格和交易方式突出显示 -->
       <div class="price-card">
         <div class="price-main">
-          <template v-if="itemDetail.tradeMethod === TRADE_METHOD_MAP.ITEM_TO_MONEY">
+          <template v-if="itemDetail.tradeMethod === 'ITEM_TO_MONEY'">
             <span class="currency">¥</span>
             <span class="amount">{{ itemDetail.transferPrice }}</span>
           </template>
-          <template v-else-if="itemDetail.tradeMethod === TRADE_METHOD_MAP.ITEM_TO_POINTS">
+          <template v-else-if="itemDetail.tradeMethod === 'ITEM_TO_POINTS'">
             <span class="amount">{{ itemDetail.transferPoints }}</span>
             <span class="unit">积分</span>
           </template>
