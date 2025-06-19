@@ -261,6 +261,13 @@
               autosize
               placeholder="请输入备注信息（选填）"
             />
+            <van-field
+              v-model="exchangeForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
+            />
           </van-cell-group>
           <div class="submit-button">
             <van-button round block type="primary" native-type="submit">
@@ -299,9 +306,10 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { getSquareItemDetail } from '@/api/stuff'
-import { TRADE_METHOD_MAP, DELIVERY_METHOD_MAP, getValueText } from '@/constants/stuff'
+import { getSquareItemDetail, applySquareExchange } from '@/api/stuff'
+import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
+import { useUserStore } from '@/store/modules/user'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -310,7 +318,8 @@ type ExchangeForm = {
   itemId: string,
   itemTitle: string,
   itemType: string,
-  remark: string
+  remark: string,
+  address: string
 }  
 
 export default defineComponent({
@@ -358,6 +367,8 @@ export default defineComponent({
       isLiked: false,
       isCollected: false
     })
+
+    const userStore = useUserStore()
 
     onMounted(async () => {
       const itemId = route.params.id as string
@@ -430,7 +441,8 @@ export default defineComponent({
       itemId: '0',
       itemTitle: '',
       itemType: '',
-      remark: ''
+      remark: '',
+      address: ''
     })
 
     // 物品类型选项
@@ -445,7 +457,7 @@ export default defineComponent({
 
     // 模拟我的物品列表
     const myItemColumns = [
-      { text: 'iPhone 16', value: '2025032500011' },
+      { text: 'iPhone 16', value: '2025061900009' },
       { text: 'iPad Pro', value: '2025032500012' },
       { text: 'MacBook Air', value: '2025032500013' }
     ]
@@ -472,10 +484,28 @@ export default defineComponent({
     }
 
     // 提交交换申请
-    const onExchangeSubmit = (values: any) => {
-      console.log('交换申请表单：', exchangeForm.value)
-      showToast('申请已提交')
-      showExchangeForm.value = false
+    const onExchangeSubmit = async () => {
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          fromUserId: userStore.userInfo?.userId || '',
+          swapItemId: exchangeForm.value.itemId,
+          contactInfo: {
+            linkman: exchangeForm.value.linkman,
+            phone: exchangeForm.value.phone,
+            address: exchangeForm.value.address
+          }
+        };
+        const res = await applySquareExchange(params);
+        if (res.success) {
+          showToast('申请已提交');
+          showExchangeForm.value = false;
+        } else {
+          showToast(res.desc || '提交失败');
+        }
+      } catch (e) {
+        showToast('提交失败');
+      }
     }
 
     // 添加交易方式类型判断方法

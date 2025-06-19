@@ -34,12 +34,12 @@
             @load="onLoad"
             class="trade-list-content"
           >
-            <div class="trade-item" v-for="trade in getFilteredTrades(status.value)" :key="trade.id">
+            <div class="trade-item" v-for="trade in trades" :key="trade.id">
               <div class="trade-header">
                 <div class="trade-status" :class="trade.tradeStatus">
                   {{ getStatusText(trade.tradeStatus) }}
                 </div>
-                <div class="trade-type" :class="trade.flag.toLowerCase()">
+                <div class="trade-type" :class="trade.flag?.toLowerCase()">
                   {{ trade.flag === 'SELL' ? '换/售出' : '换/购入' }}
                 </div>
               </div>
@@ -54,10 +54,9 @@
                   <div class="trade-title">{{ trade.itemTitle }}</div>
                   <div class="trade-id">交易编号: {{ trade.id }}</div>
                   <div class="trade-price">
-                    <span class="label">{{ trade.tradeMethod === '人民币' ? '交易金额：¥' : trade.tradeMethod === '积分' ? '交易积分：' : '交换物：' }}</span>
-                    <span class="value">{{ trade.tradeMethod === '人民币' ? trade.tradePrice : trade.tradeMethod === '积分' ? trade.tradePoints : trade.swapItemTitle }}</span>
+                    <span class="label">{{ trade.tradeMethod === 'ITEM_TO_MONEY' ? '交易金额：¥' : trade.tradeMethod === 'ITEM_TO_POINTS' ? '交易积分：' : '交换物：' }}</span>
+                    <span class="value">{{ trade.tradeMethod === 'ITEM_TO_MONEY' ? trade.tradePrice : trade.tradeMethod === 'ITEM_TO_POINTS' ? trade.tradePoints : trade.swapItemTitle }}</span>
                   </div>
-                  
                   <template v-if="trade.tradeStatus === 'completed'">
                     <div class="trade-score">
                       <div class="score-item">
@@ -78,20 +77,20 @@
                   查看详情
                 </van-button>
                 <template v-if="trade.tradeStatus === 'trading'">
-                  <template v-if="trade.fromUserId === userInfo.userId && trade.tradeMethod === '以物换物'">
+                  <template v-if="trade.fromUserId === userInfo.userId && trade.tradeMethod === 'ITEM_TO_ITEM'">
                     <van-button size="small" type="primary" @click="acceptTrade(trade)">接受交易</van-button>
                     <van-button size="small" type="danger" @click="rejectTrade(trade)">拒绝交易</van-button>
                   </template>
                   <template v-if="trade.fromUserId !== userInfo.userId">
                     <van-button size="small" type="danger" @click="cancelTrade(trade)">取消交易</van-button>
-                    <template v-if="trade.tradeMethod !== '以物换物'">
+                    <template v-if="trade.tradeMethod !== 'ITEM_TO_ITEM'">
                       <van-button size="small" type="primary" @click="goPayTrade(trade)">去支付</van-button>
                     </template>
                   </template>
                 </template>
                 <template v-if="trade.tradeStatus === 'accepted'">
                   <van-button size="small" type="success" @click="confirmTrade(trade)">确认交易</van-button>
-                  <template v-if="trade.fromUserId !== userInfo.userId && trade.tradeMethod !== '以物换物'">
+                  <template v-if="trade.fromUserId !== userInfo.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
                     <van-button size="small" type="warning" @click="refundTrade(trade)">发起退款</van-button>
                   </template>
                 </template>
@@ -131,32 +130,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showDialog } from 'vant'
-type TradeList = {
-            "id": string,
-            "itemId": string,
-            "itemTitle": string,
-            "firstImage": string,
-            "fromUserId": string,
-            "toUserId": string,
-            "tradeMethod": number|string,
-            "tradeStatus": string,
-            "paymentStatus": number|string,
-            "tradePrice": number|undefined,
-            "tradePoints": number|undefined,
-            "swapItemId": string|undefined,
-            "swapItemTitle": string|undefined,
-            "contactInfo": string,
-            "logisticsFrom": string|undefined,
-            "logisticsTo": string|undefined,
-            "fromScore": number|undefined,
-            "toScore": number|undefined,
-            "finishTradeTime": string|undefined,
-            "createTime": number,
-            "flag": string
-        }
+import { getTradeList } from '@/api/stuff'
+import type { TradeListItem } from '@/api/types'
 
 export default defineComponent({
   name: 'TradeListView',
@@ -166,9 +144,10 @@ export default defineComponent({
     const loading = ref(false)
     const finished = ref(false)
     const refreshing = ref(false)
-    const userInfo = ref({
-      userId: "20250324000002"
-    })
+    const trades = ref<TradeListItem[]>([])
+    const pageNo = ref(1)
+    const pageSize = ref(10)
+    const userInfo = ref({ userId: '' }) // 可根据实际登录信息获取
 
     // 交易状态列表
     const statusList = [
@@ -180,194 +159,6 @@ export default defineComponent({
       { text: '已拒绝', value: 'rejected' },
       { text: '已退款', value: 'refunded' }
     ]
-
-    // 模拟交易数据
-    const trades = ref<TradeList[]>([
-      {
-            "id": "2025040100001",
-            "itemId": "2025040100001",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "以物换物",
-            "tradeStatus": 'trading',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": undefined,
-            "toScore": undefined,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100002",
-            "itemId": "2025040100002",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "以物换物",
-            "tradeStatus": 'accepted',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": undefined,
-            "toScore": undefined,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100003",
-            "itemId": "2025040100004",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "以物换物",
-            "tradeStatus": 'completed',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": 6,
-            "toScore": 9,
-            "finishTradeTime": '2025-04-01 12:12:10',
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100004",
-            "itemId": "2025040100004",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "以物换物",
-            "tradeStatus": 'rejected',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": 6,
-            "toScore": 9,
-            "finishTradeTime": '2025-04-01 12:12:10',
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100005",
-            "itemId": "2025040100004",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "以物换物",
-            "tradeStatus": 'cancelled',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": 6,
-            "toScore": 9,
-            "finishTradeTime": '2025-04-01 12:12:10',
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100006",
-            "itemId": "2025040100007",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "人民币",
-            "tradeStatus": 'accepted',
-            "paymentStatus": 0,
-            "tradePrice": undefined,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": undefined,
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": 6,
-            "toScore": 9,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'SELL'
-        },
-        {
-            "id": "2025040100011",
-            "itemId": "2025040100002",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000003",
-            "toUserId": "20250324000002",
-            "tradeMethod": "人民币",
-            "tradeStatus": 'trading',
-            "paymentStatus": 0,
-            "tradePrice": 100,
-            "tradePoints": undefined,
-            "swapItemId": undefined,
-            "swapItemTitle": undefined,
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": undefined,
-            "toScore": undefined,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'BUY'
-        },
-        {
-            "id": "2025040100012",
-            "itemId": "2025040100002",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000003",
-            "toUserId": "20250324000002",
-            "tradeMethod": "人民币",
-            "tradeStatus": 'accepted',
-            "paymentStatus": 0,
-            "tradePrice": 100,
-            "tradePoints": undefined,
-            "swapItemId": undefined,
-            "swapItemTitle": undefined,
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": undefined,
-            "toScore": undefined,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'BUY'
-        }
-    ])
 
     // 获取状态样式
     const getStatusType = (status: string) => {
@@ -393,36 +184,70 @@ export default defineComponent({
       return textMap[status] || status
     }
 
-    // 根据状态筛选交易
-    const getFilteredTrades = (status: string) => {
-      if (status === 'all') return trades.value
-      return trades.value.filter(trade => trade.tradeStatus === status)
+    // 获取交易列表
+    const fetchTrades = async (isRefresh = false) => {
+      if (isRefresh) {
+        pageNo.value = 1
+        finished.value = false
+        trades.value = []
+      }
+      loading.value = true
+      const status = statusList[activeTab.value].value
+      const params: any = {
+        pageNo: pageNo.value,
+        pageSize: pageSize.value
+      }
+      if (status !== 'all') params.tradeStatus = status
+      try {
+        params.tradeMethod='ITEM_TO_ITEM'
+        const res = await getTradeList(params)
+        if (res.success) {
+          if (isRefresh) {
+            trades.value = res.data
+          } else {
+            trades.value = trades.value.concat(res.data)
+          }
+          finished.value = res.data.length < pageSize.value
+          pageNo.value++
+        } else {
+          showToast(res.desc || '获取失败')
+          finished.value = true
+        }
+      } catch (e) {
+        showToast('获取失败')
+        finished.value = true
+      } finally {
+        loading.value = false
+        if (isRefresh) refreshing.value = false
+      }
     }
 
-    // 下拉刷新
     const onRefresh = () => {
       refreshing.value = true
-      setTimeout(() => {
-        refreshing.value = false
-      }, 1000)
+      fetchTrades(true)
     }
 
-    // 上拉加载
     const onLoad = () => {
-      loading.value = true
-      setTimeout(() => {
-        loading.value = false
-        finished.value = true
-      }, 1000)
+      if (!finished.value) fetchTrades()
     }
+
+    // 监听 tab 切换
+    watch(activeTab, () => {
+      fetchTrades(true)
+    })
+
+    // 初始化加载
+    onMounted(() => {
+      fetchTrades(true)
+    })
 
     // 查看详情
-    const viewDetail = (trade: any) => {
+    const viewDetail = (trade: TradeListItem) => {
       router.push(`/stuff/trade/${trade.id}`)
     }
 
-    // 接受交易
-    const acceptTrade = (trade: any) => {
+    // 下面的操作方法可根据实际业务对接API
+    const acceptTrade = (trade: TradeListItem) => {
       showDialog({
         title: '确认接受',
         message: '确定要接受这个交易吗？',
@@ -430,12 +255,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已接受交易')
         trade.tradeStatus = 'accepted'
-      }).catch(() => {
-        console.log('cancel')
       })
     }
-    // 拒绝交易
-    const rejectTrade = (trade: any) => {
+    const rejectTrade = (trade: TradeListItem) => {
       showDialog({
         title: '确认拒绝',
         message: '确定要拒绝这个交易吗？',
@@ -443,13 +265,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已拒绝交易')
         trade.tradeStatus = 'rejected'
-      }).catch(() => {
-        console.log('rejected')
       })
     }
-    
-    // 发起退款
-    const refundTrade = (trade: any) => {
+    const refundTrade = (trade: TradeListItem) => {
       showDialog({
         title: '确认发起退款',
         message: '确定要发起退款这个交易吗？',
@@ -457,13 +275,9 @@ export default defineComponent({
       }).then(() => {
         showToast('已发起退款')
         trade.tradeStatus = 'refunded'
-      }).catch(() => {
-        console.log('refunded')
       })
     }
-
-    // 确认交易
-    const confirmTrade = (trade: any) => {
+    const confirmTrade = (trade: TradeListItem) => {
       showDialog({
         title: '确认完成',
         message: '确定要完成这个交易吗？',
@@ -471,13 +285,9 @@ export default defineComponent({
       }).then(() => {
         showToast('交易已完成')
         trade.tradeStatus = 'completed'
-      }).catch(() => {
-        console.log('cancel')
       })
     }
-
-    // 取消交易
-    const cancelTrade = (trade: any) => {
+    const cancelTrade = (trade: TradeListItem) => {
       showDialog({
         title: '取消交易',
         message: '确定要取消这个交易吗？',
@@ -485,12 +295,9 @@ export default defineComponent({
       }).then(() => {
         showToast('交易已取消')
         trade.tradeStatus = 'cancelled'
-      }).catch(() => {
-        console.log('cancel')
       })
     }
-    // 继续支付/去支付
-    const goPayTrade = (trade: any) => {
+    const goPayTrade = (trade: TradeListItem) => {
       showDialog({
         title: '继续支付',
         message: '确定要支付这个交易吗？',
@@ -498,12 +305,9 @@ export default defineComponent({
       }).then(() => {
         showToast('支付已成功')
         trade.tradeStatus = 'accepted'
-      }).catch(() => {
-        console.log('accepted')
       })
     }
 
-    // 返回上一页
     const onClickLeft = () => {
       router.back()
     }
@@ -518,7 +322,6 @@ export default defineComponent({
       userInfo,
       getStatusType,
       getStatusText,
-      getFilteredTrades,
       onRefresh,
       onLoad,
       viewDetail,

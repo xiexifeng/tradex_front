@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail } from './types';
+import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem } from './types';
 
 // 上传文件到 OSS
 export const uploadFile = async (file: File): Promise<ApiResponse<string>> => {
@@ -87,4 +87,32 @@ export const listSquareItems = async (params: ListSquareItemsParams): Promise<Ap
 // 获取交易广场物品详情
 export const getSquareItemDetail = async (itemId: string): Promise<ApiResponse<SquareItemDetail>> => {
   return request.post(`/client/square/detail-item/${itemId}`);
+};
+
+// 交易广场-发起交换申请
+export const applySquareExchange = async (data: {
+  itemId: string;
+  fromUserId: string;
+  swapItemId: string;
+  contactInfo: {
+    linkman: string;
+    phone: string;
+    address: string;
+  };
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/transfer-apply', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 交易管理-查询
+export const getTradeList = async (params: {
+  pageNo: number;
+  pageSize: number;
+  tradeStatus?: string;
+  tradeMethod?: string;
+}): Promise<ApiResponse<TradeListItem[]>> => {
+  return request.post('/client/trade/list-mine', params, {
+    headers: { 'Content-Type': 'application/json' }
+  });
 };

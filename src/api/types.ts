@@ -131,3 +131,28 @@ export interface SquareItemDetail {
   isLiked: boolean;
   isCollected: boolean;
 }
+
+// 交易管理-查询接口返回的单条数据类型
+export interface TradeListItem {
+  id: string;
+  itemId: string;
+  itemTitle: string;
+  firstImage: string;
+  fromUserId: string;
+  toUserId: string;
+  tradeMethod: string;
+  tradeStatus: string;
+  paymentStatus: number;
+  tradePrice: number | null;
+  tradePoints: number | null;
+  swapItemId?: string;
+  swapItemTitle?: string;
+  contactInfo: string;
+  logisticsFrom?: string;
+  logisticsTo?: string;
+  fromScore?: number;
+  toScore?: number;
+  finishTradeTime?: string;
+  createTime: number;
+  flag: string;
+}

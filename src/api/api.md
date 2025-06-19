@@ -416,3 +416,112 @@ curl -X POST http://47.122.125.199/tradex/client/square/detail-item/{itemId} \
 }
 
 ```
+
+## 交易广场-发起交换申请
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/trade/transfer-apply \
+-H "Content-Type: application/json" \
+-d '
+{
+  "itemId": "item12222",
+  "fromUserId": "user12222",
+  "swapItemId": "item12222",
+  "contactInfo":  {
+            "linkman": "张三",
+            "phone": "17322449888",
+            "address": "龙华万家"
+        }
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```
+## 交易管理-查询
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/trade/list-mine \
+-H "Content-Type: application/json" \
+-d '
+{
+  "pageNo": 1,
+  "pageSize": 10
+  "tradeStatus": "all"
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": [{
+            "id": "2025040100001",
+            "itemId": "2025040100001",
+            "itemTitle": "iphone 16",
+            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+            "fromUserId": "20250324000002",
+            "toUserId": "20250324000001",
+            "tradeMethod": "ITEM_TO_ITEM",
+            "tradeStatus": "trading",
+            "paymentStatus": 0,
+            "tradePrice": null,
+            "tradePoints": null,
+            "swapItemId": "20250324000002",
+            "swapItemTitle": "小米6",
+            "contactInfo": "",
+            "logisticsFrom": null,
+            "logisticsTo": null,
+            "fromScore": null,
+            "toScore": null,
+            "finishTradeTime": null,
+            "createTime": 1743470905967,
+            "flag": 'SELL'
+        }]
+}
+
+```
+
+
+## 以物换物-卖方接受交易
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/trade/accept-transfer-apply \
+-H "Content-Type: application/json" \
+-d '
+{
+  "tradeId": "trade12222"
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```
