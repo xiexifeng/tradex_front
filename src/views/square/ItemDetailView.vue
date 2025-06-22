@@ -249,7 +249,7 @@
               placeholder="请选择要交换的物品"
               readonly
               is-link
-              @click="showItemListPopup = true"
+              @click="openItemListPopup"
               :rules="[{ required: true, message: '请选择交换物品' }]"
             />
             <van-field
@@ -306,10 +306,10 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { getSquareItemDetail, applySquareExchange } from '@/api/stuff'
+import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems } from '@/api/stuff'
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
-import { useUserStore } from '@/store/modules/user'
+// import { useUserStore } from '@/store/modules/user'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -368,7 +368,7 @@ export default defineComponent({
       isCollected: false
     })
 
-    const userStore = useUserStore()
+    // const userStore = useUserStore()
 
     onMounted(async () => {
       const itemId = route.params.id as string
@@ -455,12 +455,27 @@ export default defineComponent({
       {text: '其他', value: '其他'}
     ]
 
-    // 模拟我的物品列表
-    const myItemColumns = [
-      { text: 'iPhone 16', value: '2025061900009' },
-      { text: 'iPad Pro', value: '2025032500012' },
-      { text: 'MacBook Air', value: '2025032500013' }
-    ]
+    // 我的可交换物品列表（动态获取）
+    const myItemColumns = ref<{ text: string, value: string }[]>([])
+
+    // 拉取可交换物品
+    const fetchMyCanTradeItems = async () => {
+      const res = await getMyCanTradeItems({ pageNo: 1, pageSize: 100 })
+      if (res.success && Array.isArray(res.data)) {
+        myItemColumns.value = res.data.map(item => ({
+          text: item.itemTitle,
+          value: item.id
+        }))
+      } else {
+        myItemColumns.value = []
+      }
+    }
+
+    // 打开弹窗时先拉取
+    const openItemListPopup = async () => {
+      await fetchMyCanTradeItems()
+      showItemListPopup.value = true
+    }
 
     // 打开交换表单
     const exchange = () => {
@@ -488,7 +503,7 @@ export default defineComponent({
       try {
         const params = {
           itemId: itemDetail.value.id,
-          fromUserId: userStore.userInfo?.userId || '',
+          fromUserId: itemDetail.value.userId || '',
           swapItemId: exchangeForm.value.itemId,
           contactInfo: {
             linkman: exchangeForm.value.linkman,
@@ -542,7 +557,8 @@ export default defineComponent({
       getTradeMethodType,
       isSubmitting: ref(false),
       TRADE_METHOD_MAP,
-      getValueText
+      getValueText,
+      openItemListPopup
     }
   }
 })

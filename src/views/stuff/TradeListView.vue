@@ -155,7 +155,7 @@ export default defineComponent({
       { text: '交易中', value: 'trading' },
       { text: '已达成', value: 'accepted' },
       { text: '已完成', value: 'completed' },
-      { text: '已取消', value: 'cancelled' },
+      { text: '已取消', value: 'canceled' },
       { text: '已拒绝', value: 'rejected' },
       { text: '已退款', value: 'refunded' }
     ]
@@ -166,7 +166,7 @@ export default defineComponent({
         trading: 'primary',
         accepted: 'success',
         completed: 'warning',
-        cancelled: 'danger'
+        canceled: 'danger'
       }
       return typeMap[status] || 'default'
     }
@@ -177,7 +177,7 @@ export default defineComponent({
         trading: '交易中',
         accepted: '已达成',
         completed: '已完成',
-        cancelled: '已取消',
+        canceled: '已取消',
         rejected: '已拒绝',
         refunded: '已退款'
       }
@@ -294,7 +294,7 @@ export default defineComponent({
         showCancelButton: true,
       }).then(() => {
         showToast('交易已取消')
-        trade.tradeStatus = 'cancelled'
+        trade.tradeStatus = 'canceled'
       })
     }
     const goPayTrade = (trade: TradeListItem) => {
@@ -518,7 +518,7 @@ export default defineComponent({
           vertical-align: middle;
         }
       }
-      &.cancelled { 
+      &.canceled { 
         color: #969799;
         &::before {
           content: '';

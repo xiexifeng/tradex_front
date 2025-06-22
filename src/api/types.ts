@@ -156,3 +156,12 @@ export interface TradeListItem {
   createTime: number;
   flag: string;
 }
+
+// 可交换物品接口
+export interface MyCanTradeItem {
+  id: string;
+  userId: string;
+  itemTitle: string;
+  itemType: string;
+  firstImage: string;
+}

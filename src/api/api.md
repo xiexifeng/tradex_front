@@ -449,7 +449,8 @@ curl -X POST http://47.122.125.199/tradex/client/trade/transfer-apply \
 }
 
 ```
-## 交易管理-查询
+
+## 交易管理-查询我的交易
 
 **请求：**
 
@@ -499,13 +500,63 @@ curl -X POST http://47.122.125.199/tradex/client/trade/list-mine \
 
 ```
 
+## 以物换物-查询我可以交换的物品
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/item/list-my-can-trade-item \
+-H "Content-Type: application/json" 
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": [
+        {
+            "id": "2025041600004",
+            "userId": "2025041600008",
+            "itemTitle": "ipad",
+            "itemType": "电子产品",
+            "firstImage": "https://loremflickr.com/400/400?lock=4629788122736503"
+        },
+        {
+            "id": "2025061400001",
+            "userId": "2025041600008",
+            "itemTitle": "小兔子",
+            "itemType": "玩具",
+            "firstImage": "http://127.0.0.1:80/tradex/basic/oss/previewFile/6ecfc82f-91eb-4d55-94b5-abf88b76fce6.png"
+        },
+        {
+            "id": "2025062200001",
+            "userId": "2025041600008",
+            "itemTitle": "宠物企鹅",
+            "itemType": "玩具",
+            "firstImage": "http://127.0.0.1:80/tradex/basic/oss/previewFile/b10bc147-8633-4d63-86c6-e2b702ab92c0.png"
+        },
+        {
+            "id": "2025062200002",
+            "userId": "2025041600008",
+            "itemTitle": "迷你鼠",
+            "itemType": "玩具",
+            "firstImage": "http://127.0.0.1:80/tradex/basic/oss/previewFile/fe599d5f-ccb8-42e8-908e-11011952f5ce.png"
+        }
+    ]
+}
+
+```
 
 ## 以物换物-卖方接受交易
 
 **请求：**
 
 ```bash
-curl -X POST http://47.122.125.199/tradex/trade/accept-transfer-apply \
+curl -X POST http://47.122.125.199/tradex/clien/trade/accept-transfer-apply \
 -H "Content-Type: application/json" \
 -d '
 {

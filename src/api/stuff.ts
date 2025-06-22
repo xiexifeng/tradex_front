@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem } from './types';
+import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem, MyCanTradeItem } from './types';
 
 // 上传文件到 OSS
 export const uploadFile = async (file: File): Promise<ApiResponse<string>> => {
@@ -31,10 +31,21 @@ export const publishItem = async (data: {
 export const getMyItems = async (params: {
   pageNo: number;
   pageSize: number;
-  status?: string;
-  itemTitle?: string;
 }): Promise<ApiResponse<Item[]>> => {
   return request.post('/client/item/list-mine', params, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};
+
+// 查询我的可以交换的物品列表
+export const getMyCanTradeItems = async (params: {
+  pageNo: number;
+  pageSize: number;
+  itemTitle?: string;
+}): Promise<ApiResponse<MyCanTradeItem[]>> => {
+  return request.post('/client/item/list-my-can-trade-item', params, {
     headers: {
       'Content-Type': 'application/json'
     }
