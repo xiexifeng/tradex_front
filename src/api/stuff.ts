@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem, MyCanTradeItem } from './types';
+import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem, MyCanTradeItem, TradeOrderForPay } from './types';
 
 // 上传文件到 OSS
 export const uploadFile = async (file: File): Promise<ApiResponse<string>> => {
@@ -112,6 +112,36 @@ export const applySquareExchange = async (data: {
   };
 }): Promise<ApiResponse> => {
   return request.post('/client/trade/transfer-apply', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 交易广场-创建支付单
+export const createOrderForPay = async (data: {
+  itemId: string;
+  fromUserId: string;
+  contactInfo: {
+    linkman: string;
+    phone: string;
+    address: string;
+  };
+}): Promise<ApiResponse<TradeOrderForPay>> => {
+  return request.post('/client/trade/create-pay', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 交易广场-确认支付
+export const confirmPay = async (data: {
+  itemId: string;
+  tradeId: string;
+  tradePassword: string;
+  tradeMethod: string;
+  tradePrice: number|null;
+  tradePoints: number|null;
+  paymentMethod: string|null;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/confirm-pay', data, {
     headers: { 'Content-Type': 'application/json' }
   });
 };

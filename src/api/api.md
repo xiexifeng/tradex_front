@@ -576,3 +576,73 @@ curl -X POST http://47.122.125.199/tradex/clien/trade/accept-transfer-apply \
 }
 
 ```
+
+## 积分换物-发起支付,创建支付订单
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/clien/trade/create-pay \
+-H "Content-Type: application/json" \
+-d '
+{
+  "itemId": "item12222",
+  "fromUserId": "user20222222",
+  "contactInfo":{
+            "linkman": "张三",
+            "phone": "17322449888",
+            "address": "龙华万家"
+        }
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+        "tradeId":"trade20222222",
+        "itemId": "item100000",
+        "tradeMethod": "ITEM_TO_POINTS",
+        "tradePrice": null,
+        "tradePoints": 10
+    }
+}
+
+```
+
+## 积分换物-立即支付
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/clien/trade/goPay \
+-H "Content-Type: application/json" \
+-d '
+{
+    "tradeId":"trade20222222",
+    "itemId": "item100000",
+    "tradePassword":"123456"
+    "tradeMethod": "ITEM_TO_POINTS",
+    "tradePrice": null,
+    "tradePoints": 10，
+    "paymentMethod": null
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```

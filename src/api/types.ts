@@ -165,3 +165,12 @@ export interface MyCanTradeItem {
   itemType: string;
   firstImage: string;
 }
+
+// 待支付的交易订单接口
+export interface TradeOrderForPay {
+  tradeId: string;
+  itemId: string;
+  tradeMethod: string;
+  tradePrice: number|null;
+  tradePoints: number|null;
+}

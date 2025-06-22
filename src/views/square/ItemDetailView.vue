@@ -206,54 +206,41 @@
       </div>
     </div>
 
-    <!-- 交换表单弹出层 -->
+    <!-- 购买表单弹出层 -->
     <van-popup
-      v-model:show="showExchangeForm"
+      v-model:show="showBuyForm"
       position="bottom"
       round
       closeable
-      :style="{ height: '70%' }"
+      :style="{ height: '60%' }"
     >
       <div class="exchange-popup">
-        <div class="popup-title">发起交换</div>
-        <van-form @submit="onExchangeSubmit">
+        <div class="popup-title">填写购买信息</div>
+        <van-form @submit="onBuySubmit">
           <van-cell-group inset>
             <van-field
-              v-model="exchangeForm.linkman"
+              v-model="buyForm.linkman"
               name="linkman"
               label="联系人"
               placeholder="请输入联系人姓名"
               :rules="[{ required: true, message: '请填写联系人' }]"
             />
             <van-field
-              v-model="exchangeForm.phone"
+              v-model="buyForm.phone"
               name="phone"
               label="联系电话"
               placeholder="请输入联系电话"
               :rules="[{ required: true, message: '请填写联系电话' }]"
             />
             <van-field
-              v-model="exchangeForm.itemType"
-              name="itemType"
-              label="物品类型"
-              placeholder="请选择物品类型"
-              readonly
-              is-link
-              @click="showItemTypePopup = true"
-              :rules="[{ required: true, message: '请选择物品类型' }]"
+              v-model="buyForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
             />
             <van-field
-              v-model="selectedItemTitle"
-              name="exchangeItem"
-              label="交换物品"
-              placeholder="请选择要交换的物品"
-              readonly
-              is-link
-              @click="openItemListPopup"
-              :rules="[{ required: true, message: '请选择交换物品' }]"
-            />
-            <van-field
-              v-model="exchangeForm.remark"
+              v-model="buyForm.remark"
               name="remark"
               label="备注"
               type="textarea"
@@ -261,17 +248,51 @@
               autosize
               placeholder="请输入备注信息（选填）"
             />
+          </van-cell-group>
+          <div class="submit-button">
+            <van-button round block type="primary" native-type="submit" :loading="isSubmitting">
+              确认购买
+            </van-button>
+          </div>
+        </van-form>
+      </div>
+    </van-popup>
+
+    <!-- 积分支付弹窗 -->
+    <van-popup
+      v-model:show="showPayPopup"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '40%' }"
+    >
+      <div class="exchange-popup">
+        <div class="popup-title">积分支付</div>
+        <van-form @submit="onPaySubmit">
+          <van-cell-group inset>
             <van-field
-              v-model="exchangeForm.address"
-              name="address"
-              label="联系地址"
-              placeholder="请输入联系地址"
-              :rules="[{ required: true, message: '请填写联系地址' }]"
+              v-model="payForm.tradePoints"
+              name="tradePoints"
+              label="支付积分"
+              type="number"
+              :readonly="true"
+            />
+            <van-field
+              v-model="payForm.tradePassword"
+              name="tradePassword"
+              label="支付密码"
+              type="password"
+              maxlength="6"
+              placeholder="请输入6位支付密码"
+              :rules="[
+                { required: true, message: '请输入支付密码' },
+                { pattern: /^\d{6}$/, message: '请输入6位数字密码' }
+              ]"
             />
           </van-cell-group>
           <div class="submit-button">
-            <van-button round block type="primary" native-type="submit">
-              提交申请
+            <van-button round block type="primary" native-type="submit" :loading="isPaying">
+              确认支付
             </van-button>
           </div>
         </van-form>
@@ -306,7 +327,7 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems } from '@/api/stuff'
+import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay } from '@/api/stuff'
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
 // import { useUserStore } from '@/store/modules/user'
@@ -419,13 +440,8 @@ export default defineComponent({
     }
 
     const buy = () => {
-      if (itemDetail.value.tradeMethod === 'ITEM_TO_MONEY') {
-        router.push(`/stuff/transfer/${itemDetail.value.id}`)
-      } else if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
-        router.push(`/stuff/transfer/${itemDetail.value.id}`)
-      } else {
-        router.push(`/stuff/exchange/${itemDetail.value.id}`)
-      }
+      // 打开购买表单弹窗
+      showBuyForm.value = true
     }
 
     // 交换表单相关
@@ -533,6 +549,99 @@ export default defineComponent({
       }
     }
 
+    // 新增购买表单相关
+    const showBuyForm = ref(false)
+    const buyForm = ref({
+      linkman: '',
+      phone: '',
+      address: '',
+      remark: ''
+    })
+
+    // 积分支付相关
+    const showPayPopup = ref(false)
+    const payForm = ref({
+      tradePoints: 0,
+      tradePassword: ''
+    })
+    const isPaying = ref(false)
+    const payTradeId = ref('')
+
+    const isSubmitting = ref(false)
+
+    const onBuySubmit = async () => {
+      isSubmitting.value = true
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          fromUserId: itemDetail.value.userId || '',
+          contactInfo: {
+            linkman: buyForm.value.linkman,
+            phone: buyForm.value.phone,
+            address: buyForm.value.address
+          }
+        }
+        const res = await createOrderForPay(params)
+        if (res.success) {
+          showToast('下单成功')
+          showBuyForm.value = false
+          // 判断是否为积分支付
+          if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
+            payTradeId.value = res.data?.tradeId || ''
+            payForm.value.tradePoints = itemDetail.value.transferPoints
+            // payForm.value.tradePassword = ''
+            showPayPopup.value = true
+          }
+        } else {
+          showToast(res.desc || '下单失败')
+        }
+      } catch (e) {
+        showToast('下单失败')
+      } finally {
+        isSubmitting.value = false
+      }
+    }
+
+    const onPaySubmit = async () => {
+      console.log('提交时 tradePassword:', payForm.value.tradePassword)
+      if (!payForm.value.tradePassword || payForm.value.tradePassword.length !== 6) {
+        showToast('请输入6位支付密码')
+        return
+      }
+      isPaying.value = true
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          tradeId: payTradeId.value,
+          tradePassword: payForm.value.tradePassword,
+          tradeMethod: itemDetail.value.tradeMethod,
+          tradePrice: null,
+          tradePoints: payForm.value.tradePoints,
+          paymentMethod: null
+        }
+        console.log('提交时 tradePassword:', payForm.value.tradePassword)
+        const res = await confirmPay(params)
+        if (res.success) {
+          showToast('支付成功')
+          showPayPopup.value = false
+          // 可跳转到订单详情页等
+        } else {
+          if (res.desc && res.desc.includes('密码')) {
+            showToast(res.desc)
+            payForm.value.tradePassword = ''
+          } else {
+            showToast(res.desc || '支付失败')
+            showPayPopup.value = false
+          }
+        }
+      } catch (e) {
+        showToast('支付失败')
+        showPayPopup.value = false
+      } finally {
+        isPaying.value = false
+      }
+    }
+
     return {
       itemDetail,
       isLiked,
@@ -555,7 +664,14 @@ export default defineComponent({
       onItemConfirm,
       onExchangeSubmit,
       getTradeMethodType,
-      isSubmitting: ref(false),
+      showBuyForm,
+      buyForm,
+      onBuySubmit,
+      isSubmitting,
+      showPayPopup,
+      payForm,
+      isPaying,
+      onPaySubmit,
       TRADE_METHOD_MAP,
       getValueText,
       openItemListPopup
