@@ -116,7 +116,7 @@
             </div>
             <div class="seller-score">
               <van-rate v-model="itemDetail.userExt.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
-              <span class="score-text">{{ itemDetail.userExt.tradeScore }}分</span>
+              <span class="score-text">{{ itemDetail.userExt.tradeScore === -999 ? '登录后可查看' : itemDetail.userExt.tradeScore + '分' }}</span>
             </div>
             <div class="blockchain-id">
               <van-icon name="certificate" />
@@ -320,6 +320,78 @@
         title="选择交换物品"
       />
     </van-popup>
+
+    <!-- 交换表单弹出层 -->
+    <van-popup
+      v-model:show="showExchangeForm"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '70%' }"
+    >
+      <div class="exchange-popup">
+        <div class="popup-title">发起交换</div>
+        <van-form @submit="onExchangeSubmit">
+          <van-cell-group inset>
+            <van-field
+              v-model="exchangeForm.linkman"
+              name="linkman"
+              label="联系人"
+              placeholder="请输入联系人姓名"
+              :rules="[{ required: true, message: '请填写联系人' }]"
+            />
+            <van-field
+              v-model="exchangeForm.phone"
+              name="phone"
+              label="联系电话"
+              placeholder="请输入联系电话"
+              :rules="[{ required: true, message: '请填写联系电话' }]"
+            />
+            <van-field
+              v-model="exchangeForm.itemType"
+              name="itemType"
+              label="物品类型"
+              placeholder="请选择物品类型"
+              readonly
+              is-link
+              @click="showItemTypePopup = true"
+              :rules="[{ required: true, message: '请选择物品类型' }]"
+            />
+            <van-field
+              v-model="selectedItemTitle"
+              name="exchangeItem"
+              label="交换物品"
+              placeholder="请选择要交换的物品"
+              readonly
+              is-link
+              @click="openItemListPopup"
+              :rules="[{ required: true, message: '请选择交换物品' }]"
+            />
+            <van-field
+              v-model="exchangeForm.remark"
+              name="remark"
+              label="备注"
+              type="textarea"
+              rows="2"
+              autosize
+              placeholder="请输入备注信息（选填）"
+            />
+            <van-field
+              v-model="exchangeForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
+            />
+          </van-cell-group>
+          <div class="submit-button">
+            <van-button round block type="primary" native-type="submit">
+              提交申请
+            </van-button>
+          </div>
+        </van-form>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -404,6 +476,13 @@ export default defineComponent({
         const res = await getSquareItemDetail(itemId)
         if (res.success) {
           itemDetail.value = res.data
+          // 如果userExt不存在，设置默认值
+          if (!itemDetail.value.userExt) {
+            itemDetail.value.userExt = {
+              blockchainId: '登录后可查看',
+              tradeScore: -999
+            }
+          }
           isLiked.value = itemDetail.value.isLiked
           isCollected.value = itemDetail.value.isCollected
         } else {

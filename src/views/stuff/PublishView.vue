@@ -394,6 +394,10 @@ export default defineComponent({
               const res = await uploadFile(item.file);
               if (res.success && res.data) {
                 item.url = res.data; // 更新图片预览地址
+                item.status = 'done'; // 标记上传成功
+              } else {
+                item.status = 'failed'; // 标记上传失败
+                showToast('图片上传失败');
               }
             }
           }
@@ -403,12 +407,28 @@ export default defineComponent({
             const res = await uploadFile(file.file);
             if (res.success && res.data) {
               file.url = res.data; // 更新图片预览地址
+              file.status = 'done'; // 标记上传成功
+            } else {
+              file.status = 'failed'; // 标记上传失败
+              showToast('图片上传失败');
             }
           }
         }
       } catch (error) {
         console.error('上传图片失败:', error);
         showToast('上传图片失败');
+        // 标记上传失败
+        if (Array.isArray(file)) {
+          file.forEach(item => {
+            if (item.file) {
+              item.status = 'failed';
+            }
+          });
+        } else {
+          if (file.file) {
+            file.status = 'failed';
+          }
+        }
       }
     }
 
@@ -424,6 +444,20 @@ export default defineComponent({
           return;
         }
 
+        // 检查是否有上传失败的图片
+        const failedImages = formData.images.filter(img => img.status === 'failed');
+        if (failedImages.length > 0) {
+          showToast('有图片上传失败，请重新上传');
+          return;
+        }
+
+        // 检查所有图片URL是否有效
+        const validImages = formData.images.filter(img => img.url && img.url.trim() !== '');
+        if (validImages.length === 0) {
+          showToast('请至少上传一张有效的图片');
+          return;
+        }
+
         // 确认对话框
         await showDialog({
           title: '确认提交',
@@ -435,7 +469,7 @@ export default defineComponent({
         const submitData = {
           itemTitle: formData.name,
           itemType: formData.clazzText,
-          itemImageList: formData.images.map(img => img.url || ''),
+          itemImageList: validImages.map(img => img.url || ''),
           itemDescription: formData.description,
           depreciation: formData.depreciation
         };
