@@ -500,6 +500,56 @@ curl -X POST http://47.122.125.199/tradex/client/trade/list-mine \
 
 ```
 
+## 交易管理-查询我的交易详情
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/trade/{tradeId} \
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+            "id": "2025040100001",
+            "itemId": "2025040100001",
+            "itemTitle": "iphone 16",
+            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+            "fromUserId": "20250324000002",
+            "toUserId": "20250324000001",
+            "tradeMethod": "ITEM_TO_ITEM",
+            "tradeStatus": "trading",
+            "paymentStatus": 0,
+            "tradePrice": null,
+            "tradePoints": null,
+            "swapItemId": "20250324000002",
+            "swapItemTitle": "小米6",
+            "swapItemFirstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
+            "contactInfo": "",
+            "logisticsFrom": null,
+            "logisticsTo": null,
+            "fromScore": null,
+            "toScore": null,
+            "finishTradeTime": null,
+            "createTime": 1743470905967,
+            "flag": 'SELL'
+            "payment": {
+              "paymentMethod": "CASH",
+              "paymentNo": "PO0000001",
+              "amount": 10
+            }
+        }
+}
+
+```
+
+
 ## 以物换物-查询我可以交换的物品
 
 **请求：**

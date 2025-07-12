@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem, MyCanTradeItem, TradeOrderForPay } from './types';
+import type { ApiResponse, Item, ItemDetail, ListSquareItemsParams, ListSquareItemsResponse, SquareItemDetail, TradeListItem, MyCanTradeItem, TradeOrderForPay, TradeDetail } from './types';
 
 // 上传文件到 OSS
 export const uploadFile = async (file: File): Promise<ApiResponse<string>> => {
@@ -156,4 +156,8 @@ export const getTradeList = async (params: {
   return request.post('/client/trade/list-mine', params, {
     headers: { 'Content-Type': 'application/json' }
   });
+};
+
+export const getTradeDetail = async (tradeId: string): Promise<ApiResponse<TradeDetail>> => {
+  return request.post(`/client/trade/${tradeId}`);
 };

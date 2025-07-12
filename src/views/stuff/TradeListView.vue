@@ -130,11 +130,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted } from 'vue'
+import { defineComponent, ref, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showDialog } from 'vant'
 import { getTradeList } from '@/api/stuff'
 import type { TradeListItem } from '@/api/types'
+import { useUserStore } from '@/store/modules/user'
 
 export default defineComponent({
   name: 'TradeListView',
@@ -147,7 +148,8 @@ export default defineComponent({
     const trades = ref<TradeListItem[]>([])
     const pageNo = ref(1)
     const pageSize = ref(10)
-    const userInfo = ref({ userId: '' }) // 可根据实际登录信息获取
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
 
     // 交易状态列表
     const statusList = [

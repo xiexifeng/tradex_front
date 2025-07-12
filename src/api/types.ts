@@ -174,3 +174,33 @@ export interface TradeOrderForPay {
   tradePrice: number|null;
   tradePoints: number|null;
 }
+
+export interface TradeDetail {
+  id: string;
+  itemId: string;
+  itemTitle: string;
+  firstImage: string;
+  fromUserId: string;
+  toUserId: string;
+  tradeMethod: string;
+  tradeStatus: string;
+  paymentStatus: number;
+  tradePrice: number | null;
+  tradePoints: number | null;
+  swapItemId?: string;
+  swapItemTitle?: string;
+  swapItemFirstImage?: string;
+  contactInfo: string;
+  logisticsFrom?: string | null;
+  logisticsTo?: string | null;
+  fromScore?: number | null;
+  toScore?: number | null;
+  finishTradeTime?: string | null;
+  createTime: number;
+  flag: string;
+  payment?: {
+    paymentMethod: string;
+    paymentNo: string;
+    amount: number;
+  };
+}

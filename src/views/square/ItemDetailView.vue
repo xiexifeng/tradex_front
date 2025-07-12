@@ -112,9 +112,9 @@
           <div class="seller-info">
             <div class="seller-name-row">
               <span class="seller-name">{{ itemDetail.userNickname }}</span>
-              <van-tag type="primary" size="small" plain>认证用户</van-tag>
+              <van-tag type="primary" plain>认证用户</van-tag>
             </div>
-            <div class="seller-score">
+            <div class="seller-score" @click="handleScoreClick">
               <van-rate v-model="itemDetail.userExt.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
               <span class="score-text">{{ itemDetail.userExt.tradeScore === -999 ? '登录后可查看' : itemDetail.userExt.tradeScore + '分' }}</span>
             </div>
@@ -196,12 +196,13 @@
           round 
           block 
           :loading="isSubmitting"
-          @click="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? exchange() : buy()"
+          :disabled="userInfo != null && userInfo.userId === itemDetail.userId"
+          @click="handleBuyOrExchange"
         >
           <template #icon>
             <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
           </template>
-          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
+          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}{{ userInfo?.userId }}
         </van-button>
       </div>
     </div>
@@ -396,13 +397,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay } from '@/api/stuff'
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
-// import { useUserStore } from '@/store/modules/user'
+import { useUserStore } from '@/store/modules/user'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -461,7 +462,8 @@ export default defineComponent({
       isCollected: false
     })
 
-    // const userStore = useUserStore()
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
 
     onMounted(async () => {
       const itemId = route.params.id as string
@@ -721,6 +723,25 @@ export default defineComponent({
       }
     }
 
+    const handleScoreClick = () => {
+      // 如果评分是-999（未登录状态），跳转到登录页面
+      if (itemDetail.value.userExt?.tradeScore === -999) {
+        router.push('/login')
+      }
+    }
+
+    const handleBuyOrExchange = () => {
+      if (!userInfo?.value || !userInfo.value.userId) {
+        router.push('/login')
+        return
+      }
+      if (itemDetail?.value && itemDetail.value.tradeMethod === 'ITEM_TO_ITEM') {
+        exchange()
+      } else {
+        buy()
+      }
+    }
+
     return {
       itemDetail,
       isLiked,
@@ -753,7 +774,10 @@ export default defineComponent({
       onPaySubmit,
       TRADE_METHOD_MAP,
       getValueText,
-      openItemListPopup
+      openItemListPopup,
+      handleScoreClick,
+      userInfo,
+      handleBuyOrExchange
     }
   }
 })

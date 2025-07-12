@@ -7,7 +7,7 @@
       class="nav-bar"
     />
 
-    <div class="detail-content">
+    <div class="detail-content" v-if="tradeInfo">
       <!-- 交易状态卡片 -->
       <div class="trade-header">
         <div class="status-wrap">
@@ -60,7 +60,7 @@
           <span>交易方式</span>
         </div>
         <!-- 以物换物 -->
-        <template v-if="tradeInfo.tradeMethod === '以物换物'">
+        <template v-if="tradeInfo.tradeMethod === 'ITEM_TO_ITEM'">
           <div class="swap-info">
             <div class="swap-title">
               <van-icon name="exchange" />
@@ -92,9 +92,9 @@
         <template v-else>
           <div class="payment-info">
             <div class="payment-amount">
-              <van-icon :name="tradeInfo.tradeMethod === '人民币' ? 'cash-back-record' : 'points'" />
-              <span class="label">{{ tradeInfo.tradeMethod === '人民币' ? '交易金额：' : '交易积分：' }}</span>
-              <span class="value">{{ tradeInfo.tradeMethod === '人民币' ? `¥${tradeInfo.tradePrice}` : tradeInfo.tradePoints }}</span>
+              <van-icon :name="tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? 'cash-back-record' : 'points'" />
+              <span class="label">{{ tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? '交易金额：' : '交易积分：' }}</span>
+              <span class="value">{{ tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? `¥${tradeInfo.tradePrice}` : tradeInfo.tradePoints }}</span>
             </div>
             <template v-if="tradeInfo.payment">
               <div class="payment-detail">
@@ -142,36 +142,37 @@
           <div class="score-item">
             <van-icon name="smile" />
             <span class="label">评分：</span>
-            <van-rate v-model="tradeInfo.fromScore" size="14" readonly allow-half void-icon="star" void-color="#eee" />
-            <span class="score-value">{{ tradeInfo.fromScore }}分</span>
+            <van-rate v-model="fromScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+            <span class="score-value">{{ fromScoreSafe }}分</span>
           </div>
           <div class="score-item">
             <van-icon name="good-job" />
             <span class="label">得分：</span>
-            <van-rate v-model="tradeInfo.toScore" size="14" readonly allow-half void-icon="star" void-color="#eee" />
-            <span class="score-value">{{ tradeInfo.toScore }}分</span>
+            <van-rate v-model="toScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+            <span class="score-value">{{ toScoreSafe }}分</span>
           </div>
         </div>
       </van-cell-group>
     </div>
+    <div v-else class="loading">加载中...</div>
 
     <!-- 底部按钮 -->
-    <div class="action-buttons" v-if="tradeInfo.tradeStatus !== 'completed'">
+    <div class="action-buttons" v-if="tradeInfo && tradeInfo.tradeStatus !== 'completed'">
       <template v-if="tradeInfo.tradeStatus === 'trading'">
-        <template v-if="tradeInfo.fromUserId === userInfo.userId && tradeInfo.tradeMethod === '以物换物'">
+        <template v-if="tradeInfo.fromUserId === userInfo?.userId && tradeInfo.tradeMethod === 'ITEM_TO_ITEM'">
           <van-button size="large" type="primary" @click="acceptTrade">接受交易</van-button>
           <van-button size="large" type="danger" plain hairline @click="rejectTrade">拒绝交易</van-button>
         </template>
-        <template v-if="tradeInfo.fromUserId !== userInfo.userId">
+        <template v-if="tradeInfo.fromUserId !== userInfo?.userId">
           <van-button size="large" type="danger" plain hairline @click="cancelTrade">取消交易</van-button>
-          <template v-if="tradeInfo.tradeMethod !== '以物换物'">
+          <template v-if="tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
             <van-button size="large" type="primary" @click="goPayTrade">去支付</van-button>
           </template>
         </template>
       </template>
       <template v-if="tradeInfo.tradeStatus === 'accepted'">
-        <van-button size="large" type="success" @click="confirmTrade">确认交易</van-button>
-        <template v-if="tradeInfo.fromUserId !== userInfo.userId && tradeInfo.tradeMethod !== '以物换物'">
+        <van-button size="large" type="success" @click="confirmTrade">确认交易{{ userInfo?.userId }}</van-button>
+        <template v-if="tradeInfo.fromUserId !== userInfo?.userId && tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
           <van-button size="large" type="warning" plain hairline @click="refundTrade">发起退款</van-button>
         </template>
       </template>
@@ -180,38 +181,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast, showDialog } from 'vant'
-type TradeDetail = {
-            "id": string,
-            "itemId": string,
-            "itemTitle": string,
-            "firstImage": string,
-            "fromUserId": string,
-            "toUserId": string,
-            "tradeMethod": number|string,
-            "tradeStatus": string,
-            "paymentStatus": number|string,
-            "tradePrice": number|undefined,
-            "tradePoints": number|undefined,
-            "swapItemId": string|undefined,
-            "swapItemTitle": string|undefined,
-            "swapItemFirstImage": string|undefined,
-            "contactInfo": string,
-            "logisticsFrom": string|undefined,
-            "logisticsTo": string|undefined,
-            "fromScore": number|undefined,
-            "toScore": number|undefined,
-            "finishTradeTime": string|undefined,
-            "createTime": number,
-            "flag": string
-            "payment": undefined|{
-              "paymentMethod": string|number|undefined,
-              "paymentNo": string|undefined,
-              "amount": number|undefined
-            }
-        }
+import type { TradeDetail } from '@/api/types'
+import { getTradeDetail } from '@/api/stuff'
+import { useUserStore } from '@/store/modules/user'
 
 export default defineComponent({
   name: 'TradeDetailView',
@@ -220,35 +195,17 @@ export default defineComponent({
     const route = useRoute()
 
     // 交易信息
-    const tradeInfo = ref<TradeDetail>({
-            "id": "2025040100001",
-            "itemId": "2025040100001",
-            "itemTitle": "iphone 16",
-            "firstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "fromUserId": "20250324000002",
-            "toUserId": "20250324000001",
-            "tradeMethod": "人民币",
-            "tradeStatus": 'trading',
-            "paymentStatus": 0,
-            "tradePrice": 100,
-            "tradePoints": undefined,
-            "swapItemId": '20250324000002',
-            "swapItemTitle": '小米6',
-            "swapItemFirstImage": "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-            "contactInfo": '',
-            "logisticsFrom": undefined,
-            "logisticsTo": undefined,
-            "fromScore": undefined,
-            "toScore": undefined,
-            "finishTradeTime": undefined,
-            "createTime": 1743470905967,
-            "flag": 'SELL',
-            "payment": {
-              "paymentMethod": '微信支付',
-              "paymentNo": 'PAY2025040100003',
-              "amount": 100
-            }
-        })
+    const tradeInfo = ref<TradeDetail | null>(null)
+
+    // 评分安全绑定
+    const fromScoreSafe = computed({
+      get: () => tradeInfo.value?.fromScore ?? 0,
+      set: v => { if (tradeInfo.value) tradeInfo.value.fromScore = v }
+    })
+    const toScoreSafe = computed({
+      get: () => tradeInfo.value?.toScore ?? 0,
+      set: v => { if (tradeInfo.value) tradeInfo.value.toScore = v }
+    })
 
     // 交换物品列表
     const exchangeItems = ref([
@@ -283,7 +240,7 @@ export default defineComponent({
         showCancelButton: true,
       }).then(() => {
         showToast('已达成交易')
-        tradeInfo.value.tradeStatus = 'accepted'
+        tradeInfo.value!.tradeStatus = 'accepted'
       }).catch(() => {
         console.log('cancel')
       })
@@ -314,9 +271,27 @@ export default defineComponent({
       }
       return textMap[status] || status
     }
-    const userInfo = ref({
-      userId: "20250324000002"
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
+
+    onMounted(async () => {
+      const tradeId = route.params.id as string
+      if (!tradeId) {
+        showToast('交易ID不存在')
+        return
+      }
+      try {
+        const res = await getTradeDetail(tradeId)
+        if (res.success && res.data) {
+          tradeInfo.value = res.data
+        } else {
+          showToast(res.desc || '获取交易详情失败')
+        }
+      } catch (e) {
+        showToast('获取交易详情失败')
+      }
     })
+
     // 接受交易
     const acceptTrade = (trade: any) => {
       showDialog({
@@ -399,11 +374,6 @@ export default defineComponent({
       })
     }
 
-    onMounted(() => {
-      // 这里应该根据路由参数获取交易详情
-      console.log('Trade ID:', route.params.id)
-    })
-
     return {
       tradeInfo,
       userInfo,
@@ -417,7 +387,9 @@ export default defineComponent({
       goPayTrade,
       refundTrade,
       confirmTrade,
-      cancelTrade
+      cancelTrade,
+      fromScoreSafe,
+      toScoreSafe
     }
   }
 })
