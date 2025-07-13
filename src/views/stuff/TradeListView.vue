@@ -88,7 +88,7 @@
                     </template>
                   </template>
                 </template>
-                <template v-if="trade.tradeStatus === 'accepted'">
+                <template v-if="trade.toUserId === userInfo.userId && trade.tradeStatus === 'accepted'">
                   <van-button size="small" type="success" @click="confirmTrade(trade)">确认交易</van-button>
                   <template v-if="trade.fromUserId !== userInfo.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
                     <van-button size="small" type="warning" @click="refundTrade(trade)">发起退款</van-button>
@@ -136,6 +136,7 @@ import { showToast, showDialog } from 'vant'
 import { getTradeList } from '@/api/stuff'
 import type { TradeListItem } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
+import { useTradeActions } from '@/composables/useTradeActions'
 
 export default defineComponent({
   name: 'TradeListView',
@@ -150,6 +151,7 @@ export default defineComponent({
     const pageSize = ref(10)
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade } = useTradeActions()
 
     // 交易状态列表
     const statusList = [
@@ -248,27 +250,23 @@ export default defineComponent({
       router.push(`/stuff/trade/${trade.id}`)
     }
 
-    // 下面的操作方法可根据实际业务对接API
+    // 接受交易
     const acceptTrade = (trade: TradeListItem) => {
-      showDialog({
-        title: '确认接受',
-        message: '确定要接受这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已接受交易')
+      handleAcceptTrade(trade.id, () => {
         trade.tradeStatus = 'accepted'
+        fetchTrades(true)
       })
     }
+
+    // 拒绝交易
     const rejectTrade = (trade: TradeListItem) => {
-      showDialog({
-        title: '确认拒绝',
-        message: '确定要拒绝这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已拒绝交易')
+      handleRejectTrade(trade.id, () => {
         trade.tradeStatus = 'rejected'
+        fetchTrades(true)
       })
     }
+
+    // 发起退款
     const refundTrade = (trade: TradeListItem) => {
       showDialog({
         title: '确认发起退款',
@@ -279,14 +277,12 @@ export default defineComponent({
         trade.tradeStatus = 'refunded'
       })
     }
+
+    // 确认交易
     const confirmTrade = (trade: TradeListItem) => {
-      showDialog({
-        title: '确认完成',
-        message: '确定要完成这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('交易已完成')
+      handleConfirmTrade(trade.id, () => {
         trade.tradeStatus = 'completed'
+        fetchTrades(true)
       })
     }
     const cancelTrade = (trade: TradeListItem) => {

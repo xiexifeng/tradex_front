@@ -88,11 +88,13 @@
 import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { showDialog } from 'vant'
+import { useUserStore } from '@/store/modules/user'
 
 export default defineComponent({
   name: 'SettingsView',
   setup() {
     const router = useRouter()
+    const userStore = useUserStore()
 
     const onClickLeft = () => {
       router.back()
@@ -125,6 +127,7 @@ export default defineComponent({
         showCancelButton: true,
       }).then(() => {
         // 清除用户登录状态
+        userStore.logout()
         router.push('/login')
       })
     }

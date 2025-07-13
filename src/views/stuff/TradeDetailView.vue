@@ -159,20 +159,20 @@
     <!-- 底部按钮 -->
     <div class="action-buttons" v-if="tradeInfo && tradeInfo.tradeStatus !== 'completed'">
       <template v-if="tradeInfo.tradeStatus === 'trading'">
-        <template v-if="tradeInfo.fromUserId === userInfo?.userId && tradeInfo.tradeMethod === 'ITEM_TO_ITEM'">
+        <template v-if="tradeInfo.fromUserId === userInfo.userId && tradeInfo.tradeMethod === 'ITEM_TO_ITEM'">
           <van-button size="large" type="primary" @click="acceptTrade">接受交易</van-button>
           <van-button size="large" type="danger" plain hairline @click="rejectTrade">拒绝交易</van-button>
         </template>
-        <template v-if="tradeInfo.fromUserId !== userInfo?.userId">
+        <template v-if="tradeInfo.fromUserId !== userInfo.userId">
           <van-button size="large" type="danger" plain hairline @click="cancelTrade">取消交易</van-button>
           <template v-if="tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
             <van-button size="large" type="primary" @click="goPayTrade">去支付</van-button>
           </template>
         </template>
       </template>
-      <template v-if="tradeInfo.tradeStatus === 'accepted'">
-        <van-button size="large" type="success" @click="confirmTrade">确认交易{{ userInfo?.userId }}</van-button>
-        <template v-if="tradeInfo.fromUserId !== userInfo?.userId && tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
+      <template v-if="tradeInfo.toUserId === userInfo.userId && tradeInfo.tradeStatus === 'accepted'">
+        <van-button size="large" type="success" @click="confirmTrade">确认交易</van-button>
+        <template v-if="tradeInfo.toUserId === userInfo.userId && tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
           <van-button size="large" type="warning" plain hairline @click="refundTrade">发起退款</van-button>
         </template>
       </template>
@@ -187,6 +187,7 @@ import { showToast, showDialog } from 'vant'
 import type { TradeDetail } from '@/api/types'
 import { getTradeDetail } from '@/api/stuff'
 import { useUserStore } from '@/store/modules/user'
+import { useTradeActions } from '@/composables/useTradeActions'
 
 export default defineComponent({
   name: 'TradeDetailView',
@@ -273,6 +274,7 @@ export default defineComponent({
     }
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade } = useTradeActions()
 
     onMounted(async () => {
       const tradeId = route.params.id as string
@@ -293,29 +295,18 @@ export default defineComponent({
     })
 
     // 接受交易
-    const acceptTrade = (trade: any) => {
-      showDialog({
-        title: '确认接受',
-        message: '确定要接受这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已接受交易')
-        trade.tradeStatus = 'accepted'
-      }).catch(() => {
-        console.log('cancel')
+    const acceptTrade = () => {
+      if (!tradeInfo.value) return
+      handleAcceptTrade(tradeInfo.value.id, () => {
+        tradeInfo.value!.tradeStatus = 'accepted'
       })
     }
+
     // 拒绝交易
-    const rejectTrade = (trade: any) => {
-      showDialog({
-        title: '确认拒绝',
-        message: '确定要拒绝这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已拒绝交易')
-        trade.tradeStatus = 'rejected'
-      }).catch(() => {
-        console.log('rejected')
+    const rejectTrade = () => {
+      if (!tradeInfo.value) return
+      handleRejectTrade(tradeInfo.value.id, () => {
+        tradeInfo.value!.tradeStatus = 'rejected'
       })
     }
     
@@ -334,16 +325,10 @@ export default defineComponent({
     }
 
     // 确认交易
-    const confirmTrade = (trade: any) => {
-      showDialog({
-        title: '确认完成',
-        message: '确定要完成这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('交易已完成')
-        trade.tradeStatus = 'completed'
-      }).catch(() => {
-        console.log('cancel')
+    const confirmTrade = () => {
+      if (!tradeInfo.value) return
+      handleConfirmTrade(tradeInfo.value.id, () => {
+        tradeInfo.value!.tradeStatus = 'completed'
       })
     }
 

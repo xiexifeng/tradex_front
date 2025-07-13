@@ -161,3 +161,31 @@ export const getTradeList = async (params: {
 export const getTradeDetail = async (tradeId: string): Promise<ApiResponse<TradeDetail>> => {
   return request.post(`/client/trade/${tradeId}`);
 };
+
+// 以物换物-卖方接受交易
+export const acceptTransferApply = async (data: {
+  tradeId: string;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/accept-transfer-apply', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 以物换物-卖方拒绝交易
+export const rejectTransferApply = async (data: {
+  tradeId: string;
+  rejectReason: string;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/reject-transfer-apply', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 交易列表-交易完成，买方确认即可
+export const completeTrade = async (data: {
+  tradeId: string;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/completed', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};

@@ -202,7 +202,7 @@
           <template #icon>
             <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
           </template>
-          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}{{ userInfo?.userId }}
+          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
         </van-button>
       </div>
     </div>
