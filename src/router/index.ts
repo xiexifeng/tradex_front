@@ -74,6 +74,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/user/edit-profile',
+    name: 'editProfile',
+    component: () => import(/* webpackChunkName: "editProfile" */ '../views/user/EditProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/user/address',
     name: 'addressList',
     component: () => import(/* webpackChunkName: "addressList" */ '../views/user/address/AddressListView.vue'),

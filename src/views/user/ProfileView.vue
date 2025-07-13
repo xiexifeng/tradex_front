@@ -25,7 +25,7 @@
               round
               width="80"
               height="80"
-              :src="user.avatarUrl"
+              :src="userInfo.avatarUrl"
               class="avatar"
             />
             <div class="user-badge">
@@ -34,18 +34,18 @@
           </div>
           <div class="user-info">
             <div class="nickname">
-              {{ user.nickname }}
-              <span :class="['gender-tag', user.gender === '男' ? 'male' : 'female']">
-                {{ user.gender === '男' ? '♂' : '♀' }}
+              {{ userInfo.nickname }}
+              <span :class="['gender-tag', userInfo.gender === 'MAN' ? 'male' : 'female']">
+                {{ userInfo.gender === 'MAN' ? '♂' : '♀' }}
               </span>
             </div>
             <div class="user-meta">
-              <span class="user-id">ID: {{ user.userId }}</span>
+              <span class="user-id">ID: {{ userInfo.userId }}</span>
               <van-icon name="qr" class="qr-icon"/>
             </div>
             <div class="location">
               <van-icon name="location-o"/>
-              <span>{{ user.ipAddress }}</span>
+              <span>{{ userInfo.ipAddress }}</span>
             </div>
           </div>
           <van-button 
@@ -59,25 +59,25 @@
             编辑资料
           </van-button>
         </div>
-        <div class="user-brief">{{ user.brief || '这个人很懒，什么都没写~' }}</div>
+        <div class="user-brief">{{ userInfo.brief || '这个人很懒，什么都没写~' }}</div>
       </div>
 
       <!-- 数据统计卡片 -->
       <div class="stats-card">
         <div class="stat-item">
-          <span class="stat-value">{{ user.followers }}</span>
+          <span class="stat-value">{{ userInfo.followers }}</span>
           <span class="stat-label">关注</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ user.followers }}</span>
+          <span class="stat-value">{{ userInfo.followers }}</span>
           <span class="stat-label">粉丝</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ user.likes }}</span>
+          <span class="stat-value">{{ userInfo.likes }}</span>
           <span class="stat-label">获赞</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ user.collects }}</span>
+          <span class="stat-value">{{ userInfo.collects }}</span>
           <span class="stat-label">收藏</span>
         </div>
       </div>
@@ -93,15 +93,15 @@
             <div class="blockchain-row">
               <van-icon name="certificate" class="cert-icon"/>
               <span class="label">区块链ID</span>
-              <span class="value">{{ user.blockchainId }}</span>
+              <span class="value">{{ userInfo.blockchainId }}</span>
             </div>
             <div class="blockchain-row">
               <van-icon name="star" class="star-icon"/>
               <span class="label">信用评分</span>
               <div class="score-wrapper">
-                <span class="score">{{ user.tradeScore }}</span>
+                <span class="score">{{ userInfo.tradeScore }}</span>
                 <van-rate 
-                  v-model="user.tradeScore" 
+                  v-model="userInfo.tradeScore" 
                   size="12" 
                   readonly 
                   allow-half 
@@ -116,7 +116,7 @@
 
       <!-- 交易记录卡片 -->
       <van-collapse v-model="activeNames" accordion class="records-card">
-        <van-collapse-item :title="`综合评分：${user.tradeScore}`" name="1">
+        <van-collapse-item :title="`综合评分：${userInfo.tradeScore}`" name="1">
           <div class="table-wrapper">
             <div class="table-header">
               <span class="col-score">得分</span>
@@ -288,41 +288,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
-import { showDialog, showToast, Collapse, CollapseItem, Col, Row } from 'vant'
+import { defineComponent, ref, onMounted, computed } from 'vue'
+import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import type { Item } from '@/api/types'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
-
-type UserInfo = {
-  "userId": string,
-  "nickname": string,
-  "realName": string,
-  "gender": string,
-  "birthday": string,
-  "avatarUrl": string,
-  "address": string,
-  "wechat": string|undefined,
-  "qq": string|undefined,
-  "brief": string|undefined,
-  "authStatus": string|undefined,
-  "blockchainId": string|undefined,
-  "tradeScore": number,
-  "followers": number,
-  "likes": number,
-  "collects": number,
-  "ipAddress": string,
-}
+import { useUserStore } from '@/store/modules/user'
 
 export default defineComponent({
   components: {
     CancelTransferDialog
   },
   setup() {
-    const onClickLeft = () => {
-      showToast('点击设置')
-    }
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
 
     const openCamera = () => {
       showToast('打开相机')
@@ -471,7 +451,6 @@ export default defineComponent({
     })
 
     return {
-      onClickLeft,
       openCamera,
       onShare,
       activeTab,
@@ -494,30 +473,12 @@ export default defineComponent({
       showCancelTransfer,
       currentItemId,
       showCancelDialog,
-      onCancelSuccess
+      onCancelSuccess,
+      userInfo
     }
   },
   data() {
     return {
-      user: {
-        "userId": "20250324000001",
-        "nickname": "NPE",
-        "realName": "张三丰",
-        "gender": '男',
-        "birthday": "1990-01-01",
-        "avatarUrl": "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        "address": "深圳市南山区xx小区",
-        "wechat": "13800001234",
-        "qq": "3738843",
-        "brief": "这个人有点懒",
-        "authStatus": 0,
-        "blockchainId": "Hashweruworw939423",
-        "tradeScore": 8.9000,
-        "followers": 100,
-        "likes": 8,
-        "collects": 100,
-        "ipAddress": "广东"
-    },
       transactions: [
       {"tradeId":"2025032500012","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 18","scoreTime":"2025-04-01 12:11:00"},
       {"tradeId":"2025032500013","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 19","scoreTime":"2025-04-01 12:12:00"}
@@ -542,7 +503,7 @@ export default defineComponent({
       });
     },
     editProfile() {
-      showToast('编辑资料')
+      this.$router.push('/user/edit-profile')
     },
     goToSettings() {
       this.$router.push('/user/settings')

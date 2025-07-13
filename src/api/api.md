@@ -81,6 +81,36 @@ curl -X POST http://47.122.125.199/tradex/client/auth/login-or-register \
 }
 ```
 
+## 编辑用户资料
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/user/update \
+-H "Content-Type: application/json" \
+-d '{
+    "nickname": "iz7joz9rln",
+    "gender": "MAN",
+    "birthday": null,
+    "avatarUrl": null,
+    "address": null,
+    "wechat": null,
+    "qq": null,
+    "brief": null
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+
 ## oss 上传文件
 
 **请求：**

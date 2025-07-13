@@ -21,5 +21,21 @@ export const userApi = {
       '/client/auth/login',
       `username=${username}&password=${password}`
     );
+  },
+
+  // 编辑用户资料
+  updateUserProfile(data: {
+    nickname?: string;
+    gender?: string;
+    birthday?: string | null;
+    avatarUrl?: string | null;
+    address?: string | null;
+    wechat?: string | null;
+    qq?: string | null;
+    brief?: string | null;
+  }): Promise<ApiResponse> {
+    return request.post('/client/user/update', data, {
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };

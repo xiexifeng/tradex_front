@@ -21,6 +21,10 @@ export interface UserInfo {
   authStatus: string | null;
   blockchainId: string | null;
   tradeScore: number | null;
+  followers: number | null;
+  likes: number | null;
+  collects: number | null;
+  ipAddress: string | null;
 }
 
 // 登录响应类型
