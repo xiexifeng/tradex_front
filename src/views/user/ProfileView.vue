@@ -18,14 +18,14 @@
 
     <div class="profile-content">
       <!-- 用户信息卡片 -->
-      <div class="user-card">
+      <div class="user-card" v-if="userInfo">
         <div class="user-header">
           <div class="avatar-wrapper">
             <van-image
               round
               width="80"
               height="80"
-              :src="userInfo.avatarUrl"
+              :src="userInfo?.avatarUrl || ''"
               class="avatar"
             />
             <div class="user-badge">
@@ -34,18 +34,18 @@
           </div>
           <div class="user-info">
             <div class="nickname">
-              {{ userInfo.nickname }}
-              <span :class="['gender-tag', userInfo.gender === 'MAN' ? 'male' : 'female']">
-                {{ userInfo.gender === 'MAN' ? '♂' : '♀' }}
+              {{ userInfo?.nickname || '' }}
+              <span :class="['gender-tag', userInfo?.gender === 'MAN' ? 'male' : 'female']">
+                {{ userInfo?.gender === 'MAN' ? '♂' : '♀' }}
               </span>
             </div>
             <div class="user-meta">
-              <span class="user-id">ID: {{ userInfo.userId }}</span>
+              <span class="user-id">ID: {{ userInfo?.userId || '' }}</span>
               <van-icon name="qr" class="qr-icon"/>
             </div>
             <div class="location">
               <van-icon name="location-o"/>
-              <span>{{ userInfo.ipAddress }}</span>
+              <span>{{ userInfo?.ipAddress || '' }}</span>
             </div>
           </div>
           <van-button 
@@ -59,25 +59,25 @@
             编辑资料
           </van-button>
         </div>
-        <div class="user-brief">{{ userInfo.brief || '这个人很懒，什么都没写~' }}</div>
+        <div class="user-brief">{{ userInfo?.brief || '这个人很懒，什么都没写~' }}</div>
       </div>
 
       <!-- 数据统计卡片 -->
       <div class="stats-card">
         <div class="stat-item">
-          <span class="stat-value">{{ userInfo.followers }}</span>
+          <span class="stat-value">{{ userInfo?.followers || 0 }}</span>
           <span class="stat-label">关注</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ userInfo.followers }}</span>
+          <span class="stat-value">{{ userInfo?.followers || 0 }}</span>
           <span class="stat-label">粉丝</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ userInfo.likes }}</span>
+          <span class="stat-value">{{ userInfo?.likes || 0 }}</span>
           <span class="stat-label">获赞</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ userInfo.collects }}</span>
+          <span class="stat-value">{{ userInfo?.collects || 0 }}</span>
           <span class="stat-label">收藏</span>
         </div>
       </div>
@@ -93,19 +93,19 @@
             <div class="blockchain-row">
               <van-icon name="certificate" class="cert-icon"/>
               <span class="label">区块链ID</span>
-              <span class="value">{{ userInfo.blockchainId }}</span>
+              <span class="value">{{ userInfo?.blockchainId || '' }}</span>
             </div>
             <div class="blockchain-row">
               <van-icon name="star" class="star-icon"/>
               <span class="label">信用评分</span>
               <div class="score-wrapper">
-                <span class="score">{{ userInfo.tradeScore }}</span>
+                <span class="score">{{ userInfo?.tradeScore || 0 }}</span>
                 <van-rate 
-                  v-model="userInfo.tradeScore" 
-                  size="12" 
-                  readonly 
-                  allow-half 
-                  void-icon="star" 
+                  :model-value="userInfo?.tradeScore || 0"
+                  size="12"
+                  readonly
+                  allow-half
+                  void-icon="star"
                   void-color="#eee"
                 />
               </div>
@@ -116,7 +116,7 @@
 
       <!-- 交易记录卡片 -->
       <van-collapse v-model="activeNames" accordion class="records-card">
-        <van-collapse-item :title="`综合评分：${userInfo.tradeScore}`" name="1">
+        <van-collapse-item :title="`综合评分：${userInfo?.tradeScore || 0}`" name="1">
           <div class="table-wrapper">
             <div class="table-header">
               <span class="col-score">得分</span>
@@ -133,7 +133,7 @@
           </div>
         </van-collapse-item>
 
-        <van-collapse-item :title="`积分余额：${pointsAccount.pointsBalance}`" name="2">
+        <van-collapse-item :title="`积分余额：${pointsAccount?.pointsBalance || 0}`" name="2">
           <div class="table-wrapper">
             <div class="table-header">
               <span class="col-points">变动</span>
@@ -447,6 +447,10 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      if (!userStore.token || !userInfo.value) {
+        router.push('/login')
+        return
+      }
       loadItems('all')
     })
 
