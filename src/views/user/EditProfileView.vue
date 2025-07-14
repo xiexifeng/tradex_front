@@ -143,6 +143,7 @@ import { showToast } from "vant";
 import { userApi } from "@/api/user";
 import { uploadFile } from "@/api/stuff";
 import { useUserStore } from "@/store/modules/user";
+import imageCompression from 'browser-image-compression'
 
 export default defineComponent({
   name: "EditProfileView",
@@ -210,6 +211,30 @@ export default defineComponent({
       fileInput.value?.click();
     };
 
+    // 选择图片后处理
+    async function handleBeforeUpload(file: File) {
+      let uploadHandledFile = file
+      if (file.size > 1 * 1024 * 1024) {
+        try {
+          uploadHandledFile = await imageCompression(file, {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 800, // 可根据需求调整
+            useWebWorker: true
+          })
+          if (uploadHandledFile.size > 1 * 1024 * 1024) {
+            showToast('图片压缩后仍大于1M，请选择更小的图片')
+            return
+          }
+          return new File([uploadHandledFile], file.name, { type: file.type })
+        } catch (e) {
+          showToast('图片压缩失败')
+          return
+        }
+      }
+      return file
+
+    }
+
     // 文件选择处理
     const onFileChange = async (event: Event) => {
       const target = event.target as HTMLInputElement;
@@ -223,15 +248,19 @@ export default defineComponent({
         return;
       }
 
-      // 检查文件大小 (限制为 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        showToast("图片大小不能超过 5MB");
-        return;
+      // // 检查文件大小 (限制为 1MB)
+      // if (file.size > 1 * 1024 * 1024) {
+      //   showToast("图片大小不能超过 1MB");
+      //   return;
+      // }
+      const compressFile = await handleBeforeUpload(file)
+      if(compressFile == null) {
+        return
       }
 
       try {
         showToast("上传中...");
-        const res = await uploadFile(file);
+        const res = await uploadFile(compressFile);
         if (res.success) {
           form.avatarUrl = res.data;
           showToast("头像上传成功");

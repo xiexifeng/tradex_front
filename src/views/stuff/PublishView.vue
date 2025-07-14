@@ -334,6 +334,7 @@ import { useRouter } from 'vue-router'
 import { showToast, showDialog, FormInstance } from 'vant'
 import type { UploaderFileListItem } from 'vant'
 import { uploadFile, publishItem } from '@/api/stuff'
+import imageCompression from 'browser-image-compression'
 
 export default defineComponent({
   name: 'PublishView',
@@ -383,6 +384,29 @@ export default defineComponent({
       const price = parseFloat(value)
       return price >= 0 && price <= 999999
     }
+    // 选择图片后处理
+    async function handleBeforeUpload(file: File) {
+      let uploadHandledFile = file
+      if (file.size > 1 * 1024 * 1024) {
+        try {
+          uploadHandledFile = await imageCompression(file, {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 800, // 可根据需求调整
+            useWebWorker: true
+          })
+          if (uploadHandledFile.size > 1 * 1024 * 1024) {
+            showToast('图片压缩后仍大于1M，请选择更小的图片')
+            return
+          }
+          return new File([uploadHandledFile], file.name, { type: file.type })
+        } catch (e) {
+          showToast('图片压缩失败')
+          return
+        }
+      }
+      return file
+
+    }
 
     // 处理图片上传
     const afterRead = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
@@ -391,6 +415,21 @@ export default defineComponent({
           // 多文件上传
           for (const item of file) {
             if (item.file) {
+              // 检查文件类型
+              if (!item.file.type.startsWith("image/")) {
+                    showToast("请选择图片文件");
+                    return;
+              }
+              item.file = await handleBeforeUpload(item.file)
+              if(item.file == null) {
+                return
+              }
+              // 检查文件大小 (限制为 5MB)
+              if (item.file.size > 1 * 1024 * 1024) {
+                showToast("图片大小不能超过 1MB");
+                return;
+              }
+
               const res = await uploadFile(item.file);
               if (res.success && res.data) {
                 item.url = res.data; // 更新图片预览地址
@@ -404,6 +443,16 @@ export default defineComponent({
         } else {
           // 单文件上传
           if (file.file) {
+            file.file = await handleBeforeUpload(file.file)
+            if(file.file == null) {
+              return
+            }
+            // 检查文件大小 (限制为 5MB)
+            if (file.file.size > 1 * 1024 * 1024) {
+              showToast("图片大小不能超过 1MB");
+              return;
+            }
+            console.log('file.file:'+file.file.size)
             const res = await uploadFile(file.file);
             if (res.success && res.data) {
               file.url = res.data; // 更新图片预览地址
@@ -431,6 +480,8 @@ export default defineComponent({
         }
       }
     }
+
+    
 
     // 提交表单
     const onSubmit = async () => {
