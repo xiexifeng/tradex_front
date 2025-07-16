@@ -47,6 +47,7 @@ import {
   Col,
   Row,
   Slider,
+  Sticky,
 } from 'vant'
 
 const app = createApp(App)
@@ -92,6 +93,7 @@ const vantComponents = [
   Col,
   Row,
   Slider,
+  Sticky,
 ]
 
 vantComponents.forEach(component => {

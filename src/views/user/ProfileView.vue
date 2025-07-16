@@ -93,7 +93,15 @@
             <div class="blockchain-row">
               <van-icon name="certificate" class="cert-icon"/>
               <span class="label">区块链ID</span>
-              <span class="value">{{ userInfo?.blockchainId || '' }}</span>
+              <span class="value">
+                {{ userInfo?.blockchainId ? userInfo.blockchainId.slice(0, 10) + '...' : '' }}
+                <van-icon v-if="userInfo?.blockchainId" 
+                  name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(userInfo?.blockchainId)"
+                />
+              </span>
             </div>
             <div class="blockchain-row">
               <van-icon name="star" class="star-icon"/>
@@ -197,7 +205,13 @@
                       <template #desc>
                         <div class="item-desc">
                           <span class="item-id">编号: {{ item.id }}</span>
-                          <span class="blockchain-id">{{ item.blockchainId }}</span>
+                          <span class="blockchain-id">{{ item.blockchainId.slice(0, 10) + '...' }} <van-icon v-if="item.blockchainId" 
+                            name="question" 
+                            class="copy-icon"
+                            style="margin-left: 6px; cursor: pointer;"
+                            @click="copyBlockchainId(item.blockchainId)"
+                          /></span>
+                          
                         </div>
                       </template>
                       <template #footer>
@@ -446,6 +460,18 @@ export default defineComponent({
       onRefresh()
     }
 
+    const copyBlockchainId = (blockchainId: string) => {
+      if (blockchainId) {
+        navigator.clipboard.writeText(blockchainId)
+          .then(() => {
+            showToast('已复制区块链ID')
+          })
+          .catch(() => {
+            showToast('复制失败')
+          })
+      }
+    }
+
     onMounted(() => {
       if (!userStore.token || !userInfo.value) {
         router.push('/login')
@@ -478,7 +504,8 @@ export default defineComponent({
       currentItemId,
       showCancelDialog,
       onCancelSuccess,
-      userInfo
+      userInfo,
+      copyBlockchainId
     }
   },
   data() {
@@ -733,6 +760,13 @@ export default defineComponent({
     .value {
       flex: 1;
       color: #323233;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .copy-icon {
+      color: #1989fa;
       font-size: 14px;
     }
     

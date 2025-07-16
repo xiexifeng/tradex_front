@@ -64,7 +64,13 @@
         <div class="blockchain-info">
           <van-icon name="certificate" />
           <span class="blockchain-label">区块链ID：</span>
-          <span class="blockchain-value">{{ itemDetail.blockchainId }}</span>
+          <span class="blockchain-value">{{ itemDetail?.blockchainId ? itemDetail.blockchainId.slice(0, 10) + '...' : '' }}</span>
+          <van-icon v-if="itemDetail?.blockchainId" 
+                  name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(itemDetail?.blockchainId)"
+                />
         </div>
         <div class="tags-row">
           <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
@@ -120,7 +126,13 @@
             </div>
             <div class="blockchain-id">
               <van-icon name="certificate" />
-              <span>区块链ID: {{ itemDetail.userExt.blockchainId }}</span>
+              <span>区块链ID: {{ itemDetail?.userExt.blockchainId ? itemDetail.userExt.blockchainId.slice(0, 10) + '...' : '' }}</span>
+              <van-icon v-if="itemDetail?.userExt.blockchainId" 
+                  name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(itemDetail?.userExt.blockchainId)"
+                />
             </div>
           </div>
         </div>
@@ -741,6 +753,17 @@ export default defineComponent({
         buy()
       }
     }
+    const copyBlockchainId = (blockchainId: string) => {
+      if (blockchainId) {
+        navigator.clipboard.writeText(blockchainId)
+          .then(() => {
+            showToast('已复制区块链ID')
+          })
+          .catch(() => {
+            showToast('复制失败')
+          })
+      }
+    }
 
     return {
       itemDetail,
@@ -777,7 +800,8 @@ export default defineComponent({
       openItemListPopup,
       handleScoreClick,
       userInfo,
-      handleBuyOrExchange
+      handleBuyOrExchange,
+      copyBlockchainId,
     }
   }
 })

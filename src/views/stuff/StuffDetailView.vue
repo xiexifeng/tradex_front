@@ -42,7 +42,14 @@
         <span>区块链信息</span>
       </div>
       <div class="blockchain-info">
-        <van-cell v-if="itemDetail.blockchainId" title="区块链ID" :value="itemDetail.blockchainId" />
+        <van-cell v-if="itemDetail.blockchainId" title="区块链ID" :value="itemDetail.blockchainId.slice(0, 10) + '...'">
+          <template #right-icon>
+            <van-icon name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(itemDetail?.blockchainId)" />
+          </template>
+        </van-cell>
         <van-cell v-if="itemDetail.transferTimes > 0" title="转让次数" :value="`${itemDetail.transferTimes}次`" />
         <van-cell v-if="itemDetail.lastUserId" title="最后持有人" :value="itemDetail.lastUserId" />
       </div>
@@ -398,6 +405,17 @@ export default defineComponent({
     const viewTradeDetails = () => {
       router.push(`/stuff/trade/${itemDetail.value.id}`)
     }
+    const copyBlockchainId = (blockchainId: string) => {
+      if (blockchainId) {
+        navigator.clipboard.writeText(blockchainId)
+          .then(() => {
+            showToast('已复制区块链ID')
+          })
+          .catch(() => {
+            showToast('复制失败')
+          })
+      }
+    }
 
     onMounted(() => {
       fetchItemDetail()
@@ -423,7 +441,8 @@ export default defineComponent({
       onDeliveryConfirm,
       onTradeMethodConfirm,
       onTransferSubmit,
-      onCancelTransferSuccess
+      onCancelTransferSuccess,
+      copyBlockchainId
     }
   }
 })
@@ -552,6 +571,10 @@ export default defineComponent({
   }
   
   .blockchain-info,
+  .copy-icon {
+      color: #1989fa;
+      font-size: 14px;
+    }
   .trade-info {
     :deep(.van-cell) {
       padding: 16px;

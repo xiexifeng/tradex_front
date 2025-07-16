@@ -102,7 +102,7 @@
             <div class="product-footer">
               <div class="user-info">
                 <img :src="product.userAvatar" class="user-avatar">
-                <span class="user-name">{{ product.userNickname }}</span>
+                <span class="user-name">{{ product.userNickname.length > 5 ? product.userNickname.slice(0,5) + '...' : product.userNickname }}</span>
               </div>
               <div class="stats">
                 <span><van-icon name="eye-o" /> {{ product.viewCount }}</span>
