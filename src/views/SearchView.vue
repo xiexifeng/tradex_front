@@ -444,7 +444,6 @@ export default defineComponent({
 
     // 搜索
     const onSearch = () => {
-      console.log('onSearch:'+searchValue.value)
       if (!searchValue.value.trim()) return
       resetList()
       saveHistory(searchValue.value)
@@ -462,8 +461,9 @@ export default defineComponent({
     const onLoad = () => {
       console.log('onLoad:'+searchValue.value)
       if (!searchValue.value.trim()) return
-      loading.value = false;
+      
       loadMore(searchValue.value)
+      loading.value = false;
     }
 
     const onCancel = () => {

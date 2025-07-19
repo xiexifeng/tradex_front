@@ -189,3 +189,18 @@ export const completeTrade = async (data: {
     headers: { 'Content-Type': 'application/json' }
   });
 };
+
+// 交易广场-标记或取消物品的喜爱，查看，收藏
+export const socialItem = async (data: {
+  itemId: string;
+  socialType: 'COLLECTION' | 'LOVE' | 'VIEW';
+  socialOperate: 'ADD' | 'CANCEL';
+}): Promise<ApiResponse> => {
+  const formData = new URLSearchParams();
+  formData.append('socialType', data.socialType);
+  formData.append('socialOperate', data.socialOperate);
+  
+  return request.post(`/client/square/social-item/${data.itemId}`, formData, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
+};

@@ -447,6 +447,28 @@ curl -X POST http://47.122.125.199/tradex/client/square/detail-item/{itemId} \
 
 ```
 
+## 交易广场-标记或取消物品的喜爱，查看，收藏
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/square/social-item/{itemId} \
+-H "Content-Type: application/x-www-url-encoded" \
+-d "socialType=COLLECTION|LOVE|VIEW&socialOperate=ADD|CANCEL"
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```
+
 ## 交易广场-发起交换申请
 
 **请求：**

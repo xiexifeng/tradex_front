@@ -80,7 +80,6 @@ export function useItemList() {
 
   // 加载数据
   const loadItems = async (params: ItemListParams) => {
-    console.log(loading.value)
     if (loading.value) return
     
     loading.value = true

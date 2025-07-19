@@ -412,7 +412,7 @@
 import { defineComponent, ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay } from '@/api/stuff'
+import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay, socialItem } from '@/api/stuff'
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
@@ -499,6 +499,19 @@ export default defineComponent({
           }
           isLiked.value = itemDetail.value.isLiked
           isCollected.value = itemDetail.value.isCollected
+          
+          // 添加查看记录
+          try {
+            await socialItem({
+              itemId: itemId,
+              socialType: 'VIEW',
+              socialOperate: 'ADD'
+            })
+            // 更新查看次数
+            itemDetail.value.viewCount++
+          } catch (error) {
+            console.error('添加查看记录失败:', error)
+          }
         } else {
           showToast(res.desc || '获取物品详情失败')
         }
@@ -514,14 +527,68 @@ export default defineComponent({
       router.back()
     }
 
-    const toggleLike = () => {
-      isLiked.value = !isLiked.value
-      showToast(isLiked.value ? '已点赞' : '已取消点赞')
+    const toggleLike = async () => {
+      if (!userInfo.value?.userId) {
+        showToast('请先登录')
+        router.push('/login')
+        return
+      }
+      
+      try {
+        const res = await socialItem({
+          itemId: itemDetail.value.id,
+          socialType: 'LOVE',
+          socialOperate: isLiked.value ? 'CANCEL' : 'ADD'
+        })
+        
+        if (res.success) {
+          isLiked.value = !isLiked.value
+          // 更新点赞数
+          if (isLiked.value) {
+            itemDetail.value.loveCount++
+          } else {
+            itemDetail.value.loveCount = Math.max(0, itemDetail.value.loveCount - 1)
+          }
+          showToast(isLiked.value ? '已点赞' : '已取消点赞')
+        } else {
+          showToast(res.desc || '操作失败')
+        }
+      } catch (error) {
+        console.error('点赞操作失败:', error)
+        showToast('操作失败')
+      }
     }
 
-    const toggleCollect = () => {
-      isCollected.value = !isCollected.value
-      showToast(isCollected.value ? '已收藏' : '已取消收藏')
+    const toggleCollect = async () => {
+      if (!userInfo.value?.userId) {
+        showToast('请先登录')
+        router.push('/login')
+        return
+      }
+      
+      try {
+        const res = await socialItem({
+          itemId: itemDetail.value.id,
+          socialType: 'COLLECTION',
+          socialOperate: isCollected.value ? 'CANCEL' : 'ADD'
+        })
+        
+        if (res.success) {
+          isCollected.value = !isCollected.value
+          // 更新收藏数
+          if (isCollected.value) {
+            itemDetail.value.collectionCount++
+          } else {
+            itemDetail.value.collectionCount = Math.max(0, itemDetail.value.collectionCount - 1)
+          }
+          showToast(isCollected.value ? '已收藏' : '已取消收藏')
+        } else {
+          showToast(res.desc || '操作失败')
+        }
+      } catch (error) {
+        console.error('收藏操作失败:', error)
+        showToast('操作失败')
+      }
     }
 
     const share = () => {
