@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse } from './types';
+import type { ApiResponse, LoginResponse, PointsAccount, PointsTransaction } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -39,3 +39,15 @@ export const userApi = {
     });
   }
 };
+
+// 查询积分余额
+export function getPointsAccount(): Promise<ApiResponse<PointsAccount>> {
+  return request.get('/client/user/points-account');
+}
+
+// 查询积分交易记录
+export function getPointsTransactions(params: { pageNo: number; pageSize: number }): Promise<ApiResponse<PointsTransaction[]>> {
+  return request.post('/client/user/points-account/list-transaction', params, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}

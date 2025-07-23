@@ -105,17 +105,9 @@
             </div>
             <div class="blockchain-row">
               <van-icon name="star" class="star-icon"/>
-              <span class="label">信用评分</span>
+              <span class="label">综合评分</span>
               <div class="score-wrapper">
                 <span class="score">{{ userInfo?.tradeScore || 0 }}</span>
-                <van-rate 
-                  :model-value="userInfo?.tradeScore || 0"
-                  size="12"
-                  readonly
-                  allow-half
-                  void-icon="star"
-                  void-color="#eee"
-                />
               </div>
             </div>
           </div>
@@ -154,7 +146,7 @@
                   {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
                 </span>
                 <span class="col-type">{{ item.transactionType }}</span>
-                <span class="col-time">{{ item.transactionTime }}</span>
+                <span class="col-time">{{ formatTime(item.transactionTime) }}</span>
               </div>
             </div>
           </div>
@@ -306,9 +298,10 @@ import { defineComponent, ref, onMounted, computed } from 'vue'
 import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
-import type { Item } from '@/api/types'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import { useUserStore } from '@/store/modules/user'
+import { getPointsAccount, getPointsTransactions } from '@/api/user';
+import type { Item, PointsTransaction, PointsAccount } from '@/api/types';
 
 export default defineComponent({
   components: {
@@ -342,7 +335,7 @@ export default defineComponent({
       { text: '我的物品', value: 'all' },
       { text: '拥有', value: 'own' },
       { text: '转让中', value: 'transferring' },
-      { text: '已转让', value: 'transferred' }
+      // { text: '已转让', value: 'transferred' }
     ]
 
     // 获取状态文本
@@ -350,7 +343,7 @@ export default defineComponent({
       const statusMap: Record<string, string> = {
         own: '拥有',
         transferring: '转让中',
-        transferred: '已转让'
+        // transferred: '已转让'
       }
       return statusMap[status] || status
     }
@@ -514,20 +507,44 @@ export default defineComponent({
       {"tradeId":"2025032500012","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 18","scoreTime":"2025-04-01 12:11:00"},
       {"tradeId":"2025032500013","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 19","scoreTime":"2025-04-01 12:12:00"}
       ],
-      usages: [
-      {"id":"20250324000001","bizNo":"2025032500010","pointsChange":-100.0,"transactionType": "消费","transactionDescription":"购买物品","transactionTime":"2025-04-01 12:00:00"},
-      {"id":"20250324000002","bizNo":"2025032500011","pointsChange": 100.0,"transactionType": "奖励","transactionDescription":"审核奖励","transactionTime":"2025-04-01 12:01:00"},
-      {"id":"20250324000003","bizNo":"2025032500012","pointsChange": 100.0,"transactionType": "卖出收入","transactionDescription":"换物-iphone16","transactionTime":"2025-04-01 12:02:00"}
-      ],
-      pointsAccount:{
-        "id": "20250324000001",
-        "userId": "20250324000001",
-        "pointsBalance": 10000.0000,
-        "frozenPoints": 0.0000
-    }
+      pointsAccount: null as PointsAccount | null,
+      usages: [] as PointsTransaction[] | [],
+      // 分页参数
+      pageNo: 1,
+      pageSize: 5,
     };
   },
+  mounted() {
+    this.fetchPointsAccount();
+    this.fetchPointsTransactions();
+  },
   methods: {
+    formatTime(timestamp: number) {
+      const date = new Date(timestamp);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${h}:${min}:${s}`;
+    },
+    async fetchPointsAccount() {
+      const res = await getPointsAccount();
+      if (res.success) {
+        this.pointsAccount = res.data;
+      }
+    },
+    async fetchPointsTransactions() {
+      const res = await getPointsTransactions({
+        pageNo: this.pageNo,
+        pageSize: this.pageSize,
+      });
+      if (res.success) {
+        this.usages = res.data;
+      }
+    },
+    
     showTransactionDetail(transaction: any) {
       showToast({
         message: `交易哈希: ${transaction.hash}\n交易时间: ${transaction.time}\n交易金额: ${transaction.amount}`

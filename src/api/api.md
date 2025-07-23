@@ -801,3 +801,60 @@ curl -X POST http://47.122.125.199/tradex/clien/trade/goPay \
 }
 
 ```
+
+## 我的-查询我的积分余额
+
+**请求：**
+
+```bash
+curl -X GET http://47.122.125.199/tradex/client/user/points-account 
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+        "id": "20250324000001",
+        "userId": "20250324000001",
+        "pointsBalance": 10000.0000,
+        "frozenPoints": 0.0000
+    }
+}
+
+```
+
+## 我的-查询我的积分交易记录列表
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/user/points-account/list-transaction \
+-H "Content-Type: application/json" \
+-d '
+{
+    "pageNo": 1,
+    "pageSize": 5
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data":[
+      {"id":"20250324000001","bizNo":"2025032500010","pointsChange":-100.0,"transactionType": "消费","transactionDescription":"购买物品","transactionTime":"2025-04-01 12:00:00"},
+      {"id":"20250324000002","bizNo":"2025032500011","pointsChange": 100.0,"transactionType": "奖励","transactionDescription":"审核奖励","transactionTime":"2025-04-01 12:01:00"},
+      {"id":"20250324000003","bizNo":"2025032500012","pointsChange": 100.0,"transactionType": "卖出收入","transactionDescription":"换物-iphone16","transactionTime":"2025-04-01 12:02:00"}
+      ]
+}
+
+```

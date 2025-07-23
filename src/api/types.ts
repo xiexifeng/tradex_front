@@ -1,4 +1,4 @@
-// 通用响应类型
+// 通用API响应
 export interface ApiResponse<T = any> {
   success: boolean;
   code: string;
@@ -207,4 +207,22 @@ export interface TradeDetail {
     paymentNo: string;
     amount: number;
   };
+}
+
+// 积分账户信息
+export interface PointsAccount {
+  id: string;
+  userId: string;
+  pointsBalance: number;
+  frozenPoints: number;
+}
+
+// 积分交易记录
+export interface PointsTransaction {
+  id: string;
+  bizNo: string;
+  pointsChange: number;
+  transactionType: string;
+  transactionDescription: string;
+  transactionTime: number;
 }
