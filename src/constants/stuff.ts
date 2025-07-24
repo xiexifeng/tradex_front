@@ -28,12 +28,24 @@ export const TRADE_METHOD_MAP = {
   ITEM_TO_ITEM: '以物换物'
 } as const
 
+// 交易方式映射
+export const TRANSACTION_TYPE_MAP = {
+  TRADE_OUTCOME: '交易支出',
+  REWARD_INCOME: '奖励',
+  TRADE_INCOME: '交易收入',
+  REFUND_INCOME: '退款收入',
+  REWARD_OUTCOME: '奖励撤回',
+  REFUND_OUTCOME: '退款支出',
+  OTHER: '其他'
+} as const
+
 // 所有映射的集合
 export const VALUE_MAPS = {
   status: STATUS_MAP,
   itemStatus: ITEM_STATUS_MAP,
   deliveryMethod: DELIVERY_METHOD_MAP,
-  tradeMethod: TRADE_METHOD_MAP
+  tradeMethod: TRADE_METHOD_MAP,
+  transactionType: TRANSACTION_TYPE_MAP
 } as const
 
 // 通用值转义方法

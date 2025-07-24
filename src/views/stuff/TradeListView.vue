@@ -61,11 +61,21 @@
                     <div class="trade-score">
                       <div class="score-item">
                         <span class="label">评分：</span>
-                        <van-rate v-model="trade.fromScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
-                      </div>
+                        <template  v-if="trade.toUserId === userInfo.userId">
+                          <van-rate v-model="trade.toScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
+                        </template>
+                        <template  v-if="trade.fromUserId === userInfo.userId">
+                          <van-rate v-model="trade.fromScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
+                        </template>
+                       </div>
                       <div class="score-item">
                         <span class="label">得分：</span>
-                        <van-rate v-model="trade.toScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
+                        <template  v-if="trade.toUserId === userInfo.userId">
+                          <van-rate v-model="trade.fromScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
+                        </template>
+                        <template  v-if="trade.fromUserId === userInfo.userId">
+                          <van-rate v-model="trade.toScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
+                        </template>
                       </div>
                     </div>
                   </template>

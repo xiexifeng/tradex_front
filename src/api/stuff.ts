@@ -204,3 +204,13 @@ export const socialItem = async (data: {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   });
 };
+
+// 交易列表-双方评分
+export const tradeScore = async (data: {
+  tradeId: string;
+  tradeScore: number;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/submit-socre', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};

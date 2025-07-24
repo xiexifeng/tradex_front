@@ -145,7 +145,7 @@
                 <span :class="['col-points', item.pointsChange > 0 ? 'increase' : 'decrease']">
                   {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
                 </span>
-                <span class="col-type">{{ item.transactionType }}</span>
+                <span class="col-type">{{ getValueText(item.transactionType, 'transactionType') }}</span>
                 <span class="col-time">{{ formatTime(item.transactionTime) }}</span>
               </div>
             </div>
@@ -302,6 +302,7 @@ import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import { useUserStore } from '@/store/modules/user'
 import { getPointsAccount, getPointsTransactions } from '@/api/user';
 import type { Item, PointsTransaction, PointsAccount } from '@/api/types';
+import { getValueText } from '@/constants/stuff'
 
 export default defineComponent({
   components: {
@@ -498,7 +499,8 @@ export default defineComponent({
       showCancelDialog,
       onCancelSuccess,
       userInfo,
-      copyBlockchainId
+      copyBlockchainId,
+      getValueText
     }
   },
   data() {

@@ -142,14 +142,38 @@
           <div class="score-item">
             <van-icon name="smile" />
             <span class="label">评分：</span>
-            <van-rate v-model="fromScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
-            <span class="score-value">{{ fromScoreSafe }}分</span>
+            <template v-if="isSeller">
+              <template v-if="tradeInfo.fromScore == null">
+                <van-rate v-model="rateValue" :count="5" allow-half=false @change="submitScore" />
+                <span class="score-value">{{ rateValue ? rateValue + '分' : '' }}</span>
+              </template>
+              <template v-else>
+                <van-rate v-model="fromScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+                <span class="score-value">{{ fromScoreSafe }}分</span>
+              </template>
+            </template>
+            <template v-else>
+              <template v-if="tradeInfo.toScore == null">
+                <van-rate v-model="rateValue" :count="5" allow-half=false @change="submitScore" />
+                <span class="score-value">{{ rateValue ? rateValue + '分' : '' }}</span>
+              </template>
+              <template v-else>
+                <van-rate v-model="toScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+                <span class="score-value">{{ toScoreSafe }}分</span>
+              </template>
+            </template>
           </div>
           <div class="score-item">
             <van-icon name="good-job" />
             <span class="label">得分：</span>
-            <van-rate v-model="toScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
-            <span class="score-value">{{ toScoreSafe }}分</span>
+            <template v-if="isSeller">
+              <van-rate v-model="toScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+              <span class="score-value">{{ toScoreSafe }}分</span>
+            </template>
+            <template v-else>
+              <van-rate v-model="fromScoreSafe" size="14" readonly allow-half void-icon="star" void-color="#eee" />
+              <span class="score-value">{{ fromScoreSafe }}分</span>
+            </template>
           </div>
         </div>
       </van-cell-group>
@@ -188,6 +212,7 @@ import type { TradeDetail } from '@/api/types'
 import { getTradeDetail } from '@/api/stuff'
 import { useUserStore } from '@/store/modules/user'
 import { useTradeActions } from '@/composables/useTradeActions'
+import { tradeScore } from '@/api/stuff'
 
 export default defineComponent({
   name: 'TradeDetailView',
@@ -207,6 +232,29 @@ export default defineComponent({
       get: () => tradeInfo.value?.toScore ?? 0,
       set: v => { if (tradeInfo.value) tradeInfo.value.toScore = v }
     })
+
+    const rateValue = ref(0)
+    const isSeller = computed(() => tradeInfo.value && userInfo.value && tradeInfo.value.fromUserId === userInfo.value.userId)
+
+    // 提交评分
+    const submitScore = async (score: number) => {
+      if (!tradeInfo.value) return
+      const data = {
+        tradeId: tradeInfo.value.id,
+        tradeScore: score
+      }
+      const res = await tradeScore(data)
+      if (res.success) {
+        showToast('评分成功')
+        if (isSeller.value) {
+          tradeInfo.value.fromScore = score
+        } else {
+          tradeInfo.value.toScore = score
+        }
+      } else {
+        showToast(res.desc || '评分失败')
+      }
+    }
 
     // 交换物品列表
     const exchangeItems = ref([
@@ -374,7 +422,10 @@ export default defineComponent({
       confirmTrade,
       cancelTrade,
       fromScoreSafe,
-      toScoreSafe
+      toScoreSafe,
+      rateValue,
+      isSeller,
+      submitScore
     }
   }
 })

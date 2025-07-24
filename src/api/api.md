@@ -732,6 +732,33 @@ curl -X POST http://47.122.125.199/tradex/clien/trade/completed \
 
 ```
 
+## 交易列表-双方互评
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/clien/trade/score \
+-H "Content-Type: application/json" \
+-d '
+{
+  "tradeId": "trade12222",
+  "tradeScore": 5
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+
+```
+
 ## 积分换物-发起支付,创建支付订单
 
 **请求：**
