@@ -127,7 +127,7 @@
               <div v-for="item in transactions" :key="item.tradeId" class="table-row">
                 <span class="col-score">{{ item.tradeScore }}</span>
                 <span class="col-item">{{ item.tradeRemark }}</span>
-                <span class="col-time">{{ item.scoreTime }}</span>
+                <span class="col-time">{{ formatTime(item.scoreTime) }}</span>
               </div>
             </div>
           </div>
@@ -276,7 +276,7 @@
         </template>
       </van-tabbar-item>
       <van-tabbar-item icon="orders-o" to="/stuff/trades">
-        交易列表
+        交易
       </van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/user/profile">
         我的
@@ -300,8 +300,8 @@ import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import { useUserStore } from '@/store/modules/user'
-import { getPointsAccount, getPointsTransactions } from '@/api/user';
-import type { Item, PointsTransaction, PointsAccount } from '@/api/types';
+import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions } from '@/api/user';
+import type { Item, PointsTransaction, PointsAccount, TradeScoreTransaction } from '@/api/types';
 import { getValueText } from '@/constants/stuff'
 
 export default defineComponent({
@@ -505,10 +505,7 @@ export default defineComponent({
   },
   data() {
     return {
-      transactions: [
-      {"tradeId":"2025032500012","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 18","scoreTime":"2025-04-01 12:11:00"},
-      {"tradeId":"2025032500013","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 19","scoreTime":"2025-04-01 12:12:00"}
-      ],
+      transactions: [] as TradeScoreTransaction[] | [],
       pointsAccount: null as PointsAccount | null,
       usages: [] as PointsTransaction[] | [],
       // 分页参数
@@ -519,6 +516,7 @@ export default defineComponent({
   mounted() {
     this.fetchPointsAccount();
     this.fetchPointsTransactions();
+    this.fetchTradeScoreTransactions();
   },
   methods: {
     formatTime(timestamp: number) {
@@ -544,6 +542,15 @@ export default defineComponent({
       });
       if (res.success) {
         this.usages = res.data;
+      }
+    },
+    async fetchTradeScoreTransactions() {
+      const res = await getTradeScoreTransactions({
+        pageNo: this.pageNo,
+        pageSize: this.pageSize,
+      });
+      if (res.success) {
+        this.transactions = res.data;
       }
     },
     

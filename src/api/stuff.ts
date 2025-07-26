@@ -159,7 +159,7 @@ export const getTradeList = async (params: {
 };
 
 export const getTradeDetail = async (tradeId: string): Promise<ApiResponse<TradeDetail>> => {
-  return request.post(`/client/trade/${tradeId}`);
+  return request.post(`/client/trade/detail/${tradeId}`);
 };
 
 // 以物换物-卖方接受交易

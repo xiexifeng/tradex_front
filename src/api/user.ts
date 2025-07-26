@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse, PointsAccount, PointsTransaction } from './types';
+import type { ApiResponse, LoginResponse, PointsAccount, PointsTransaction, TradeScoreTransaction } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -48,6 +48,13 @@ export function getPointsAccount(): Promise<ApiResponse<PointsAccount>> {
 // 查询积分交易记录
 export function getPointsTransactions(params: { pageNo: number; pageSize: number }): Promise<ApiResponse<PointsTransaction[]>> {
   return request.post('/client/user/points-account/list-transaction', params, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+// 查询信用评分记录
+export function getTradeScoreTransactions(params: { pageNo: number; pageSize: number }): Promise<ApiResponse<TradeScoreTransaction[]>> {
+  return request.post('/client/trade/list-mine-score', params, {
     headers: { 'Content-Type': 'application/json' }
   });
 }

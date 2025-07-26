@@ -35,7 +35,7 @@
         </template>
       </van-tabbar-item>
       <van-tabbar-item icon="orders-o" to="/stuff/trades">
-        交易列表
+        交易
       </van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/user/profile">
         我的

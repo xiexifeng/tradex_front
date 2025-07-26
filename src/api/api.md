@@ -557,7 +557,7 @@ curl -X POST http://47.122.125.199/tradex/client/trade/list-mine \
 **请求：**
 
 ```bash
-curl -X POST http://47.122.125.199/tradex/client/trade/{tradeId} \
+curl -X POST http://47.122.125.199/tradex/client/trade/detail/{tradeId} \
 
 ```
 
@@ -881,6 +881,36 @@ curl -X POST http://47.122.125.199/tradex/client/user/points-account/list-transa
       {"id":"20250324000001","bizNo":"2025032500010","pointsChange":-100.0,"transactionType": "消费","transactionDescription":"购买物品","transactionTime":"2025-04-01 12:00:00"},
       {"id":"20250324000002","bizNo":"2025032500011","pointsChange": 100.0,"transactionType": "奖励","transactionDescription":"审核奖励","transactionTime":"2025-04-01 12:01:00"},
       {"id":"20250324000003","bizNo":"2025032500012","pointsChange": 100.0,"transactionType": "卖出收入","transactionDescription":"换物-iphone16","transactionTime":"2025-04-01 12:02:00"}
+      ]
+}
+
+```
+
+## 我的-查询我的信用评分记录列表
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/trade/list-mine-score \
+-H "Content-Type: application/json" \
+-d '
+{
+    "pageNo": 1,
+    "pageSize": 5
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data":[
+      {"tradeId":"2025032500012","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 18","scoreTime":"2025-04-01 12:11:00"},
+      {"tradeId":"2025032500013","userId":"20250324000001","tradeScore":5,"tradeRemark":"iphone 19","scoreTime":"2025-04-01 12:12:00"}
       ]
 }
 

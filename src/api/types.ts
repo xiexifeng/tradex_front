@@ -226,3 +226,12 @@ export interface PointsTransaction {
   transactionDescription: string;
   transactionTime: number;
 }
+
+// 积分交易记录
+export interface TradeScoreTransaction {
+  tradeId: string;
+  userId: string;
+  tradeScore: number;
+  tradeRemark: string;
+  scoreTime: number;
+}
