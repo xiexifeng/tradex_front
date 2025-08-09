@@ -915,3 +915,51 @@ curl -X POST http://47.122.125.199/tradex/client/trade/list-mine-score \
 }
 
 ```
+
+## 消息-查询我的消息列表
+
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/notification/list-mine \
+-H "Content-Type: application/json" \
+-d '
+{
+    "pageNo": 1,
+    "pageSize": 5
+}'
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data":[
+      {
+        "id": "2025032500011",
+        "userId": "20250324000001",
+        "notificationType": "SYSTEM|TRADE|STUFF|REPORT",
+        "relatedId": "2025032500010",
+        "title": "系统通知|交易通知|物品通知|举报通知",
+        "content": "换物交易完成-积分增加5",
+        "status": 1,
+        "createTime": "2025-04-01 12:00:00"
+      },
+      {
+        "id": "2025032500011",
+        "userId": "20250324000001",
+        "notificationType": "TRADE",
+        "relatedId": "2025032500010",
+        "title": "交易通知",
+        "content": "换物交易完成-积分增加5",
+        "status": 1,
+        "createTime": "2025-04-01 12:00:00"
+      }
+      ]
+}
+
+```

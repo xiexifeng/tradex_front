@@ -47,9 +47,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/modules/user'
 import NotificationList from './components/NotificationList.vue'
+import { notificationApi } from '@/api/notification'
+import type { Notification } from '@/api/types'
 
 export default defineComponent({
   components: {
@@ -58,37 +61,19 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const activeTab = ref(0)
+    const notifications = ref<Notification[]>([])
 
-    // 模拟通知数据
-    const notifications = ref([
-      {
-        "id": "2025032500011",
-        "userId": "20250324000001",
-        "notificationType": 2,
-        "relatedId": "2025032500010",
-        "title": "交易通知",
-        "content": "换物交易完成-积分增加5",
-        "status": 1,
-        "createTime": "2025-04-01 12:00:00"
-      },
-      {
-        "id": "2025032500012",
-        "userId": "20250324000001",
-        "notificationType": 1,
-        "relatedId": "2025032500011",
-        "title": "系统通知",
-        "content": "您的物品已通过审核",
-        "status": 0,
-        "createTime": "2025-04-01 11:00:00"
-      }
-    ])
+    const loadNotifications = async () => {
+      const res = await notificationApi.listMyNotification({ pageNo: 1, pageSize: 10 })
+      notifications.value = res.data
+    }
 
     const unreadNotifications = computed(() => {
-      return notifications.value.filter(item => item.status === 0)
+      return notifications.value.filter(item => item.status === 1)
     })
 
     const readNotifications = computed(() => {
-      return notifications.value.filter(item => item.status === 1)
+      return notifications.value.filter(item => item.status === 2)
     })
 
     const onClickLeft = () => {
@@ -98,6 +83,16 @@ export default defineComponent({
     const viewDetail = (notification: any) => {
       router.push(`/notification/detail/${notification.id}`)
     }
+
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
+    onMounted(() => {
+      if (!userStore.token || !userInfo.value) {
+        router.push('/login')
+        return
+      }
+      loadNotifications()
+    })
 
     return {
       activeTab,

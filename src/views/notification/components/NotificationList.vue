@@ -7,20 +7,20 @@
            @click="$emit('click-item', item)">
         <div class="notification-header">
           <div class="title">
-            <div :class="['type-icon', item.notificationType === 1 ? 'system' : 'trade']">
-              <van-icon :name="item.notificationType === 1 ? 'info-o' : 'exchange'"/>
+            <div :class="['type-icon', item.notificationType.toLowerCase() === 'system' ? 'system' : 'trade']">
+              <van-icon :name="item.notificationType.toLowerCase() === 'system' ? 'info-o' : 'exchange'"/>
             </div>
             <span>{{ item.title }}</span>
           </div>
           <div :class="['status-tag', item.status === 0 ? 'unread' : 'read']">
-            {{ item.status === 0 ? '未读' : '已读' }}
+            {{ item.status === 1 ? '未读' : '已读' }}
           </div>
         </div>
         <div class="notification-content">
           {{ item.content }}
           <div class="time">
             <van-icon name="clock-o"/>
-            <span>{{ item.createTime }}</span>
+            <span>{{ formatTime(item.createTime) }}</span>
           </div>
         </div>
         <div class="notification-footer">
@@ -50,8 +50,24 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['click-item']
+  emits: ['click-item'],
+  setup() { 
+    const formatTime = (timestamp: number) => {
+      const date = new Date(timestamp);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const s = String(date.getSeconds()).padStart(2, '0');
+      return `${y}-${m}-${d} ${h}:${min}:${s}`;
+    }
+    return {
+      formatTime
+    }
+  }
 })
+
 </script>
 
 <style lang="scss" scoped>

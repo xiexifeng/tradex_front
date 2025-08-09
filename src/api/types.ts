@@ -235,3 +235,15 @@ export interface TradeScoreTransaction {
   tradeRemark: string;
   scoreTime: number;
 }
+
+// 消息记录
+export interface Notification {
+  id: string;
+  userId: string;
+  notificationType: string;
+  relatedId: string;
+  title: string;
+  content: string;
+  status: number;
+  createTime: number;
+}
