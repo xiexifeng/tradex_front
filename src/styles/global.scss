@@ -1,0 +1,76 @@
+@import './variables.scss';
+
+// 全局页面容器样式
+.page-container {
+  min-height: 100vh;
+  background-color: var(--van-background);
+  padding-bottom: 50px;
+}
+
+// 统一卡片样式
+.custom-card {
+  margin: 12px;
+  padding: 16px;
+  background: #fff;
+  border-radius: var(--van-radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+// 统一列表样式
+.custom-list {
+  .van-cell {
+    &::after {
+      border-color: var(--van-cell-border-color);
+    }
+  }
+}
+
+// 统一按钮样式
+.custom-button {
+  &.van-button--primary {
+    background: var(--van-button-primary-background);
+    border: none;
+    
+    &.van-button--plain {
+      background: transparent;
+      border: 1px solid var(--van-primary-color);
+      color: var(--van-primary-color);
+    }
+  }
+}
+
+// 统一标题样式
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--van-text-color);
+  margin: 16px 12px 8px;
+}
+
+// 统一分割线样式
+.custom-divider {
+  margin: 16px 0;
+  border-color: #ebedf0;
+}
+
+// 统一标签样式
+.custom-tag {
+  margin-right: 8px;
+}
+
+// 统一图片样式
+.custom-image {
+  border-radius: var(--van-radius-md);
+  overflow: hidden;
+}
+
+// 统一搜索框样式
+.custom-search {
+  padding: 8px 12px;
+  background: #fff;
+}
+
+// 统一空状态样式
+.custom-empty {
+  padding: 32px 0;
+} 

@@ -1,0 +1,139 @@
+// 主题色
+$primary-color: #1989fa;
+$primary-gradient: linear-gradient(135deg, #1989fa, #0066ff);
+$success-color: #07c160;
+$warning-color: #ff976a;
+$danger-color: #ee0a24;
+$info-color: #969799;
+
+// 文字颜色
+$text-primary: #323233;
+$text-regular: #666666;
+$text-secondary: #969799;
+$text-placeholder: #c8c9cc;
+
+// 背景色
+$background-color: #f7f8fa;
+$white: #ffffff;
+
+// 边框颜色
+$border-color: #ebedf0;
+
+// 圆角
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+
+// 阴影
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+
+// 间距
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+
+// 字体大小
+$font-size-xs: 12px;
+$font-size-sm: 13px;
+$font-size-md: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+
+// 动画
+$animation-duration: 0.3s;
+$animation-timing: cubic-bezier(0.55, 0, 0.1, 1);
+
+// 混合器
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card {
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 统一导航栏样式
+@mixin nav-bar {
+  .van-nav-bar {
+    background: $white;
+    
+    &__title {
+      color: $text-primary;
+      font-size: $font-size-lg;
+      font-weight: 600;
+    }
+    
+    &__text, &__arrow {
+      color: $text-regular;
+    }
+  }
+}
+
+// 统一标签页样式
+@mixin tabs {
+  .van-tabs {
+    &__line {
+      background: $primary-color;
+    }
+    
+    &__nav {
+      background: $white;
+    }
+    
+    .van-tab {
+      color: $text-regular;
+      font-size: $font-size-md;
+      
+      &--active {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// 统一按钮样式
+@mixin button {
+  .van-button {
+    &--primary {
+      background: $primary-gradient;
+      border: none;
+      
+      &.van-button--plain {
+        background: transparent;
+        border: 1px solid $primary-color;
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+// 统一底部导航栏样式
+@mixin tabbar {
+  .van-tabbar {
+    background: $white;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+    
+    &-item {
+      color: $text-secondary;
+      
+      &--active {
+        color: $primary-color;
+      }
+    }
+  }
+} 

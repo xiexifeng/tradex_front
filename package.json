@@ -11,8 +11,12 @@
   "dependencies": {
     "@vant/area-data": "^2.0.0",
     "@vue/runtime-dom": "^3.5.13",
+    "browser-image-compression": "^2.0.2",
     "core-js": "^3.8.3",
+    "date-fns": "4.1.0",
     "register-service-worker": "^1.7.2",
+    "sass": "1.87.0",
+    "sass-loader": "16.0.5",
     "vant": "^4.9.16",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
@@ -34,13 +38,15 @@
     "@vue/eslint-config-typescript": "^9.1.0",
     "@vue/test-utils": "^2.0.0-0",
     "@vue/vue3-jest": "^27.0.0-alpha.1",
+    "axios": "^1.7.7",
     "babel-jest": "^27.0.6",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "jest": "^27.0.5",
     "less": "^4.0.0",
     "less-loader": "^8.0.0",
+    "pinia": "^2.2.6",
     "ts-jest": "^27.0.4",
-    "typescript": "~4.5.5"
+    "typescript": "~4.9.5"
   }
 }

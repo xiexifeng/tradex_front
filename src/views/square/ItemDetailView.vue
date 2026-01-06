@@ -1,144 +1,340 @@
 <template>
-  <div class="item-detail">
-    <van-nav-bar
-      title="物品详情"
-      left-arrow
-      @click-left="onClickLeft"
-      class="detail-nav"
-    />
-    
-    <!-- 图片轮播 -->
-    <van-swipe class="item-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item v-for="(image, index) in itemDetail.itemImageList" :key="index">
-        <van-image :src="image" fit="cover" width="100%" height="100%" />
-      </van-swipe-item>
-    </van-swipe>
+  <div class="page-container">
+    <!-- 顶部区域（导航栏+轮播）整合为一个视觉区块 -->
+    <div class="header-section">
+      <van-nav-bar
+        title="物品详情"
+        left-arrow
+        @click-left="onClickLeft"
+        class="detail-nav"
+      >
+        <template #right>
+          <van-icon name="share-o" size="20" class="nav-icon" @click="share"/>
+        </template>
+      </van-nav-bar>
 
-    <!-- 基本信息 -->
-    <van-cell-group inset class="info-group">
-      <div class="price-row">
-        <template v-if="itemDetail.tradeMethod === '人民币'">
-          <span class="price">¥{{ itemDetail.transferPrice }}</span>
-        </template>
-        <template v-else-if="itemDetail.tradeMethod === '积分'">
-          <span class="price">{{ itemDetail.transferPoints }}积分</span>
-        </template>
-        <template v-else>
-          <span class="price">期望物品：{{ itemDetail.expectItem }}</span>
-        </template>
-        <van-tag round type="warning" size="medium">{{ itemDetail.tradeMethod }}</van-tag>
+      <div class="swipe-container">
+        <van-swipe class="item-swipe" :autoplay="3000">
+          <van-swipe-item v-for="(image, index) in itemDetail.itemImageList" :key="index">
+            <van-image :src="image" fit="cover" width="100%" height="100%" />
+          </van-swipe-item>
+          <template #indicator="{ active, total }">
+            <div class="custom-indicator">
+              <van-icon name="photograph" class="indicator-icon" />
+              <span>{{ active + 1 }}/{{ total }}</span>
+            </div>
+          </template>
+        </van-swipe>
       </div>
-      <div class="title">{{ itemDetail.itemTitle }}</div>
-      <div class="tags">
-        <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
-        <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
-        <van-tag round plain type="warning" size="medium">{{ itemDetail.deliveryMethod }}</van-tag>
-      </div>
-    </van-cell-group>
+    </div>
 
-     <!-- 卖家信息 -->
-     <van-cell-group inset class="seller-group">
+    <!-- 主要内容区 -->
+    <div class="content-section">
+      <!-- 价格和交易方式突出显示 -->
+      <div class="price-card">
+        <div class="price-main">
+          <template v-if="itemDetail.tradeMethod === 'ITEM_TO_MONEY'">
+            <span class="currency">¥</span>
+            <span class="amount">{{ itemDetail.transferPrice }}</span>
+          </template>
+          <template v-else-if="itemDetail.tradeMethod === 'ITEM_TO_POINTS'">
+            <span class="amount">{{ itemDetail.transferPoints }}</span>
+            <span class="unit">积分</span>
+          </template>
+          <template v-else>
+            <div class="exchange-info">
+              <span class="exchange-label">期望交换</span>
+              <span class="exchange-target">{{ itemDetail.expectItem }}</span>
+            </div>
+          </template>
+        </div>
+        <van-tag 
+          round 
+          :type="getTradeMethodType(itemDetail.tradeMethod)" 
+          size="medium"
+          class="trade-method-tag"
+        >
+          {{ getValueText(itemDetail.tradeMethod, 'tradeMethod') }}
+        </van-tag>
+      </div>
+
+      <!-- 商品基本信息卡片 -->
+      <div class="info-card">
+        <h1 class="title">{{ itemDetail.itemTitle }}</h1>
+        <div class="blockchain-info">
+          <van-icon name="certificate" />
+          <span class="blockchain-label">区块链ID：</span>
+          <span class="blockchain-value">{{ itemDetail?.blockchainId ? itemDetail.blockchainId.slice(0, 10) + '...' : '' }}</span>
+          <van-icon v-if="itemDetail?.blockchainId" 
+                  name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(itemDetail?.blockchainId)"
+                />
+        </div>
+        <div class="tags-row">
+          <van-tag round plain type="primary" size="medium">{{ itemDetail.itemType }}</van-tag>
+          <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation }}成新</van-tag>
+          <van-tag round plain type="warning" size="medium">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</van-tag>
+        </div>
+        <div class="item-stats">
+          <div class="stat-box">
+            <van-icon name="eye-o" />
+            <span class="stat-value">{{ itemDetail.viewCount }}</span>
+            <span class="stat-label">浏览</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="like-o" />
+            <span class="stat-value">{{ itemDetail.loveCount }}</span>
+            <span class="stat-label">点赞</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="star-o" />
+            <span class="stat-value">{{ itemDetail.collectionCount }}</span>
+            <span class="stat-label">收藏</span>
+          </div>
+          <div class="stat-box">
+            <van-icon name="exchange" />
+            <span class="stat-value">{{ itemDetail.transferTimes }}</span>
+            <span class="stat-label">转让</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卖家信息卡片改版 -->
       <div class="seller-card">
-        <div class="seller-info">
-          <van-image
-            round
-            width="50"
-            height="50"
-            :src="itemDetail.avatarUrl"
-          />
-          <div class="seller-details">
-            <div class="seller-name">{{ itemDetail.nickname }}</div>
-            <div class="seller-score">
-              <van-rate v-model="itemDetail.userDetail.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
-              <span>{{ itemDetail.userDetail.tradeScore }}分</span>
+        <div class="seller-main">
+          <div class="seller-avatar">
+            <van-image
+              round
+              width="60"
+              height="60"
+              :src="itemDetail.userAvatar"
+            />
+            <div class="seller-badge">
+              <van-icon name="shield-o" />
+            </div>
+          </div>
+          <div class="seller-info">
+            <div class="seller-name-row">
+              <span class="seller-name">{{ itemDetail.userNickname }}</span>
+              <van-tag type="primary" plain>认证用户</van-tag>
+            </div>
+            <div class="seller-score" @click="handleScoreClick">
+              <van-rate v-model="itemDetail.userExt.tradeScore" size="12" color="#ffd21e" void-icon="star" void-color="#eee" readonly allow-half />
+              <span class="score-text">{{ itemDetail.userExt.tradeScore === -999 ? '登录后可查看' : itemDetail.userExt.tradeScore + '分' }}</span>
+            </div>
+            <div class="blockchain-id">
+              <van-icon name="certificate" />
+              <span>区块链ID: {{ itemDetail?.userExt.blockchainId ? itemDetail.userExt.blockchainId.slice(0, 10) + '...' : '' }}</span>
+              <van-icon v-if="itemDetail?.userExt.blockchainId" 
+                  name="question" 
+                  class="copy-icon"
+                  style="margin-left: 6px; cursor: pointer;"
+                  @click="copyBlockchainId(itemDetail?.userExt.blockchainId)"
+                />
             </div>
           </div>
         </div>
-        <div class="seller-blockchain">
-          <van-icon name="shield-o" />
-          <span class="blockchain-id">区块链ID: {{ itemDetail.userDetail.blockchainId }}</span>
+        <van-button 
+          round 
+          type="primary" 
+          plain 
+          icon="chat-o" 
+          class="contact-button"
+          @click="contactSeller"
+        >
+          联系卖家
+        </van-button>
+      </div>
+
+      <!-- 商品描述卡片 -->
+      <div class="desc-card">
+        <div class="section-title">
+          <van-icon name="description" />
+          <span>商品描述</span>
+        </div>
+        <div class="description-content">
+          {{ itemDetail.itemDescription }}
         </div>
       </div>
-    </van-cell-group>
 
-    <!-- 物品描述 -->
-    <van-cell-group inset class="desc-group">
-      <div class="section-title">
-        <van-icon name="description" />
-        <span>物品描述</span>
-      </div>
-      <div class="description">{{ itemDetail.itemDescription }}</div>
-    </van-cell-group>
-
-    <!-- 交易信息 -->
-    <van-cell-group inset class="trade-group">
-      <div class="section-title">
-        <van-icon name="transaction" />
-        <span>交易信息</span>
-      </div>
-      <div class="trade-info">
-        <van-cell title="联系人" :value="itemDetail.contactInfo.linkman" />
-        <van-cell title="联系电话" :value="itemDetail.contactInfo.phone" />
-        <van-cell title="交付方式" :value="itemDetail.deliveryMethod" />
-        <van-cell title="交付地址" :value="itemDetail.contactInfo.address" />
-        <van-cell title="物品区块链ID" :value="itemDetail.blockchainId" />
-        <van-cell title="物品转让次数" :value="itemDetail.transferTimes + '次'" />
-        <div class="interaction-stats">
-          <div class="stat-item">
-            <van-icon name="eye-o" />
-            <span>{{ itemDetail.viewCount }}</span>
+      <!-- 交易信息卡片 -->
+      <div class="trade-card">
+        <div class="section-title">
+          <van-icon name="transaction" />
+          <span>交易信息</span>
+        </div>
+        <div class="trade-grid">
+          <div class="trade-item">
+            <span class="item-label">联系人</span>
+            <span class="item-value">{{ itemDetail.contactInfo.linkman }}</span>
           </div>
-          <div class="stat-item">
-            <van-icon name="like-o" />
-            <span>{{ itemDetail.loveCount }}</span>
+          <div class="trade-item">
+            <span class="item-label">联系电话</span>
+            <span class="item-value">{{ itemDetail.contactInfo.phone }}</span>
           </div>
-          <div class="stat-item">
-            <van-icon name="star-o" />
-            <span>{{ itemDetail.collectionCount }}</span>
+          <div class="trade-item">
+            <span class="item-label">交付方式</span>
+            <span class="item-value">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</span>
+          </div>
+          <div class="trade-item">
+            <span class="item-label">交付地址</span>
+            <span class="item-value">{{ itemDetail.contactInfo.address }}</span>
           </div>
         </div>
       </div>
-    </van-cell-group>
+    </div>
 
-    <!-- 底部操作栏 -->
+    <!-- 底部操作栏改版 -->
     <div class="bottom-bar">
-      <div class="action-icons">
+      <div class="action-group">
         <div class="action-item" @click="toggleLike">
-          <van-icon :name="isLiked ? 'like' : 'like-o'" :class="{ active: isLiked }" />
-          <span>点赞</span>
+          <div class="action-icon" :class="{ active: isLiked }">
+            <van-icon :name="isLiked ? 'like' : 'like-o'" />
+          </div>
+          <span>{{ isLiked ? '已点赞' : '点赞' }}</span>
         </div>
         <div class="action-item" @click="toggleCollect">
-          <van-icon :name="isCollected ? 'star' : 'star-o'" :class="{ active: isCollected }" />
-          <span>收藏</span>
-        </div>
-        <div class="action-item" @click="share">
-          <van-icon name="share-o" />
-          <span>分享</span>
+          <div class="action-icon" :class="{ active: isCollected }">
+            <van-icon :name="isCollected ? 'star' : 'star-o'" />
+          </div>
+          <span>{{ isCollected ? '已收藏' : '收藏' }}</span>
         </div>
       </div>
       <div class="button-group">
         <van-button 
-          v-if="itemDetail.tradeMethod !== '以物换物'"
           type="primary" 
-          round
+          round 
           block 
-          @click="buy"
+          :loading="isSubmitting"
+          :disabled="userInfo != null && userInfo.userId === itemDetail.userId"
+          @click="handleBuyOrExchange"
         >
-          立即购买
-        </van-button>
-        <van-button 
-          v-else
-          type="primary" 
-          round
-          block 
-          @click="exchange"
-        >
-          发起交换
+          <template #icon>
+            <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
+          </template>
+          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
         </van-button>
       </div>
     </div>
 
-    <!-- 交换申请弹出层 -->
+    <!-- 购买表单弹出层 -->
+    <van-popup
+      v-model:show="showBuyForm"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '60%' }"
+    >
+      <div class="exchange-popup">
+        <div class="popup-title">填写购买信息</div>
+        <van-form @submit="onBuySubmit">
+          <van-cell-group inset>
+            <van-field
+              v-model="buyForm.linkman"
+              name="linkman"
+              label="联系人"
+              placeholder="请输入联系人姓名"
+              :rules="[{ required: true, message: '请填写联系人' }]"
+            />
+            <van-field
+              v-model="buyForm.phone"
+              name="phone"
+              label="联系电话"
+              placeholder="请输入联系电话"
+              :rules="[{ required: true, message: '请填写联系电话' }]"
+            />
+            <van-field
+              v-model="buyForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
+            />
+            <van-field
+              v-model="buyForm.remark"
+              name="remark"
+              label="备注"
+              type="textarea"
+              rows="2"
+              autosize
+              placeholder="请输入备注信息（选填）"
+            />
+          </van-cell-group>
+          <div class="submit-button">
+            <van-button round block type="primary" native-type="submit" :loading="isSubmitting">
+              确认购买
+            </van-button>
+          </div>
+        </van-form>
+      </div>
+    </van-popup>
+
+    <!-- 积分支付弹窗 -->
+    <van-popup
+      v-model:show="showPayPopup"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '40%' }"
+    >
+      <div class="exchange-popup">
+        <div class="popup-title">积分支付</div>
+        <van-form @submit="onPaySubmit">
+          <van-cell-group inset>
+            <van-field
+              v-model="payForm.tradePoints"
+              name="tradePoints"
+              label="支付积分"
+              type="number"
+              :readonly="true"
+            />
+            <van-field
+              v-model="payForm.tradePassword"
+              name="tradePassword"
+              label="支付密码"
+              type="password"
+              maxlength="6"
+              placeholder="请输入6位支付密码"
+              :rules="[
+                { required: true, message: '请输入支付密码' },
+                { pattern: /^\d{6}$/, message: '请输入6位数字密码' }
+              ]"
+            />
+          </van-cell-group>
+          <div class="submit-button">
+            <van-button round block type="primary" native-type="submit" :loading="isPaying">
+              确认支付
+            </van-button>
+          </div>
+        </van-form>
+      </div>
+    </van-popup>
+
+    <!-- 物品类型选择弹出层 -->
+    <van-popup v-model:show="showItemTypePopup" position="bottom" round>
+      <van-picker
+        :columns="itemTypeColumns"
+        @confirm="onItemTypeConfirm"
+        @cancel="showItemTypePopup = false"
+        show-toolbar
+        title="选择物品类型"
+      />
+    </van-popup>
+
+    <!-- 交换物品选择弹出层 -->
+    <van-popup v-model:show="showItemListPopup" position="bottom" round>
+      <van-picker
+        :columns="myItemColumns"
+        @confirm="onItemConfirm"
+        @cancel="showItemListPopup = false"
+        show-toolbar
+        title="选择交换物品"
+      />
+    </van-popup>
+
+    <!-- 交换表单弹出层 -->
     <van-popup
       v-model:show="showExchangeForm"
       position="bottom"
@@ -181,7 +377,7 @@
               placeholder="请选择要交换的物品"
               readonly
               is-link
-              @click="showItemListPopup = true"
+              @click="openItemListPopup"
               :rules="[{ required: true, message: '请选择交换物品' }]"
             />
             <van-field
@@ -193,6 +389,13 @@
               autosize
               placeholder="请输入备注信息（选填）"
             />
+            <van-field
+              v-model="exchangeForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
+            />
           </van-cell-group>
           <div class="submit-button">
             <van-button round block type="primary" native-type="submit">
@@ -202,79 +405,28 @@
         </van-form>
       </div>
     </van-popup>
-
-    <!-- 物品类型选择弹出层 -->
-    <van-popup v-model:show="showItemTypePopup" position="bottom" round>
-      <van-picker
-        :columns="itemTypeColumns"
-        @confirm="onItemTypeConfirm"
-        @cancel="showItemTypePopup = false"
-        show-toolbar
-        title="选择物品类型"
-      />
-    </van-popup>
-
-    <!-- 交换物品选择弹出层 -->
-    <van-popup v-model:show="showItemListPopup" position="bottom" round>
-      <van-picker
-        :columns="myItemColumns"
-        @confirm="onItemConfirm"
-        @cancel="showItemListPopup = false"
-        show-toolbar
-        title="选择交换物品"
-      />
-    </van-popup>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-type ItemDetail = {
-      id: string,
-      userId: string,
-      nickname: string,
-      avatarUrl: string,
-      itemTitle: string,
-      itemType: string,
-      itemDescription: string,
-      firstImage: string,
-      itemImageList: string[],
-      depreciation: number,
-      transferTimes: number,
-      lastUserId: string,
-      blockchainId: string,
-      loveCount: number,
-      collectionCount: number,
-      viewCount: number,
-      tradeMethod: string,
-      transferPrice: number,
-      transferPoints: number,
-      expectItem: string,
-      contactInfo: {
-        linkman: string,
-        phone: string,
-        address: string
-      },
-      exchangeApplyCount: number,
-      deliveryMethod: string,
-      isLiked: boolean,
-      isCollected: boolean,
-      userDetail: {
-        tradeScore: number,
-        blockchainId: string
-      }
-    }
+import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay, socialItem } from '@/api/stuff'
+import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
+import type { SquareItemDetail } from '@/api/types'
+import { useUserStore } from '@/store/modules/user'
+
 type ExchangeForm = {
-      targetItemId: string,
-      linkman: string,
-      phone: string,
-      itemId: string,
-      itemTitle: string,
-      itemType: string,
-      remark: string
-    }  
+  targetItemId: string,
+  linkman: string,
+  phone: string,
+  itemId: string,
+  itemTitle: string,
+  itemType: string,
+  remark: string,
+  address: string
+}  
 
 export default defineComponent({
   name: 'ItemDetailView',
@@ -283,12 +435,13 @@ export default defineComponent({
     const route = useRoute()
     const isLiked = ref(false)
     const isCollected = ref(false)
+    const loading = ref(false)
 
-    const itemDetail = ref<ItemDetail>({
+    const itemDetail = ref<SquareItemDetail>({
       id: '0',
       userId: '0',
-      nickname: '',
-      avatarUrl: '',
+      userAvatar: '',
+      userNickname: '',
       itemTitle: '',
       itemType: '',
       itemDescription: '',
@@ -305,6 +458,11 @@ export default defineComponent({
       transferPrice: 0,
       transferPoints: 0,
       expectItem: '',
+      publishTime: 0,
+      userExt: {
+        blockchainId: '',
+        tradeScore: 0
+      },
       contactInfo: {
         linkman: '',
         phone: '',
@@ -313,68 +471,124 @@ export default defineComponent({
       exchangeApplyCount: 0,
       deliveryMethod: '',
       isLiked: false,
-      isCollected: false,
-      userDetail: {
-        tradeScore: 0,
-        blockchainId: ''
-      }
+      isCollected: false
     })
 
-    onMounted(async () => {
-      // 这里应该调用API获取物品详情
-      // 模拟API调用
-      itemDetail.value = {
-        id: '2025032500010',
-        userId: '20250324000002',
-        nickname: "NPE",
-        avatarUrl: "https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg",
-        itemTitle: "iphone 16",
-        itemType: "电子产品",
-        itemDescription: "刚买2个月 32G 9成新",
-        firstImage: "https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg",
-        itemImageList: ["https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg","https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"],
-        depreciation: 9,
-        transferTimes: 0,
-        lastUserId: '20250324000002',
-        blockchainId: "Hash0030343jkjlkj",
-        loveCount: 10,
-        collectionCount: 10,
-        viewCount: 10,
-        tradeMethod: "以物换物",
-        transferPrice: 190.0000,
-        transferPoints: 0,
-        expectItem: "ipad 10",
-        contactInfo: {
-          linkman: '张先生',
-          phone: '13800008888',
-          address: '深圳市南山区xx小区'
-        },
-        exchangeApplyCount: 0,
-        deliveryMethod: "同城自取",
-        isLiked: true,
-        isCollected: false,
-        userDetail: {
-          tradeScore: 8.9,
-          blockchainId: 'Hash0x99eeieidd'
-        }
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
 
+    onMounted(async () => {
+      const itemId = route.params.id as string
+      if (!itemId) {
+        showToast('物品ID不存在')
+        router.back()
+        return
       }
-      isLiked.value = itemDetail.value.isLiked
-      isCollected.value = itemDetail.value.isCollected
+
+      loading.value = true
+      try {
+        const res = await getSquareItemDetail(itemId)
+        if (res.success) {
+          itemDetail.value = res.data
+          // 如果userExt不存在，设置默认值
+          if (!itemDetail.value.userExt) {
+            itemDetail.value.userExt = {
+              blockchainId: '登录后可查看',
+              tradeScore: -999
+            }
+          }
+          isLiked.value = itemDetail.value.isLiked
+          isCollected.value = itemDetail.value.isCollected
+          
+          // 添加查看记录
+          try {
+            await socialItem({
+              itemId: itemId,
+              socialType: 'VIEW',
+              socialOperate: 'ADD'
+            })
+            // 更新查看次数
+            itemDetail.value.viewCount++
+          } catch (error) {
+            console.error('添加查看记录失败:', error)
+          }
+        } else {
+          showToast(res.desc || '获取物品详情失败')
+        }
+      } catch (error) {
+        console.error('获取物品详情失败:', error)
+        showToast('获取物品详情失败')
+      } finally {
+        loading.value = false
+      }
     })
 
     const onClickLeft = () => {
       router.back()
     }
 
-    const toggleLike = () => {
-      isLiked.value = !isLiked.value
-      showToast(isLiked.value ? '已点赞' : '已取消点赞')
+    const toggleLike = async () => {
+      if (!userInfo.value?.userId) {
+        showToast('请先登录')
+        router.push('/login')
+        return
+      }
+      
+      try {
+        const res = await socialItem({
+          itemId: itemDetail.value.id,
+          socialType: 'LOVE',
+          socialOperate: isLiked.value ? 'CANCEL' : 'ADD'
+        })
+        
+        if (res.success) {
+          isLiked.value = !isLiked.value
+          // 更新点赞数
+          if (isLiked.value) {
+            itemDetail.value.loveCount++
+          } else {
+            itemDetail.value.loveCount = Math.max(0, itemDetail.value.loveCount - 1)
+          }
+          showToast(isLiked.value ? '已点赞' : '已取消点赞')
+        } else {
+          showToast(res.desc || '操作失败')
+        }
+      } catch (error) {
+        console.error('点赞操作失败:', error)
+        showToast('操作失败')
+      }
     }
 
-    const toggleCollect = () => {
-      isCollected.value = !isCollected.value
-      showToast(isCollected.value ? '已收藏' : '已取消收藏')
+    const toggleCollect = async () => {
+      if (!userInfo.value?.userId) {
+        showToast('请先登录')
+        router.push('/login')
+        return
+      }
+      
+      try {
+        const res = await socialItem({
+          itemId: itemDetail.value.id,
+          socialType: 'COLLECTION',
+          socialOperate: isCollected.value ? 'CANCEL' : 'ADD'
+        })
+        
+        if (res.success) {
+          isCollected.value = !isCollected.value
+          // 更新收藏数
+          if (isCollected.value) {
+            itemDetail.value.collectionCount++
+          } else {
+            itemDetail.value.collectionCount = Math.max(0, itemDetail.value.collectionCount - 1)
+          }
+          showToast(isCollected.value ? '已收藏' : '已取消收藏')
+        } else {
+          showToast(res.desc || '操作失败')
+        }
+      } catch (error) {
+        console.error('收藏操作失败:', error)
+        showToast('操作失败')
+      }
     }
 
     const share = () => {
@@ -382,15 +596,12 @@ export default defineComponent({
     }
 
     const contactSeller = () => {
-      showToast(`联系方式：${itemDetail.value.contactInfo}`)
+      showToast(`联系方式：${itemDetail.value.contactInfo.phone}`)
     }
 
     const buy = () => {
-      if (itemDetail.value.tradeMethod === '人民币') {
-        router.push(`/stuff/transfer/${itemDetail.value.id}`)
-      } else {
-        router.push(`/stuff/exchange/${itemDetail.value.id}`)
-      }
+      // 打开购买表单弹窗
+      showBuyForm.value = true
     }
 
     // 交换表单相关
@@ -406,7 +617,8 @@ export default defineComponent({
       itemId: '0',
       itemTitle: '',
       itemType: '',
-      remark: ''
+      remark: '',
+      address: ''
     })
 
     // 物品类型选项
@@ -419,12 +631,27 @@ export default defineComponent({
       {text: '其他', value: '其他'}
     ]
 
-    // 模拟我的物品列表
-    const myItemColumns = [
-      { text: 'iPhone 16', value: '2025032500011' },
-      { text: 'iPad Pro', value: '2025032500012' },
-      { text: 'MacBook Air', value: '2025032500013' }
-    ]
+    // 我的可交换物品列表（动态获取）
+    const myItemColumns = ref<{ text: string, value: string }[]>([])
+
+    // 拉取可交换物品
+    const fetchMyCanTradeItems = async () => {
+      const res = await getMyCanTradeItems({ pageNo: 1, pageSize: 100 })
+      if (res.success && Array.isArray(res.data)) {
+        myItemColumns.value = res.data.map(item => ({
+          text: item.itemTitle,
+          value: item.id
+        }))
+      } else {
+        myItemColumns.value = []
+      }
+    }
+
+    // 打开弹窗时先拉取
+    const openItemListPopup = async () => {
+      await fetchMyCanTradeItems()
+      showItemListPopup.value = true
+    }
 
     // 打开交换表单
     const exchange = () => {
@@ -448,10 +675,161 @@ export default defineComponent({
     }
 
     // 提交交换申请
-    const onExchangeSubmit = (values: any) => {
-      console.log('交换申请表单：', exchangeForm.value)
-      showToast('申请已提交')
-      showExchangeForm.value = false
+    const onExchangeSubmit = async () => {
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          fromUserId: itemDetail.value.userId || '',
+          swapItemId: exchangeForm.value.itemId,
+          contactInfo: {
+            linkman: exchangeForm.value.linkman,
+            phone: exchangeForm.value.phone,
+            address: exchangeForm.value.address
+          }
+        };
+        const res = await applySquareExchange(params);
+        if (res.success) {
+          showToast('申请已提交');
+          showExchangeForm.value = false;
+        } else {
+          showToast(res.desc || '提交失败');
+        }
+      } catch (e) {
+        showToast('提交失败');
+      }
+    }
+
+    // 添加交易方式类型判断方法
+    const getTradeMethodType = (method: string) => {
+      switch (method) {
+        case 'ITEM_TO_MONEY': return 'danger'
+        case 'ITEM_TO_POINTS': return 'warning'
+        case 'ITEM_TO_ITEM': return 'primary'
+        default: return 'default'
+      }
+    }
+
+    // 新增购买表单相关
+    const showBuyForm = ref(false)
+    const buyForm = ref({
+      linkman: '',
+      phone: '',
+      address: '',
+      remark: ''
+    })
+
+    // 积分支付相关
+    const showPayPopup = ref(false)
+    const payForm = ref({
+      tradePoints: 0,
+      tradePassword: ''
+    })
+    const isPaying = ref(false)
+    const payTradeId = ref('')
+
+    const isSubmitting = ref(false)
+
+    const onBuySubmit = async () => {
+      isSubmitting.value = true
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          fromUserId: itemDetail.value.userId || '',
+          contactInfo: {
+            linkman: buyForm.value.linkman,
+            phone: buyForm.value.phone,
+            address: buyForm.value.address
+          }
+        }
+        const res = await createOrderForPay(params)
+        if (res.success) {
+          showToast('下单成功')
+          showBuyForm.value = false
+          // 判断是否为积分支付
+          if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
+            payTradeId.value = res.data?.tradeId || ''
+            payForm.value.tradePoints = itemDetail.value.transferPoints
+            // payForm.value.tradePassword = ''
+            showPayPopup.value = true
+          }
+        } else {
+          showToast(res.desc || '下单失败')
+        }
+      } catch (e) {
+        showToast('下单失败')
+      } finally {
+        isSubmitting.value = false
+      }
+    }
+
+    const onPaySubmit = async () => {
+      console.log('提交时 tradePassword:', payForm.value.tradePassword)
+      if (!payForm.value.tradePassword || payForm.value.tradePassword.length !== 6) {
+        showToast('请输入6位支付密码')
+        return
+      }
+      isPaying.value = true
+      try {
+        const params = {
+          itemId: itemDetail.value.id,
+          tradeId: payTradeId.value,
+          tradePassword: payForm.value.tradePassword,
+          tradeMethod: itemDetail.value.tradeMethod,
+          tradePrice: null,
+          tradePoints: payForm.value.tradePoints,
+          paymentMethod: null
+        }
+        console.log('提交时 tradePassword:', payForm.value.tradePassword)
+        const res = await confirmPay(params)
+        if (res.success) {
+          showToast('支付成功')
+          showPayPopup.value = false
+          // 可跳转到订单详情页等
+        } else {
+          if (res.desc && res.desc.includes('密码')) {
+            showToast(res.desc)
+            payForm.value.tradePassword = ''
+          } else {
+            showToast(res.desc || '支付失败')
+            showPayPopup.value = false
+          }
+        }
+      } catch (e) {
+        showToast('支付失败')
+        showPayPopup.value = false
+      } finally {
+        isPaying.value = false
+      }
+    }
+
+    const handleScoreClick = () => {
+      // 如果评分是-999（未登录状态），跳转到登录页面
+      if (itemDetail.value.userExt?.tradeScore === -999) {
+        router.push('/login')
+      }
+    }
+
+    const handleBuyOrExchange = () => {
+      if (!userInfo?.value || !userInfo.value.userId) {
+        router.push('/login')
+        return
+      }
+      if (itemDetail?.value && itemDetail.value.tradeMethod === 'ITEM_TO_ITEM') {
+        exchange()
+      } else {
+        buy()
+      }
+    }
+    const copyBlockchainId = (blockchainId: string) => {
+      if (blockchainId) {
+        navigator.clipboard.writeText(blockchainId)
+          .then(() => {
+            showToast('已复制区块链ID')
+          })
+          .catch(() => {
+            showToast('复制失败')
+          })
+      }
     }
 
     return {
@@ -474,147 +852,372 @@ export default defineComponent({
       myItemColumns,
       onItemTypeConfirm,
       onItemConfirm,
-      onExchangeSubmit
+      onExchangeSubmit,
+      getTradeMethodType,
+      showBuyForm,
+      buyForm,
+      onBuySubmit,
+      isSubmitting,
+      showPayPopup,
+      payForm,
+      isPaying,
+      onPaySubmit,
+      TRADE_METHOD_MAP,
+      getValueText,
+      openItemListPopup,
+      handleScoreClick,
+      userInfo,
+      handleBuyOrExchange,
+      copyBlockchainId,
     }
   }
 })
 </script>
 
-<style scoped>
-.item-detail {
+<style lang="scss" scoped>
+.page-container {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background-color: #f8f9fa;
   padding-bottom: 60px;
 }
 
-.detail-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: transparent;
+.header-section {
+  position: relative;
+  height: 420px;
+  background: #000;
+  
+  .detail-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    
+    :deep(.van-nav-bar__content) {
+      background: linear-gradient(to right, #1989fa, #39a0ff);
+      
+      .van-nav-bar__title,
+      .van-icon {
+        color: #fff;
+      }
+    }
+  }
+
+  .swipe-container {
+    height: 100%;
+    
+    .item-swipe {
+      height: 100%;
+      
+      :deep(.van-image) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .custom-indicator {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      .indicator-icon {
+        font-size: 16px;
+      }
+    }
+  }
 }
 
-.item-swipe {
-  height: 375px;
-  margin-top: -46px;
-}
-
-.info-group {
-  margin: 12px;
+.content-section {
+  margin-top: -20px;
+  position: relative;
+  z-index: 1;
+  border-radius: 20px 20px 0 0;
+  background: #f8f9fa;
   padding: 16px;
-  border-radius: 12px;
 }
 
-.price-row {
+.price-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  
+  .price-main {
+    display: flex;
+    align-items: baseline;
+    
+    .currency {
+      font-size: 20px;
+      color: #ee0a24;
+      margin-right: 2px;
+    }
+    
+    .amount {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ee0a24;
+    }
+    
+    .unit {
+      font-size: 16px;
+      color: #ee0a24;
+      margin-left: 4px;
+    }
+    
+    .exchange-info {
+      .exchange-label {
+        font-size: 14px;
+        color: #969799;
+        margin-right: 8px;
+      }
+      
+      .exchange-target {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1989fa;
+      }
+    }
+  }
+  
+  .trade-method-tag {
+    font-size: 14px;
+    padding: 6px 16px;
+  }
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 12px;
-}
-
-.price {
-  font-size: 28px;
-  font-weight: bold;
-  color: #ee0a24;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #323233;
-  line-height: 1.4;
-}
-
-.tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.seller-group {
-  margin: 12px;
-  border-radius: 12px;
-  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #323233;
+    margin: 0 0 12px;
+    line-height: 1.4;
+  }
+  
+  .blockchain-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    
+    .van-icon {
+      font-size: 16px;
+      color: #1989fa;
+    }
+    
+    .blockchain-label {
+      font-size: 14px;
+      color: #969799;
+    }
+    
+    .blockchain-value {
+      font-size: 14px;
+      color: #1989fa;
+      flex: 1;
+      word-break: break-all;
+    }
+  }
+  
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .item-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f5f5f5;
+    
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      
+      .van-icon {
+        font-size: 20px;
+        color: #1989fa;
+      }
+      
+      .stat-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #323233;
+      }
+      
+      .stat-label {
+        font-size: 12px;
+        color: #969799;
+      }
+    }
+  }
 }
 
 .seller-card {
-  padding: 16px;
-}
-
-.seller-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .seller-main {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    .seller-avatar {
+      position: relative;
+      
+      .seller-badge {
+        position: absolute;
+        right: -4px;
+        bottom: -4px;
+        width: 20px;
+        height: 20px;
+        background: #1989fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .van-icon {
+          color: #fff;
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .seller-info {
+      flex: 1;
+      
+      .seller-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        .seller-name {
+          font-size: 18px;
+          font-weight: bold;
+          color: #323233;
+        }
+      }
+      
+      .seller-score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        .score-text {
+          font-size: 14px;
+          color: #ffd21e;
+        }
+      }
+      
+      .blockchain-id {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #969799;
+        
+        .van-icon {
+          color: #1989fa;
+        }
+      }
+    }
+  }
+  
+  .contact-button {
+    width: 100%;
+    height: 40px;
+  }
 }
 
-.seller-details {
-  flex: 1;
-}
-
-.seller-name {
-  font-size: 16px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 4px;
-}
-
-.seller-score {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #969799;
-  font-size: 12px;
-}
-
-.seller-blockchain {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #969799;
-  font-size: 13px;
-  padding-top: 12px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.desc-group,
-.trade-group {
-  margin: 12px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #323233;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.description {
-  padding: 16px;
-  color: #666;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.interaction-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px;
-  border-top: 1px solid #f5f5f5;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #969799;
+.desc-card,
+.trade-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #323233;
+    
+    .van-icon {
+      color: #1989fa;
+    }
+  }
+  
+  .description-content {
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  
+  .trade-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    
+    .trade-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+      
+      .item-label {
+        font-size: 13px;
+        color: #969799;
+      }
+      
+      .item-value {
+        font-size: 14px;
+        color: #323233;
+        
+        &.blockchain {
+          color: #1989fa;
+          word-break: break-all;
+        }
+      }
+    }
+  }
 }
 
 .bottom-bar {
@@ -626,81 +1229,63 @@ export default defineComponent({
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.action-icons {
-  display: flex;
-  gap: 24px;
-}
-
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #666;
-}
-
-.action-item span {
-  font-size: 12px;
-}
-
-.van-icon {
-  font-size: 24px;
-}
-
-.van-icon.active {
-  color: #ee0a24;
-}
-
-.button-group {
-  flex: 1;
-  margin-left: 16px;
-}
-
-:deep(.van-button--primary) {
-  background: linear-gradient(to right, #ff6034, #ee0a24);
-  border: none;
-}
-
-:deep(.van-cell) {
-  padding: 12px 16px;
-}
-
-:deep(.van-tag--medium) {
-  padding: 0 12px;
-  height: 28px;
-  line-height: 26px;
-}
-
-.exchange-popup {
-  padding: 24px 16px;
-}
-
-.popup-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
-  margin-bottom: 20px;
-}
-
-.submit-button {
-  margin: 24px 16px;
-}
-
-:deep(.van-popup) {
-  max-height: 90%;
-  overflow-y: auto;
-}
-
-:deep(.van-field__label) {
-  width: 6em !important;
-}
-
-:deep(.van-cell-group) {
-  margin: 0;
+  
+  .action-group {
+    display: flex;
+    gap: 24px;
+  }
+  
+  .action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    .action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f7f8fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      
+      .van-icon {
+        font-size: 24px;
+        color: #666;
+      }
+      
+      &.active {
+        background: #fee;
+        
+        .van-icon {
+          color: #ee0a24;
+        }
+      }
+    }
+    
+    span {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+  
+  .button-group {
+    flex: 1;
+    
+    :deep(.van-button--primary) {
+      background: linear-gradient(to right, #ff6034, #ee0a24);
+      border: none;
+      height: 44px;
+      
+      .van-icon {
+        font-size: 18px;
+        margin-right: 4px;
+      }
+    }
+  }
 }
 </style> 

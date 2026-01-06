@@ -46,6 +46,8 @@ import {
   CollapseItem,
   Col,
   Row,
+  Slider,
+  Sticky,
 } from 'vant'
 
 const app = createApp(App)
@@ -90,6 +92,8 @@ const vantComponents = [
   CollapseItem,
   Col,
   Row,
+  Slider,
+  Sticky,
 ]
 
 vantComponents.forEach(component => {
