@@ -78,22 +78,22 @@
           <van-tag round plain type="warning" size="medium">{{ getValueText(itemDetail.deliveryMethod, 'deliveryMethod') }}</van-tag>
         </div>
         <div class="item-stats">
-          <div class="stat-box">
+          <div class="stat-pill">
             <van-icon name="eye-o" />
             <span class="stat-value">{{ itemDetail.viewCount }}</span>
             <span class="stat-label">浏览</span>
           </div>
-          <div class="stat-box">
+          <div class="stat-pill">
             <van-icon name="like-o" />
             <span class="stat-value">{{ itemDetail.loveCount }}</span>
             <span class="stat-label">点赞</span>
           </div>
-          <div class="stat-box">
+          <div class="stat-pill">
             <van-icon name="star-o" />
             <span class="stat-value">{{ itemDetail.collectionCount }}</span>
             <span class="stat-label">收藏</span>
           </div>
-          <div class="stat-box">
+          <div class="stat-pill">
             <van-icon name="exchange" />
             <span class="stat-value">{{ itemDetail.transferTimes }}</span>
             <span class="stat-label">转让</span>
@@ -893,7 +893,7 @@ export default defineComponent({
 
 .header-section {
   position: relative;
-  height: 420px;
+  height: 360px;
   background: #000;
   
   .detail-nav {
@@ -946,20 +946,38 @@ export default defineComponent({
 }
 
 .content-section {
-  margin-top: -20px;
+  margin-top: -16px;
   position: relative;
   z-index: 1;
-  border-radius: 20px 20px 0 0;
-  background: #f8f9fa;
-  padding: 16px;
+  border-radius: 18px 18px 0 0;
+  background: #f6f7fb;
+  padding: 14px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #f7f8fa;
+  border: 1px solid #eef1f6;
+  color: #323233;
+  font-size: 13px;
+
+  .van-icon {
+    font-size: 16px;
+    color: #1989fa;
+  }
 }
 
 .price-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
+  background: linear-gradient(180deg, #ffffff, #f9fbff);
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef1f6;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1009,10 +1027,11 @@ export default defineComponent({
 
 .info-card {
   background: #fff;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef1f6;
   
   .title {
     font-size: 20px;
@@ -1053,36 +1072,29 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
   
   .item-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding-top: 16px;
-    border-top: 1px solid #f5f5f5;
-    
-    .stat-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f1f3;
+
+    .stat-pill {
+      @extend .pill;
+      padding: 6px 10px;
       gap: 4px;
-      
-      .van-icon {
-        font-size: 20px;
-        color: #1989fa;
-      }
-      
+
       .stat-value {
-        font-size: 16px;
-        font-weight: bold;
+        font-weight: 700;
         color: #323233;
       }
-      
+
       .stat-label {
-        font-size: 12px;
         color: #969799;
+        font-size: 12px;
       }
     }
   }
@@ -1090,10 +1102,11 @@ export default defineComponent({
 
 .seller-card {
   background: #fff;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef1f6;
   
   .seller-main {
     display: flex;
@@ -1173,10 +1186,11 @@ export default defineComponent({
 .desc-card,
 .trade-card {
   background: #fff;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef1f6;
   
   .section-title {
     display: flex;
@@ -1235,12 +1249,12 @@ export default defineComponent({
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
+  background: #ffffff;
   padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
   
   .action-group {
     display: flex;
