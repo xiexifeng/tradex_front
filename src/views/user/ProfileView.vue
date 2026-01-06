@@ -336,6 +336,7 @@ export default defineComponent({
       { text: '我的物品', value: 'all' },
       { text: '拥有', value: 'own' },
       { text: '转让中', value: 'transferring' },
+      { text: '申请交换中', value: 'transfer_applying' },
       // { text: '已转让', value: 'transferred' }
     ]
 
@@ -344,6 +345,7 @@ export default defineComponent({
       const statusMap: Record<string, string> = {
         own: '拥有',
         transferring: '转让中',
+        transfer_applying: '申请交换中',
         // transferred: '已转让'
       }
       return statusMap[status] || status
@@ -429,7 +431,8 @@ export default defineComponent({
       const typeMap: Record<string, 'primary' | 'warning' | 'default'> = {
         own: 'primary',
         transferring: 'warning',
-        transferred: 'default'
+        transferred: 'default',
+        transfer_applying: 'warning',
       }
       return typeMap[status] || 'default'
     }

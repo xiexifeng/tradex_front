@@ -5,7 +5,8 @@ type ValueMap = Record<string, string>
 export const STATUS_MAP = {
   own: '拥有',
   transferring: '转让中',
-  transferred: '已转让'
+  transferred: '已转让',
+  transfer_applying: '申请交换中',
 } as const
 
 // 物品有效性状态映射
