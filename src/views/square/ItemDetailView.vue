@@ -31,7 +31,7 @@
     <!-- 主要内容区 -->
     <div class="content-section">
       <!-- 价格和交易方式突出显示 -->
-      <div class="price-card">
+      <BaseCard class="price-card">
         <div class="price-main">
           <template v-if="itemDetail.tradeMethod === 'ITEM_TO_MONEY'">
             <span class="currency">¥</span>
@@ -56,10 +56,10 @@
         >
           {{ getValueText(itemDetail.tradeMethod, 'tradeMethod') }}
         </van-tag>
-      </div>
+      </BaseCard>
 
       <!-- 商品基本信息卡片 -->
-      <div class="info-card">
+      <BaseCard class="info-card">
         <h1 class="title">{{ itemDetail.itemTitle }}</h1>
         <div class="blockchain-info">
           <van-icon name="certificate" />
@@ -99,10 +99,10 @@
             <span class="stat-label">转让</span>
           </div>
         </div>
-      </div>
+      </BaseCard>
 
       <!-- 卖家信息卡片改版 -->
-      <div class="seller-card">
+      <BaseCard class="seller-card">
         <div class="seller-main">
           <div class="seller-avatar">
             <van-image
@@ -146,10 +146,10 @@
         >
           联系卖家
         </van-button>
-      </div>
+      </BaseCard>
 
       <!-- 商品描述卡片 -->
-      <div class="desc-card">
+      <BaseCard class="desc-card">
         <div class="section-title">
           <van-icon name="description" />
           <span>商品描述</span>
@@ -157,10 +157,10 @@
         <div class="description-content">
           {{ itemDetail.itemDescription }}
         </div>
-      </div>
+      </BaseCard>
 
       <!-- 交易信息卡片 -->
-      <div class="trade-card">
+      <BaseCard class="trade-card">
         <div class="section-title">
           <van-icon name="transaction" />
           <span>交易信息</span>
@@ -183,41 +183,45 @@
             <span class="item-value">{{ itemDetail.contactInfo.address }}</span>
           </div>
         </div>
-      </div>
+      </BaseCard>
     </div>
 
     <!-- 底部操作栏改版 -->
-    <div class="bottom-bar">
-      <div class="action-group">
-        <div class="action-item" @click="toggleLike">
-          <div class="action-icon" :class="{ active: isLiked }">
-            <van-icon :name="isLiked ? 'like' : 'like-o'" />
+    <BottomBar>
+      <template #left>
+        <div class="action-group">
+          <div class="action-item" @click="toggleLike">
+            <div class="action-icon" :class="{ active: isLiked }">
+              <van-icon :name="isLiked ? 'like' : 'like-o'" />
+            </div>
+            <span>{{ isLiked ? '已点赞' : '点赞' }}</span>
           </div>
-          <span>{{ isLiked ? '已点赞' : '点赞' }}</span>
-        </div>
-        <div class="action-item" @click="toggleCollect">
-          <div class="action-icon" :class="{ active: isCollected }">
-            <van-icon :name="isCollected ? 'star' : 'star-o'" />
+          <div class="action-item" @click="toggleCollect">
+            <div class="action-icon" :class="{ active: isCollected }">
+              <van-icon :name="isCollected ? 'star' : 'star-o'" />
+            </div>
+            <span>{{ isCollected ? '已收藏' : '收藏' }}</span>
           </div>
-          <span>{{ isCollected ? '已收藏' : '收藏' }}</span>
         </div>
-      </div>
-      <div class="button-group">
-        <van-button 
-          type="primary" 
-          round 
-          block 
-          :loading="isSubmitting"
-          :disabled="userInfo != null && userInfo.userId === itemDetail.userId"
-          @click="handleBuyOrExchange"
-        >
-          <template #icon>
-            <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
-          </template>
-          {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
-        </van-button>
-      </div>
-    </div>
+      </template>
+      <template #right>
+        <div class="button-group">
+          <van-button 
+            type="primary" 
+            round 
+            block 
+            :loading="isSubmitting"
+            :disabled="userInfo != null && userInfo.userId === itemDetail.userId"
+            @click="handleBuyOrExchange"
+          >
+            <template #icon>
+              <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
+            </template>
+            {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
+          </van-button>
+        </div>
+      </template>
+    </BottomBar>
 
     <!-- 购买表单弹出层 -->
     <van-popup
@@ -416,6 +420,8 @@ import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrd
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
+import BaseCard from '@/components/ui/BaseCard.vue'
+import BottomBar from '@/components/ui/BottomBar.vue'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -430,6 +436,10 @@ type ExchangeForm = {
 
 export default defineComponent({
   name: 'ItemDetailView',
+  components: {
+    BaseCard,
+    BottomBar
+  },
   setup() {
     const router = useRouter()
     const route = useRoute()

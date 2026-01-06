@@ -37,52 +37,12 @@
         @load="onLoad"
       >
         <div class="products-grid">
-          <div v-for="product in items" 
-               :key="product.id" 
-               class="product-card" 
-               @click="onViewClick(product.id)"
-          >
-            <div class="product-image">
-              <img :src="product.firstImage" :alt="product.itemTitle">
-              <div class="product-tags">
-                <van-tag round type="primary">{{ product.itemType }}</van-tag>
-                <van-tag round type="warning">{{ product.depreciation }}成新</van-tag>
-              </div>
-            </div>
-            <div class="product-info">
-              <h3 class="product-title">{{ product.itemTitle }}</h3>
-              <p class="product-desc">{{ product.itemDescription }}</p>
-              <div class="product-meta">
-                <div class="price-info">
-                  <template v-if="product.tradeMethod === 'ITEM_TO_MONEY'">
-                    <span class="price">¥{{ product.transferPrice }}</span>
-                  </template>
-                  <template v-else-if="product.tradeMethod === 'ITEM_TO_POINTS'">
-                    <span class="price">{{ product.transferPoints }}积分</span>
-                  </template>
-                  <template v-else>
-                    <span class="exchange">换{{ product.expectItem }}</span>
-                  </template>
-                </div>
-                <div class="trade-method">
-                  <van-tag plain :type="getTradeMethodType(product.tradeMethod)">
-                    {{ getValueText(product.tradeMethod, 'tradeMethod') }}
-                  </van-tag>
-                </div>
-              </div>
-              <div class="product-footer">
-                <div class="user-info">
-                  <img :src="product.userAvatar" class="user-avatar">
-                  <span class="user-name">{{ product.userNickname }}</span>
-                </div>
-                <div class="stats">
-                  <span><van-icon name="eye-o" /> {{ product.viewCount }}</span>
-                  <span><van-icon name="like-o" /> {{ product.loveCount }}</span>
-                  <span><van-icon name="star-o" /> {{ product.collectionCount }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ItemCard
+            v-for="product in items"
+            :key="product.id"
+            :item="product"
+            @select="onViewClick"
+          />
         </div>
       </van-list>
     </div>
@@ -132,19 +92,7 @@
 </template>
 
 <style lang="scss" scoped>
-// 首先定义 mixins
-@mixin text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@mixin multi-ellipsis($lines) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+@import '@/styles/theme.scss';
 
 .page-container {
   min-height: 100vh;
@@ -176,115 +124,6 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-}
-
-.product-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s;
-  
-  &:active {
-    transform: scale(0.98);
-  }
-  
-  .product-image {
-    position: relative;
-    padding-top: 100%;
-    
-    img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .product-tags {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      display: flex;
-      gap: 4px;
-    }
-  }
-  
-  .product-info {
-    padding: 12px;
-    
-    .product-title {
-      font-size: 14px;
-      font-weight: bold;
-      margin: 0;
-      @include text-ellipsis;
-    }
-    
-    .product-desc {
-      font-size: 12px;
-      color: #666;
-      margin: 4px 0;
-      @include multi-ellipsis(2);
-    }
-    
-    .product-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 8px 0;
-      
-      .price {
-        font-size: 16px;
-        font-weight: bold;
-        color: #ff6b6b;
-      }
-      
-      .exchange {
-        font-size: 14px;
-        color: #1989fa;
-      }
-    }
-    
-    .product-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid #f5f5f5;
-      
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        
-        .user-avatar {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-        }
-        
-        .user-name {
-          font-size: 12px;
-          color: #666;
-        }
-      }
-      
-      .stats {
-        display: flex;
-        gap: 8px;
-        font-size: 12px;
-        color: #999;
-        
-        span {
-          display: flex;
-          align-items: center;
-          gap: 2px;
-        }
-      }
-    }
-  }
 }
 
 .search-history {
@@ -389,9 +228,13 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { useItemList } from '@/composables/useItemList'
 import { getValueText } from '@/constants/stuff'
+import ItemCard from '@/components/ui/ItemCard.vue'
 
 export default defineComponent({
   name: 'SearchView',
+  components: {
+    ItemCard
+  },
   setup() {
     const router = useRouter()
     const searchValue = ref('')

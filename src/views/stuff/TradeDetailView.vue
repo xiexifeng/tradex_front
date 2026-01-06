@@ -154,7 +154,7 @@
             </template>
             <template v-else>
               <template v-if="tradeInfo.toScore == null">
-                <van-rate v-model="rateValue" :count="5" allow-half=false @change="submitScore" />
+                <van-rate v-model="rateValue" :count="5"  @change="submitScore" />
                 <span class="score-value">{{ rateValue ? rateValue + '分' : '' }}</span>
               </template>
               <template v-else>
