@@ -61,19 +61,19 @@
                     <div class="trade-score">
                       <div class="score-item">
                         <span class="label">评分：</span>
-                        <template  v-if="trade.toUserId === userInfo.userId">
+                        <template  v-if="trade.toUserId === userInfo?.userId">
                           <van-rate v-model="trade.toScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
                         </template>
-                        <template  v-if="trade.fromUserId === userInfo.userId">
+                        <template  v-if="trade.fromUserId === userInfo?.userId">
                           <van-rate v-model="trade.fromScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
                         </template>
                        </div>
                       <div class="score-item">
                         <span class="label">得分：</span>
-                        <template  v-if="trade.toUserId === userInfo.userId">
+                        <template  v-if="trade.toUserId === userInfo?.userId">
                           <van-rate v-model="trade.fromScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
                         </template>
-                        <template  v-if="trade.fromUserId === userInfo.userId">
+                        <template  v-if="trade.fromUserId === userInfo?.userId">
                           <van-rate v-model="trade.toScore" size="12" readonly allow-half void-icon="star" void-color="#eee" />
                         </template>
                       </div>
@@ -87,20 +87,20 @@
                   查看详情
                 </van-button>
                 <template v-if="trade.tradeStatus === 'trading'">
-                  <template v-if="trade.fromUserId === userInfo.userId && trade.tradeMethod === 'ITEM_TO_ITEM'">
+                  <template v-if="trade.fromUserId === userInfo?.userId && trade.tradeMethod === 'ITEM_TO_ITEM'">
                     <van-button size="small" type="primary" @click="acceptTrade(trade)">接受交易</van-button>
                     <van-button size="small" type="danger" @click="rejectTrade(trade)">拒绝交易</van-button>
                   </template>
-                  <template v-if="trade.fromUserId !== userInfo.userId">
+                  <template v-if="trade.fromUserId !== userInfo?.userId">
                     <van-button size="small" type="danger" @click="cancelTrade(trade)">取消交易</van-button>
                     <template v-if="trade.tradeMethod !== 'ITEM_TO_ITEM'">
                       <van-button size="small" type="primary" @click="goPayTrade(trade)">去支付</van-button>
                     </template>
                   </template>
                 </template>
-                <template v-if="trade.toUserId === userInfo.userId && trade.tradeStatus === 'accepted'">
+                <template v-if="trade.toUserId === userInfo?.userId && trade.tradeStatus === 'accepted'">
                   <van-button size="small" type="success" @click="confirmTrade(trade)">确认交易</van-button>
-                  <template v-if="trade.fromUserId !== userInfo.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
+                  <template v-if="trade.fromUserId !== userInfo?.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
                     <van-button size="small" type="warning" @click="refundTrade(trade)">发起退款</van-button>
                   </template>
                 </template>
@@ -169,7 +169,7 @@ export default defineComponent({
       { text: '交易中', value: 'trading' },
       { text: '已达成', value: 'accepted' },
       { text: '已完成', value: 'completed' },
-      { text: '已取消', value: 'canceled' },
+      { text: '已取消', value: 'cancelled' },
       { text: '已拒绝', value: 'rejected' },
       { text: '已退款', value: 'refunded' }
     ]
@@ -180,7 +180,7 @@ export default defineComponent({
         trading: 'primary',
         accepted: 'success',
         completed: 'warning',
-        canceled: 'danger'
+        cancelled: 'danger'
       }
       return typeMap[status] || 'default'
     }
@@ -191,7 +191,7 @@ export default defineComponent({
         trading: '交易中',
         accepted: '已达成',
         completed: '已完成',
-        canceled: '已取消',
+        cancelled: '已取消',
         rejected: '已拒绝',
         refunded: '已退款'
       }
@@ -302,7 +302,7 @@ export default defineComponent({
         showCancelButton: true,
       }).then(() => {
         showToast('交易已取消')
-        trade.tradeStatus = 'canceled'
+        trade.tradeStatus = 'cancelled'
       })
     }
     const goPayTrade = (trade: TradeListItem) => {
@@ -526,7 +526,7 @@ export default defineComponent({
           vertical-align: middle;
         }
       }
-      &.canceled { 
+      &.cancelled { 
         color: #969799;
         &::before {
           content: '';
