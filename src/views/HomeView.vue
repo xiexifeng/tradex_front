@@ -69,14 +69,22 @@
       </van-sticky>
 
       <!-- 商品列表 -->
-      <div class="products-grid">
-        <ItemCard
-          v-for="product in items"
-          :key="product.id"
-          :item="product"
-          @select="onViewClick"
-        />
-      </div>
+      <van-list
+        v-model:loading="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        loading-text="加载中..."
+        @load="loadMore"
+      >
+        <div class="products-grid">
+          <ItemCard
+            v-for="product in items"
+            :key="product.id"
+            :item="product"
+            @select="onViewClick"
+          />
+        </div>
+      </van-list>
     </div>
 
     <!-- 底部导航栏 -->
@@ -231,6 +239,7 @@ export default defineComponent({
       itemTypeOptions,
       tradeMethodOptions,
       sortOptions,
+      pageSize,
       getTradeMethodType,
       loadItems,
       loadMore
@@ -288,7 +297,7 @@ export default defineComponent({
     // 初始加载数据
     loadItems({
       pageNo: 1,
-      pageSize: 10,
+      pageSize: pageSize.value,
       itemType: itemTypeFilter.value,
       tradeMethod: tradeMethodFilter.value,
       sortBy: sortOrder.value
@@ -298,7 +307,7 @@ export default defineComponent({
     watch([itemTypeFilter, tradeMethodFilter, sortOrder], () => {
       loadItems({
         pageNo: 1,
-        pageSize: 10,
+        pageSize: pageSize.value,
         itemType: itemTypeFilter.value,
         tradeMethod: tradeMethodFilter.value,
         sortBy: sortOrder.value

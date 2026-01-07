@@ -39,7 +39,7 @@ export function useItemList() {
   const finished = ref(false)
   const items = ref<ItemListItem[]>([])
   const currentPage = ref(1)
-  const pageSize = ref(10)
+  const pageSize = ref(4)
 
   // 筛选选项
   const itemTypeFilter = ref('all')
@@ -97,11 +97,13 @@ export function useItemList() {
         }
         finished.value = res.data.length < params.pageSize
         currentPage.value = params.pageNo
+        // console.log('loadItems:finished.value:'+finished.value)
       }
     } catch (error) {
       console.error('加载物品列表失败:', error)
     } finally {
       loading.value = false
+      // console.log('loadItems:loading.value:'+loading.value)
     }
   }
 
@@ -114,8 +116,10 @@ export function useItemList() {
 
   // 加载更多
   const loadMore = async (searchKey?: string) => {
+    // console.log('loadMore:finished.value:'+finished.value)
+    // console.log('loadMore:loading.value:'+loading.value)
     if (finished.value) return
-    
+    loading.value = false;
     const params: ItemListParams = {
       pageNo: currentPage.value + 1,
       pageSize: pageSize.value,
