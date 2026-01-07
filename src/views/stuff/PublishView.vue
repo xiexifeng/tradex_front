@@ -111,7 +111,7 @@
     <!-- 物品类型选择弹出层 -->
     <van-popup v-model:show="showTypePopup" position="bottom" round>
       <van-picker
-        :columns="columns"
+        :columns="ITEM_TYPE_COLUMNS"
         @confirm="onConfirm"
         @cancel="showTypePopup = false"
         show-toolbar
@@ -335,6 +335,7 @@ import { showToast, showDialog, FormInstance } from 'vant'
 import type { UploaderFileListItem } from 'vant'
 import { uploadFile, publishItem } from '@/api/stuff'
 import imageCompression from 'browser-image-compression'
+import { ITEM_TYPE_COLUMNS } from '@/constants/stuff'
 
 export default defineComponent({
   name: 'PublishView',
@@ -344,15 +345,7 @@ export default defineComponent({
     const formRef = ref<FormInstance>()
 
     // 物品类型选项
-    const columns = [
-      {text: '衣服', value : 'A'},
-      {text: '家具', value : 'B'},
-      {text: '玩具', value : 'C'},
-      {text: '电子产品', value : 'D'},
-      {text: '图书', value : 'E'},
-      {text: '运动器材', value : 'F'},
-      {text: '其他', value : 'G'}
-    ]
+    // const itemTypeColumns = ITEM_TYPE_COLUMNS
 
     // 表单数据
     const formData = reactive({
@@ -549,7 +542,7 @@ export default defineComponent({
     return {
       formData,
       showTypePopup,
-      columns,
+      ITEM_TYPE_COLUMNS,
       formRef,
       onClickLeft,
       onConfirm,

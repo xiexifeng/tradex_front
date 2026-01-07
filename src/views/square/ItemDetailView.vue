@@ -13,7 +13,7 @@
         </template>
       </van-nav-bar>
 
-      <div class="swipe-container">
+      <div class="swipe-container" @click="showImagePreview">
         <van-swipe class="item-swipe" :autoplay="3000">
           <van-swipe-item v-for="(image, index) in itemDetail.itemImageList" :key="index">
             <van-image :src="image" fit="cover" width="100%" height="100%" />
@@ -415,7 +415,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showImagePreview as showVantImagePreview } from 'vant'
 import { getSquareItemDetail, applySquareExchange, getMyCanTradeItems, createOrderForPay, confirmPay, socialItem } from '@/api/stuff'
 import { TRADE_METHOD_MAP, getValueText } from '@/constants/stuff'
 import type { SquareItemDetail } from '@/api/types'
@@ -842,6 +842,16 @@ export default defineComponent({
       }
     }
 
+    const showImagePreview = () => {
+      if (itemDetail.value.itemImageList && itemDetail.value.itemImageList.length > 0) {
+        showVantImagePreview({
+          images: itemDetail.value.itemImageList,
+          startPosition: 0,
+          closeable: true
+        })
+      }
+    }
+
     return {
       itemDetail,
       isLiked,
@@ -879,6 +889,7 @@ export default defineComponent({
       userInfo,
       handleBuyOrExchange,
       copyBlockchainId,
+      showImagePreview,
     }
   }
 })
@@ -915,6 +926,8 @@ export default defineComponent({
 
   .swipe-container {
     height: 100%;
+    background: #f5f6fa;
+    cursor: pointer;
     
     .item-swipe {
       height: 100%;
@@ -922,7 +935,11 @@ export default defineComponent({
       :deep(.van-image) {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+      }
+      
+      :deep(.van-image__img) {
+        object-fit: contain;
       }
     }
     

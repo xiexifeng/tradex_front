@@ -40,13 +40,25 @@ export const TRANSACTION_TYPE_MAP = {
   OTHER: '其他'
 } as const
 
+// 物品类型选项
+export const ITEM_TYPE_MAP = {
+  A: '衣服',
+  B: '家具',
+  C: '玩具',
+  D: '电子产品',
+  E: '图书',
+  F: '运动器材',
+  G: '其他'
+} as const
+
 // 所有映射的集合
 export const VALUE_MAPS = {
   status: STATUS_MAP,
   itemStatus: ITEM_STATUS_MAP,
   deliveryMethod: DELIVERY_METHOD_MAP,
   tradeMethod: TRADE_METHOD_MAP,
-  transactionType: TRANSACTION_TYPE_MAP
+  transactionType: TRANSACTION_TYPE_MAP,
+  itemType: ITEM_TYPE_MAP
 } as const
 
 // 通用值转义方法
@@ -62,6 +74,11 @@ export const DELIVERY_COLUMNS = Object.entries(DELIVERY_METHOD_MAP).map(([value,
 }))
 
 export const TRADE_METHOD_COLUMNS = Object.entries(TRADE_METHOD_MAP).map(([value, text]) => ({
+  text,
+  value
+})) 
+
+export const ITEM_TYPE_COLUMNS = Object.entries(ITEM_TYPE_MAP).map(([value, text]) => ({
   text,
   value
 })) 
