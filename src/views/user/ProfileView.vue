@@ -17,35 +17,30 @@
     </van-nav-bar>
 
     <div class="profile-content">
-      <!-- 用户信息卡片 -->
-      <div class="user-card" v-if="userInfo">
-        <div class="user-header">
-          <div class="avatar-wrapper">
-            <van-image
-              round
-              width="80"
-              height="80"
-              :src="userInfo?.avatarUrl || ''"
-              class="avatar"
-            />
-            <div class="user-badge">
-              <van-icon name="shield-o" />
+      <!-- 用户信息核心卡片 - 突出显示 -->
+      <BaseCard class="user-hero-card" v-if="userInfo">
+        <div class="hero-header">
+          <div class="hero-left">
+            <div class="avatar-wrapper">
+              <van-image
+                round
+                width="64"
+                height="64"
+                :src="userInfo?.avatarUrl || ''"
+                class="avatar"
+              />
+              <div class="user-badge">
+                <van-icon name="shield-o" />
+              </div>
             </div>
-          </div>
-          <div class="user-info">
-            <div class="nickname">
-              {{ userInfo?.nickname || '' }}
-              <span :class="['gender-tag', userInfo?.gender === 'MAN' ? 'male' : 'female']">
-                {{ userInfo?.gender === 'MAN' ? '♂' : '♀' }}
-              </span>
-            </div>
-            <div class="user-meta">
-              <span class="user-id">ID: {{ userInfo?.userId || '' }}</span>
-              <van-icon name="qr" class="qr-icon"/>
-            </div>
-            <div class="location">
-              <van-icon name="location-o"/>
-              <span>{{ userInfo?.ipAddress || '' }}</span>
+            <div class="user-info-compact">
+              <div class="nickname-row">
+                <span class="nickname">{{ userInfo?.nickname || '' }}</span>
+                <span :class="['gender-tag', userInfo?.gender === 'MAN' ? 'male' : 'female']">
+                  {{ userInfo?.gender === 'MAN' ? '♂' : '♀' }}
+                </span>
+              </div>
+              <div class="user-id-compact">用户编号: {{ userInfo?.userId || '' }}</div>
             </div>
           </div>
           <van-button 
@@ -53,105 +48,128 @@
             round 
             plain 
             type="primary" 
-            class="edit-btn"
+            class="edit-btn-compact"
             @click="editProfile"
           >
-            编辑资料
+            编辑
           </van-button>
         </div>
-        <div class="user-brief">{{ userInfo?.brief || '这个人很懒，什么都没写~' }}</div>
-      </div>
-
-      <!-- 数据统计卡片 -->
-      <div class="stats-card">
-        <div class="stat-item">
-          <span class="stat-value">{{ userInfo?.followers || 0 }}</span>
-          <span class="stat-label">关注</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ userInfo?.followers || 0 }}</span>
-          <span class="stat-label">粉丝</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ userInfo?.likes || 0 }}</span>
-          <span class="stat-label">获赞</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ userInfo?.collects || 0 }}</span>
-          <span class="stat-label">收藏</span>
-        </div>
-      </div>
-
-      <!-- 区块链信息卡片 -->
-      <div class="blockchain-card">
-        <div class="section-title">
-          <van-icon name="shield-o"/>
-          <span>区块链信息</span>
-        </div>
-        <div class="blockchain-content">
-          <div class="blockchain-item">
-            <div class="blockchain-row">
-              <van-icon name="certificate" class="cert-icon"/>
-              <span class="label">区块链ID</span>
-              <span class="value">
-                {{ userInfo?.blockchainId ? userInfo.blockchainId.slice(0, 10) + '...' : '' }}
-                <van-icon v-if="userInfo?.blockchainId" 
-                  name="question" 
-                  class="copy-icon"
-                  style="margin-left: 6px; cursor: pointer;"
-                  @click="copyBlockchainId(userInfo?.blockchainId)"
-                />
-              </span>
+        
+        <!-- 核心数据突出显示 -->
+        <div class="core-stats">
+          <div class="core-stat-item highlight">
+            <div class="core-stat-icon">
+              <van-icon name="gold-coin-o" />
             </div>
-            <div class="blockchain-row">
-              <van-icon name="star" class="star-icon"/>
-              <span class="label">综合评分</span>
-              <div class="score-wrapper">
-                <span class="score">{{ userInfo?.tradeScore || 0 }}</span>
-              </div>
+            <div class="core-stat-content">
+              <div class="core-stat-value">{{ pointsAccount?.pointsBalance || 0 }}</div>
+              <div class="core-stat-label">积分余额</div>
+            </div>
+          </div>
+          <div class="core-stat-item highlight">
+            <div class="core-stat-icon score">
+              <van-icon name="star" />
+            </div>
+            <div class="core-stat-content">
+              <div class="core-stat-value">{{ userInfo?.tradeScore || 0 }}</div>
+              <div class="core-stat-label">信用评分</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 交易记录卡片 -->
-      <van-collapse v-model="activeNames" accordion class="records-card">
-        <van-collapse-item :title="`综合评分：${userInfo?.tradeScore || 0}`" name="1">
-          <div class="table-wrapper">
-            <div class="table-header">
-              <span class="col-score">得分</span>
-              <span class="col-item">交易项</span>
-              <span class="col-time">评分时间</span>
-            </div>
-            <div class="table-body">
-              <div v-for="item in transactions" :key="item.tradeId" class="table-row">
-                <span class="col-score">{{ item.tradeScore }}</span>
-                <span class="col-item">{{ item.tradeRemark }}</span>
-                <span class="col-time">{{ formatTime(item.scoreTime) }}</span>
+        <!-- 社交数据紧凑展示 -->
+        <div class="social-stats">
+          <div class="social-item">
+            <span class="social-value">{{ userInfo?.followers || 0 }}</span>
+            <span class="social-label">关注</span>
+          </div>
+          <div class="social-divider"></div>
+          <div class="social-item">
+            <span class="social-value">{{ userInfo?.followers || 0 }}</span>
+            <span class="social-label">粉丝</span>
+          </div>
+          <div class="social-divider"></div>
+          <div class="social-item">
+            <span class="social-value">{{ userInfo?.likes || 0 }}</span>
+            <span class="social-label">获赞</span>
+          </div>
+          <div class="social-divider"></div>
+          <div class="social-item">
+            <span class="social-value">{{ userInfo?.collects || 0 }}</span>
+            <span class="social-label">收藏</span>
+          </div>
+        </div>
+
+        <!-- 区块链ID紧凑展示 -->
+        <div class="blockchain-compact" v-if="userInfo?.blockchainId">
+          <van-icon name="certificate" class="cert-icon-small"/>
+          <span class="blockchain-text">
+            {{ userInfo.blockchainId.slice(0, 12) + '...' }}
+          </span>
+          <van-icon 
+            name="question" 
+            class="copy-icon-small"
+            @click="copyBlockchainId(userInfo.blockchainId)"
+          />
+        </div>
+      </BaseCard>
+
+      <!-- 交易记录卡片 - 紧凑折叠 -->
+      <BaseCard class="records-card-compact">
+        <van-collapse v-model="activeNames" accordion>
+          <van-collapse-item name="1">
+            <template #title>
+              <div class="collapse-title">
+                <van-icon name="star-o" />
+                <span>评分记录</span>
+                <span class="collapse-count">({{ transactions.length }})</span>
+              </div>
+            </template>
+            <div class="table-wrapper-compact">
+              <div class="table-header-compact">
+                <span class="col-score">得分</span>
+                <span class="col-item">交易项</span>
+                <span class="col-time">时间</span>
+              </div>
+              <div class="table-body-compact">
+                <div v-for="item in transactions" :key="item.tradeId" class="table-row-compact">
+                  <span class="col-score">{{ item.tradeScore }}</span>
+                  <span class="col-item">{{ item.tradeRemark }}</span>
+                  <span class="col-time">{{ formatTime(item.scoreTime) }}</span>
+                </div>
+                <div v-if="transactions.length === 0" class="empty-hint">暂无评分记录</div>
               </div>
             </div>
-          </div>
-        </van-collapse-item>
+          </van-collapse-item>
 
-        <van-collapse-item :title="`积分余额：${pointsAccount?.pointsBalance || 0}`" name="2">
-          <div class="table-wrapper">
-            <div class="table-header">
-              <span class="col-points">变动</span>
-              <span class="col-type">类型</span>
-              <span class="col-time">时间</span>
-            </div>
-            <div class="table-body">
-              <div v-for="item in usages" :key="item.id" class="table-row">
-                <span :class="['col-points', item.pointsChange > 0 ? 'increase' : 'decrease']">
-                  {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
-                </span>
-                <span class="col-type">{{ getValueText(item.transactionType, 'transactionType') }}</span>
-                <span class="col-time">{{ formatTime(item.transactionTime) }}</span>
+          <van-collapse-item name="2">
+            <template #title>
+              <div class="collapse-title">
+                <van-icon name="gold-coin-o" />
+                <span>积分明细</span>
+                <span class="collapse-count">({{ usages.length }})</span>
+              </div>
+            </template>
+            <div class="table-wrapper-compact">
+              <div class="table-header-compact">
+                <span class="col-points">变动</span>
+                <span class="col-type">类型</span>
+                <span class="col-time">时间</span>
+              </div>
+              <div class="table-body-compact">
+                <div v-for="item in usages" :key="item.id" class="table-row-compact">
+                  <span :class="['col-points', item.pointsChange > 0 ? 'increase' : 'decrease']">
+                    {{ item.pointsChange > 0 ? '+' : '' }}{{ item.pointsChange }}
+                  </span>
+                  <span class="col-type">{{ getValueText(item.transactionType, 'transactionType') }}</span>
+                  <span class="col-time">{{ formatTime(item.transactionTime) }}</span>
+                </div>
+                <div v-if="usages.length === 0" class="empty-hint">暂无积分记录</div>
               </div>
             </div>
-          </div>
-        </van-collapse-item>
-      </van-collapse>
+          </van-collapse-item>
+        </van-collapse>
+      </BaseCard>
 
       <!-- 物品管理标签页 -->
       <div class="items-section">
@@ -299,6 +317,7 @@ import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 import { useUserStore } from '@/store/modules/user'
 import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions, userApi } from '@/api/user';
 import type { Item, PointsTransaction, PointsAccount, TradeScoreTransaction } from '@/api/types';
@@ -306,7 +325,8 @@ import { getValueText } from '@/constants/stuff'
 
 export default defineComponent({
   components: {
-    CancelTransferDialog
+    CancelTransferDialog,
+    BaseCard
   },
   setup() {
     const userStore = useUserStore()
@@ -321,7 +341,7 @@ export default defineComponent({
     }
     const router = useRouter()
     const activeTab = ref(0)
-    const activeNames = ref(['1'])
+    const activeNames = ref('1')
     const items = ref<Item[]>([])
     const loading = ref(false)
     const finished = ref(false)
@@ -596,6 +616,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/theme.scss';
+
 .profile {
   min-height: 100vh;
   background-color: #f8f9fa;
@@ -618,218 +640,328 @@ export default defineComponent({
 }
 
 .profile-content {
-  padding: 16px;
+  padding: 12px;
 }
 
-.user-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
+// 用户核心信息卡片 - 突出显示
+.user-hero-card {
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+  border: 1px solid #e8f3ff;
   
-  .user-header {
+  .hero-header {
     display: flex;
-    gap: 16px;
-    position: relative;
-  }
-  
-  .avatar-wrapper {
-    position: relative;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
     
-    .user-badge {
-      position: absolute;
-      right: -4px;
-      bottom: -4px;
-      width: 20px;
-      height: 20px;
-      background: #1989fa;
-      border-radius: 50%;
+    .hero-left {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 12px;
+      flex: 1;
+    }
+    
+    .avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
       
-      .van-icon {
-        color: #fff;
+      .user-badge {
+        position: absolute;
+        right: -2px;
+        bottom: -2px;
+        width: 18px;
+        height: 18px;
+        background: linear-gradient(135deg, #1989fa, #39a0ff);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #fff;
+        
+        .van-icon {
+          color: #fff;
+          font-size: 10px;
+        }
+      }
+    }
+    
+    .avatar {
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(25, 137, 250, 0.15);
+    }
+    
+    .user-info-compact {
+      flex: 1;
+      min-width: 0;
+      
+      .nickname-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+        
+        .nickname {
+          font-size: 18px;
+          font-weight: 700;
+          color: #323233;
+          @include text-ellipsis;
+        }
+        
+        .gender-tag {
+          font-size: 11px;
+          padding: 2px 6px;
+          border-radius: 10px;
+          flex-shrink: 0;
+          
+          &.male {
+            background: #e8f3ff;
+            color: #1989fa;
+          }
+          
+          &.female {
+            background: #ffd8e6;
+            color: #ff2c7d;
+          }
+        }
+      }
+      
+      .user-id-compact {
         font-size: 12px;
-      }
-    }
-  }
-  
-  .avatar {
-    border: 2px solid #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .user-info {
-    flex: 1;
-    
-    .nickname {
-      font-size: 20px;
-      font-weight: bold;
-      color: #323233;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .gender-tag {
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      
-      &.male {
-        background: #e8f3ff;
-        color: #1989fa;
-      }
-      
-      &.female {
-        background: #ffd8e6;
-        color: #ff2c7d;
-      }
-    }
-    
-    .user-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      
-      .user-id {
-        font-size: 14px;
         color: #969799;
       }
+    }
+    
+    .edit-btn-compact {
+      flex-shrink: 0;
+      height: 28px;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+  }
+  
+  // 核心数据突出显示
+  .core-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+    
+    .core-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
       
-      .qr-icon {
-        color: #1989fa;
+      &.highlight {
+        background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+        border-color: #ffe58f;
+      }
+      
+      .core-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #1989fa, #39a0ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        
+        .van-icon {
+          color: #fff;
+          font-size: 20px;
+        }
+        
+        &.score {
+          background: linear-gradient(135deg, #ffd21e, #ffb800);
+        }
+      }
+      
+      .core-stat-content {
+        flex: 1;
+        min-width: 0;
+        
+        .core-stat-value {
+          font-size: 20px;
+          font-weight: 800;
+          color: #323233;
+          line-height: 1.2;
+          margin-bottom: 2px;
+        }
+        
+        .core-stat-label {
+          font-size: 11px;
+          color: #969799;
+        }
+      }
+    }
+  }
+  
+  // 社交数据紧凑展示
+  .social-stats {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid #f5f5f5;
+    
+    .social-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      
+      .social-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #323233;
+      }
+      
+      .social-label {
+        font-size: 11px;
+        color: #969799;
       }
     }
     
-    .location {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: #969799;
-      font-size: 13px;
+    .social-divider {
+      width: 1px;
+      height: 24px;
+      background: #f0f0f0;
     }
   }
   
-  .edit-btn {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  
-  .user-brief {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #f5f5f5;
-    color: #666;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-}
-
-.stats-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  
-  .stat-item {
+  // 区块链ID紧凑展示
+  .blockchain-compact {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    padding: 8px 12px;
+    margin-top: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 12px;
     
-    .stat-value {
-      font-size: 20px;
-      font-weight: bold;
-      color: #323233;
+    .cert-icon-small {
+      color: #1989fa;
+      font-size: 14px;
     }
     
-    .stat-label {
-      font-size: 12px;
-      color: #969799;
+    .blockchain-text {
+      flex: 1;
+      color: #666;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .copy-icon-small {
+      color: #1989fa;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
     }
   }
 }
 
-.blockchain-card,
-.records-card {
-  background: #fff;
-  border-radius: 16px;
+// 交易记录卡片 - 紧凑样式
+.records-card-compact {
   margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  padding: 0;
   
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #323233;
+  :deep(.van-collapse-item) {
     border-bottom: 1px solid #f5f5f5;
     
-    .van-icon {
-      color: #1989fa;
+    &:last-child {
+      border-bottom: none;
     }
   }
-}
-
-.blockchain-content {
-  padding: 20px;
   
-  .blockchain-row {
+  :deep(.van-collapse-item__title) {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  :deep(.van-collapse-item__content) {
+    padding: 0;
+  }
+  
+  .collapse-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 6px;
+    font-weight: 600;
+    color: #323233;
     
-    &:last-child {
-      margin-bottom: 0;
-    }
-    
-    .cert-icon,
-    .star-icon {
+    .van-icon {
       color: #1989fa;
       font-size: 16px;
     }
     
-    .label {
-      width: 80px;
+    .collapse-count {
       color: #969799;
-      font-size: 14px;
+      font-weight: normal;
+      font-size: 12px;
+    }
+  }
+  
+  .table-wrapper-compact {
+    .table-header-compact {
+      display: grid;
+      grid-template-columns: 60px 1fr 100px;
+      padding: 10px 16px;
+      background: #f8f9fa;
+      font-size: 12px;
+      color: #969799;
+      font-weight: 600;
     }
     
-    .value {
-      flex: 1;
-      color: #323233;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .copy-icon {
-      color: #1989fa;
-      font-size: 14px;
-    }
-    
-    .score-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .table-body-compact {
+      .table-row-compact {
+        display: grid;
+        grid-template-columns: 60px 1fr 100px;
+        padding: 10px 16px;
+        font-size: 12px;
+        color: #666;
+        border-bottom: 1px solid #f5f5f5;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .col-score {
+          font-weight: 600;
+          color: #ffd21e;
+        }
+        
+        .col-item {
+          @include text-ellipsis;
+        }
+        
+        .col-time {
+          color: #969799;
+          font-size: 11px;
+        }
+        
+        .col-points {
+          font-weight: 600;
+          
+          &.increase {
+            color: #07c160;
+          }
+          
+          &.decrease {
+            color: #ee0a24;
+          }
+        }
+      }
       
-      .score {
-        color: #ffd21e;
-        font-weight: bold;
+      .empty-hint {
+        padding: 24px;
+        text-align: center;
+        color: #969799;
+        font-size: 12px;
       }
     }
   }
@@ -871,17 +1003,17 @@ export default defineComponent({
 }
 
 .items-section {
-  margin: 0 -16px;
+  margin: 0 -12px;
   
   .custom-tabs {
     :deep(.van-tabs__wrap) {
-      height: 48px;
+      height: 44px;
       background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
     }
     
     :deep(.van-tabs__nav) {
-      padding: 6px 0;
+      padding: 4px 0;
       
       &::before {
         display: none;
@@ -889,25 +1021,23 @@ export default defineComponent({
     }
     
     :deep(.van-tab) {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
       line-height: 36px;
       transition: all 0.3s ease;
-      position: relative;
+      padding: 0 16px;
     }
     
     :deep(.van-tab--active) {
       color: #1989fa;
-      font-weight: 500;
-      transform: scale(1.05);
+      font-weight: 600;
     }
     
     :deep(.van-tabs__line) {
       background: linear-gradient(to right, #1989fa, #39a0ff);
-      height: 3px;
-      border-radius: 3px;
-      bottom: 8px;
-      transition: all 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
+      height: 2px;
+      border-radius: 2px;
+      bottom: 6px;
     }
   }
 }
@@ -915,23 +1045,30 @@ export default defineComponent({
 .items-grid {
   padding: 12px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
   
   .item-card {
     margin: 0;
     background: #fff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
     
     :deep(.van-card__header) {
       position: relative;
+      padding: 10px;
     }
     
     :deep(.van-card__thumb) {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       border-radius: 8px;
       overflow: hidden;
       
@@ -943,37 +1080,38 @@ export default defineComponent({
     }
     
     :deep(.van-card__content) {
-      padding-left: 12px;
+      padding: 10px 10px 10px 12px;
     }
     
     :deep(.van-card__title) {
-      font-size: 15px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 600;
       color: #323233;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      @include text-ellipsis;
     }
     
     .item-tags {
-      margin-top: 8px;
+      margin-top: 6px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       
       .van-tag {
-        padding: 2px 8px;
-        font-size: 12px;
-        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 11px;
+        border-radius: 3px;
       }
     }
     
     .item-desc {
-      margin-top: 8px;
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       
       .item-id {
-        font-size: 12px;
+        font-size: 11px;
         color: #969799;
         display: flex;
         align-items: center;
@@ -981,42 +1119,44 @@ export default defineComponent({
         &::before {
           content: '';
           display: inline-block;
-          width: 4px;
-          height: 4px;
+          width: 3px;
+          height: 3px;
           background: #969799;
           border-radius: 50%;
-          margin-right: 6px;
+          margin-right: 4px;
         }
       }
       
       .blockchain-id {
-        font-size: 12px;
+        font-size: 11px;
         color: #1989fa;
-        background: #e8f3ff;
-        padding: 4px 8px;
+        background: #f0f7ff;
+        padding: 3px 6px;
         border-radius: 4px;
         word-break: break-all;
         display: flex;
         align-items: center;
         
         &::before {
-          content: '区块链ID: ';
+          content: 'ID: ';
           color: #969799;
-          margin-right: 4px;
-          font-size: 12px;
+          margin-right: 2px;
+          font-size: 11px;
         }
       }
     }
     
     .action-buttons {
-      margin-top: 12px;
+      margin-top: 10px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: flex-end;
+      flex-wrap: wrap;
       
       .van-button {
-        height: 28px;
-        padding: 0 12px;
+        height: 26px;
+        padding: 0 10px;
+        font-size: 11px;
         
         &--plain {
           background: #fff;
