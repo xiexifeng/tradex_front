@@ -300,7 +300,7 @@ import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import { useUserStore } from '@/store/modules/user'
-import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions } from '@/api/user';
+import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions, userApi } from '@/api/user';
 import type { Item, PointsTransaction, PointsAccount, TradeScoreTransaction } from '@/api/types';
 import { getValueText } from '@/constants/stuff'
 
@@ -475,6 +475,14 @@ export default defineComponent({
         return
       }
       loadItems('all')
+      userApi.refreshUserInfo().then(res => {
+        if(res){
+            userStore.setUserInfo(res)
+        }
+      }).catch(error => {
+        console.error('刷新用户信息失败:', error);
+        // 错误已在 request.ts 中统一处理并显示提示
+      })
     })
 
     return {
@@ -533,27 +541,42 @@ export default defineComponent({
       return `${y}-${m}-${d} ${h}:${min}:${s}`;
     },
     async fetchPointsAccount() {
-      const res = await getPointsAccount();
-      if (res.success) {
-        this.pointsAccount = res.data;
+      try {
+        const res = await getPointsAccount();
+        if (res.success) {
+          this.pointsAccount = res.data;
+        }
+      } catch (error) {
+        console.error('获取积分账户失败:', error);
+        // 错误已在 request.ts 中统一处理并显示提示
       }
     },
     async fetchPointsTransactions() {
-      const res = await getPointsTransactions({
-        pageNo: this.pageNo,
-        pageSize: this.pageSize,
-      });
-      if (res.success) {
-        this.usages = res.data;
+      try {
+        const res = await getPointsTransactions({
+          pageNo: this.pageNo,
+          pageSize: this.pageSize,
+        });
+        if (res.success) {
+          this.usages = res.data;
+        }
+      } catch (error) {
+        console.error('获取积分交易记录失败:', error);
+        // 错误已在 request.ts 中统一处理并显示提示
       }
     },
     async fetchTradeScoreTransactions() {
-      const res = await getTradeScoreTransactions({
-        pageNo: this.pageNo,
-        pageSize: this.pageSize,
-      });
-      if (res.success) {
-        this.transactions = res.data;
+      try {
+        const res = await getTradeScoreTransactions({
+          pageNo: this.pageNo,
+          pageSize: this.pageSize,
+        });
+        if (res.success) {
+          this.transactions = res.data;
+        }
+      } catch (error) {
+        console.error('获取信用评分记录失败:', error);
+        // 错误已在 request.ts 中统一处理并显示提示
       }
     },
     

@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse, PointsAccount, PointsTransaction, TradeScoreTransaction } from './types';
+import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -37,7 +37,19 @@ export const userApi = {
     return request.post('/client/user/update', data, {
       headers: { 'Content-Type': 'application/json' }
     });
-  }
+  },
+
+  // 刷新用户信息
+  refreshUserInfo() {
+    return request.get<ApiResponse<UserInfo>>(
+      '/client/user/get'
+    ).then(res => {
+      return res.data as unknown as UserInfo;
+    }).catch(error => {
+      console.error('刷新用户信息失败:', error);
+      return Promise.reject(error);
+    });
+  },
 };
 
 // 查询积分余额
