@@ -88,19 +88,7 @@
     </div>
 
     <!-- 底部导航栏 -->
-    <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="home-o" to="/">首页</van-tabbar-item>
-      <van-tabbar-item icon="envelop-o" to="/notification">消息</van-tabbar-item>
-      <van-tabbar-item to="/stuff/publish">
-        <template #icon>
-          <div class="publish-button">
-            <van-icon name="plus" size="20" />
-          </div>
-        </template>
-      </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/stuff/trades">交易</van-tabbar-item>
-      <van-tabbar-item icon="user-o" to="/user/profile">我的</van-tabbar-item>
-    </van-tabbar>
+    <AppTabBar />
   </div>
 </template>
 
@@ -193,21 +181,6 @@
   gap: 12px;
 }
 
-.publish-button {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1989fa, #0066ff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
-  
-  .van-icon {
-    color: #fff;
-  }
-}
 </style>
 
 <script lang="ts">
@@ -216,17 +189,18 @@ import { useRouter } from 'vue-router'
 import { useItemList } from '@/composables/useItemList'
 import { getValueText } from '@/constants/stuff'
 import ItemCard from '@/components/ui/ItemCard.vue'
+import AppTabBar from '@/components/ui/AppTabBar.vue'
 
 export default defineComponent({
   name: 'HomeView',
   components: {
-    ItemCard
+    ItemCard,
+    AppTabBar
   },
   setup() {
     const router = useRouter()
     const searchValue = ref('')
     const userInfo = ref(1) // 实际项目中从vuex或pinia获取
-    const activeTab = ref(0)
 
     // 使用物品列表组合式函数
     const {
@@ -324,7 +298,6 @@ export default defineComponent({
       onClickRight,
       goToProfile,
       onViewClick,
-      activeTab,
       onSearchClick,
       itemTypeFilter,
       tradeMethodFilter,

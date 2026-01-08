@@ -279,30 +279,7 @@
   </div>
 
   <!-- 底部导航栏 -->
-  <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="home-o" to="/">
-        首页
-      </van-tabbar-item>
-      <van-tabbar-item icon="envelop-o" to="/notification">
-        消息
-      </van-tabbar-item>
-      <van-tabbar-item to="/stuff/publish">
-        <template #icon>
-          <div class="publish-button">
-            <van-icon name="plus" size="20" />
-          </div>
-        </template>
-      </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/stuff/trades">
-        交易
-      </van-tabbar-item>
-      <van-tabbar-item icon="user-o" to="/user/profile">
-        我的
-      </van-tabbar-item>
-    </van-tabbar>
-
-    <!-- 为底部导航腾出空间 -->
-    <div class="bottom-space"></div>
+  <AppTabBar />
 
     <cancel-transfer-dialog
       v-model="showCancelTransfer"
@@ -318,6 +295,7 @@ import { useRouter } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
+import AppTabBar from '@/components/ui/AppTabBar.vue'
 import { useUserStore } from '@/store/modules/user'
 import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions, userApi } from '@/api/user';
 import type { Item, PointsTransaction, PointsAccount, TradeScoreTransaction } from '@/api/types';
@@ -326,7 +304,8 @@ import { getValueText } from '@/constants/stuff'
 export default defineComponent({
   components: {
     CancelTransferDialog,
-    BaseCard
+    BaseCard,
+    AppTabBar
   },
   setup() {
     const userStore = useUserStore()
@@ -1174,19 +1153,4 @@ export default defineComponent({
   margin: 12px;
 }
 
-.publish-button {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1989fa, #0066ff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
-  
-  .van-icon {
-    color: #fff;
-  }
-}
 </style>

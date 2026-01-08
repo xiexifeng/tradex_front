@@ -20,30 +20,7 @@
   </div>
 
   <!-- 底部导航栏 -->
-  <van-tabbar v-model="activeTab" fixed route>
-      <van-tabbar-item icon="home-o" to="/">
-        首页
-      </van-tabbar-item>
-      <van-tabbar-item icon="envelop-o" to="/notification">
-        消息
-      </van-tabbar-item>
-      <van-tabbar-item to="/stuff/publish">
-        <template #icon>
-          <div class="publish-button">
-            <van-icon name="plus" size="20" />
-          </div>
-        </template>
-      </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/stuff/trades">
-        交易
-      </van-tabbar-item>
-      <van-tabbar-item icon="user-o" to="/user/profile">
-        我的
-      </van-tabbar-item>
-    </van-tabbar>
-
-    <!-- 为底部导航腾出空间 -->
-    <div class="bottom-space"></div>
+  <AppTabBar />
 </template>
 
 <script lang="ts">
@@ -51,17 +28,19 @@ import { defineComponent, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
 import NotificationList from './components/NotificationList.vue'
+import AppTabBar from '@/components/ui/AppTabBar.vue'
 import { notificationApi } from '@/api/notification'
 import type { Notification } from '@/api/types'
 
 export default defineComponent({
   components: {
-    NotificationList
+    NotificationList,
+    AppTabBar
   },
   setup() {
     const router = useRouter()
-    const activeTab = ref(0)
     const notifications = ref<Notification[]>([])
+    const activeTab = ref(0)
 
     const loadNotifications = async () => {
       const res = await notificationApi.listMyNotification({ pageNo: 1, pageSize: 10 })
@@ -95,10 +74,10 @@ export default defineComponent({
     })
 
     return {
-      activeTab,
       notifications,
       unreadNotifications,
       readNotifications,
+      activeTab,
       onClickLeft,
       viewDetail
     }
@@ -292,51 +271,6 @@ export default defineComponent({
   }
 }
 
-.van-tabbar {
-  border-top: 1px solid #f5f5f5;
-  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
-  
-  :deep(.van-tabbar-item) {
-    color: #7d7e80;
-  }
-  
-  :deep(.van-tabbar-item--active) {
-    color: #1989fa;
-  }
-  
-  :deep(.van-tabbar-item__icon) {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-  
-  :deep(.van-tabbar-item:nth-child(3)) {
-    margin-top: -14px;
-  }
-}
-
-.publish-button {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1989fa, #39a0ff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
-  
-  &:active {
-    transform: scale(0.95);
-  }
-  
-  .van-icon {
-    color: white;
-  }
-}
-
-.bottom-space {
-  height: 50px;
-}
 
 @keyframes fadeIn {
   from {
