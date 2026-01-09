@@ -630,7 +630,7 @@ curl -X POST http://47.122.125.199/tradex/client/trade/detail/{tradeId} \
             "toScore": null,
             "finishTradeTime": null,
             "createTime": 1743470905967,
-            "flag": 'SELL'
+            "flag": 'SELL',
             "payment": {
               "paymentMethod": "CASH",
               "paymentNo": "PO0000001",
