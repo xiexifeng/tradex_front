@@ -19,7 +19,9 @@ src/
 
 ---
 
-## 发送验证码
+## 认证相关接口
+
+### 发送验证码
 
 **请求：**
 
@@ -40,7 +42,7 @@ curl -X POST http://47.122.125.199/tradex/client/auth/send-sms \
 }
 ```
 
-## 手机号+验证码登录
+### 手机号+验证码登录
 
 **请求：**
 
@@ -81,7 +83,44 @@ curl -X POST http://47.122.125.199/tradex/client/auth/login-or-register \
 }
 ```
 
-## 编辑用户资料
+## 用户相关接口
+
+### 获取用户信息
+
+**请求：**
+
+```bash
+curl -X GET http://47.122.125.199/tradex/client/user/get \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json"
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": {
+        "userId": "2025052500001",
+        "nickname": "34l06t3drl",
+        "realName": null,
+        "gender": null,
+        "birthday": null,
+        "avatarUrl": null,
+        "address": null,
+        "wechat": null,
+        "qq": null,
+        "brief": null,
+        "authStatus": null,
+        "blockchainId": null,
+        "tradeScore": null
+    }
+}
+```
+
+### 编辑用户资料
 
 **请求：**
 
@@ -110,8 +149,9 @@ curl -X POST http://47.122.125.199/tradex/client/user/update \
     "data": null
 }
 ```
+## 公共接口
 
-## oss 上传文件
+### oss 上传文件
 
 **请求：**
 
@@ -133,7 +173,7 @@ curl -X POST http://47.122.125.199/tradex/basic/oss/uploadFile \
 }
 ```
 
-## oss 查看文件
+### oss 查看文件
 
 **请求：**
 
