@@ -191,7 +191,7 @@
                 v-model:loading="loading"
                 :finished="finished"
                 finished-text="没有更多了"
-                @load="loadItems(status.value)"
+                @load="loadMore(status.value)"
               >
                 <template v-if="getFilteredItems(status.value).length">
                   <div class="items-grid">
@@ -360,8 +360,19 @@ export default defineComponent({
       return statusMap[status] || status
     }
 
+    // 加载更多
+  const loadMore = async (status: string) => {
+    // console.log('loadMore:finished.value:'+finished.value)
+    // console.log('loadMore:loading.value:'+loading.value)
+    if (finished.value) return
+    loading.value = false;
+    
+    await loadItems(status)
+  }
+
     // 加载物品列表
     const loadItems = async (status: string) => {
+      console.log('loadItems:loading.value:'+loading.value)
       if (loading.value) return
       loading.value = true
       
@@ -410,8 +421,10 @@ export default defineComponent({
     }
     // 下拉刷新
     const onRefresh = () => {
+      console.log('onRefresh:loading.value:'+loading.value)
       pageNo.value = 1
       finished.value = false
+      loading.value = false
       loadItems(statusList[activeTab.value].value)
       refreshing.value = false
     }
@@ -501,6 +514,7 @@ export default defineComponent({
       getStatusTagType,
       getTransferTagType,
       loadItems,
+      loadMore,
       onTabChange,
       onRefresh,
       viewOffers,
