@@ -43,8 +43,12 @@ export default defineComponent({
     const activeTab = ref(0)
 
     const loadNotifications = async () => {
-      const res = await notificationApi.listMyNotification({ pageNo: 1, pageSize: 10 })
-      notifications.value = res.data
+      try{
+        const res = await notificationApi.listMyNotification({ pageNo: 1, pageSize: 10 })
+        notifications.value = res.data
+      } catch (error) {
+        console.error('加载通知失败:', error)
+      }
     }
 
     const unreadNotifications = computed(() => {

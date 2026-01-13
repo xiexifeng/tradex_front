@@ -205,11 +205,11 @@ export default defineComponent({
           finished.value = res.data.length < pageSize.value
           pageNo.value++
         } else {
-          showToast(res.desc || '获取失败')
+          // showToast(res.desc || '获取失败')
           finished.value = true
         }
       } catch (e) {
-        showToast('获取失败')
+        // showToast('获取失败')
         finished.value = true
       } finally {
         loading.value = false

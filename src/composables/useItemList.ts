@@ -101,6 +101,7 @@ export function useItemList() {
       }
     } catch (error) {
       console.error('加载物品列表失败:', error)
+      finished.value = true
     } finally {
       loading.value = false
       // console.log('loadItems:loading.value:'+loading.value)
@@ -116,7 +117,7 @@ export function useItemList() {
 
   // 加载更多
   const loadMore = async (searchKey?: string) => {
-    // console.log('loadMore:finished.value:'+finished.value)
+    console.log('loadMore:finished.value:'+finished.value)
     // console.log('loadMore:loading.value:'+loading.value)
     if (finished.value) return
     loading.value = false;

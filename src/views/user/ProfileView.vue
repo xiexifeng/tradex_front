@@ -397,7 +397,7 @@ export default defineComponent({
         }
       } catch (error) {
         console.error('加载物品列表失败:', error)
-        showToast('加载失败')
+        finished.value = true
       } finally {
         loading.value = false
       }
