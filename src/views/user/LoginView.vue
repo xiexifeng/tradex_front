@@ -97,7 +97,7 @@
 
     <div class="additional-links">
       <van-button plain type="primary" size="small">忘记密码？</van-button>
-      <van-button plain type="primary" size="small">立即注册</van-button>
+      <van-button plain type="primary" size="small" @click="goToRegister">立即注册</van-button>
     </div>
   </div>
 </template>
@@ -135,6 +135,11 @@ const togglePasswordVisibility = () => {
 
 const onClickLeft = () => {
   router.push('/');
+};
+
+// 跳转到注册页面
+const goToRegister = () => {
+  router.push('/register');
 };
 
 // 发送验证码

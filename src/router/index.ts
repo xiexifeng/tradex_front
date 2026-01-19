@@ -21,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "login" */ '../views/user/LoginView.vue')
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "register" */ '../views/user/RegisterView.vue')
+  },
+  {
     path: '/user/profile',
     name: 'profile',
     component: () => import(/* webpackChunkName: "userProfile" */ '../views/user/ProfileView.vue'),
@@ -122,6 +127,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/notification/detail/:id',
     name: 'NotificationDetail',
     component: () => import('@/views/notification/NotificationDetailView.vue')
+  },
+  {
+    path: '/rank/invite',
+    name: 'inviteRank',
+    component: () => import(/* webpackChunkName: "inviteRank" */ '../views/rank/InviteRankView.vue')
   }
 ]
 

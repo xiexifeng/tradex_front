@@ -286,6 +286,15 @@
       :item-id="currentItemId"
       @success="onCancelSuccess"
     />
+
+    <!-- 分享弹窗 -->
+    <ShareDialog
+      v-model:show="showShareDialog"
+      :share-title="shareTitle"
+      :share-desc="shareDesc"
+      :share-image="shareImage"
+      :share-url="shareUrl"
+    />
 </template>
 
 <script lang="ts">
@@ -296,6 +305,7 @@ import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import AppTabBar from '@/components/ui/AppTabBar.vue'
+import ShareDialog from '@/components/ShareDialog.vue'
 import { useUserStore } from '@/store/modules/user'
 import { getPointsAccount, getPointsTransactions, getTradeScoreTransactions, userApi } from '@/api/user';
 import type { Item, PointsTransaction, PointsAccount, TradeScoreTransaction } from '@/api/types';
@@ -305,7 +315,8 @@ export default defineComponent({
   components: {
     CancelTransferDialog,
     BaseCard,
-    AppTabBar
+    AppTabBar,
+    ShareDialog
   },
   setup() {
     const userStore = useUserStore()
@@ -315,9 +326,26 @@ export default defineComponent({
       showToast('打开相机')
     }
 
+    const showShareDialog = ref(false)
+
     const onShare = () => {
-      showToast('分享')
+      showShareDialog.value = true
     }
+
+    // 分享信息
+    const shareTitle = computed(() => {
+      const nickname = userInfo.value?.nickname || '我'
+      return `${nickname}邀请您加入区块链电商平台`
+    })
+    const shareDesc = computed(() => '一起来体验区块链电商的便利吧！')
+    const shareImage = computed(() => userInfo.value?.avatarUrl || 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg')
+    const shareUrl = computed(() => {
+      const baseUrl = window.location.origin
+      if (userInfo.value?.userId) {
+        return `${baseUrl}/register?inviteUserId=${userInfo.value.userId}&inviteTime=${Date.now()}`
+      }
+      return `${baseUrl}/register`
+    })
     const router = useRouter()
     const activeTab = ref(0)
     const activeNames = ref('1')
@@ -500,6 +528,11 @@ export default defineComponent({
     return {
       openCamera,
       onShare,
+      showShareDialog,
+      shareTitle,
+      shareDesc,
+      shareImage,
+      shareUrl,
       activeTab,
       activeNames,
       statusList,

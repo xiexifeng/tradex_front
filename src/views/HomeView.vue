@@ -265,6 +265,12 @@ export default defineComponent({
         text: '积分排行',
         color: '#ee0a24',
         action: () => router.push('/points-rank')
+      },
+      {
+        icon: 'friends-o',
+        text: '拉新排行',
+        color: '#ff6b9d',
+        action: () => router.push('/rank/invite')
       }
     ]
 
