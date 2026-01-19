@@ -83,6 +83,52 @@ curl -X POST http://47.122.125.199/tradex/client/auth/login-or-register \
 }
 ```
 
+### 设置交易密码
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/security/set-trade-passwd \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json"
+-d "{
+    "newTradePasswd": "sa123456"
+}"
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+
+### 设置登录密码
+**请求：**
+
+```bash
+curl -X POST http://47.122.125.199/tradex/client/security/set-login-passwd \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json"
+-d "{
+    "newLoginPasswd": "sa123456"
+}"
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+
 ## 用户相关接口
 
 ### 获取用户信息

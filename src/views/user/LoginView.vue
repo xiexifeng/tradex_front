@@ -170,10 +170,18 @@ const onPasswordSubmit = (values: any) => {
 const onCodeSubmit = async (values: any) => {
   try {
     const res = await userApi.loginByCode(values.phone, values.code);
-    const { token, userContext } = (res.data as unknown) as LoginResponse;
+    const { token, client, phone, username, loginPasswordSet, tradePasswordSet, userContext } = (res.data as unknown) as LoginResponse;
     
     userStore.setToken(token);
     userStore.setUserInfo(userContext);
+    userStore.setLoginAccount({
+      userId: userContext.userId,
+      phone: phone,
+      client: client,
+      username: username,
+      loginPasswordSet: loginPasswordSet,
+      tradePasswordSet: tradePasswordSet
+    });
     
     showToast('登录成功');
     router.push('/');

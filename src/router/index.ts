@@ -122,6 +122,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/notification/detail/:id',
     name: 'NotificationDetail',
     component: () => import('@/views/notification/NotificationDetailView.vue')
+  },
+  {
+    path: '/user/security',
+    name: 'security',
+    component: () => import(/* webpackChunkName: "security" */ '../views/user/SecurityView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

@@ -50,6 +50,24 @@ export const userApi = {
       return Promise.reject(error);
     });
   },
+
+  // 设置交易密码
+  setTradePassword(newTradePasswd: string): Promise<ApiResponse> {
+    return request.post('/client/security/set-trade-passwd', {
+      newTradePasswd
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  },
+
+  // 设置登录密码
+  setLoginPassword(newLoginPasswd: string): Promise<ApiResponse> {
+    return request.post('/client/security/set-login-passwd', {
+      newLoginPasswd
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  },
 };
 
 // 查询积分余额

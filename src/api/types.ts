@@ -7,6 +7,16 @@ export interface ApiResponse<T = any> {
 }
 
 // 用户信息类型
+export interface LoginAccount {
+  userId: string;
+  phone: string;
+  client: string | null;
+  username: string | null;
+  loginPasswordSet: boolean;
+  tradePasswordSet: boolean;
+}
+
+// 用户信息类型
 export interface UserInfo {
   userId: string;
   nickname: string;
@@ -25,14 +35,17 @@ export interface UserInfo {
   likes: number | null;
   collects: number | null;
   ipAddress: string | null;
+
 }
 
 // 登录响应类型
 export interface LoginResponse {
   token: string;
-  client: any;
+  client: string | null;
   phone: string;
   username: string;
+  loginPasswordSet: boolean;
+  tradePasswordSet: boolean;
   userContext: UserInfo;
 }
 
