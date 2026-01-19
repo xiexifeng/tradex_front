@@ -103,6 +103,17 @@
                 </div>
               </template>
             </van-field>
+            <van-field
+              v-model="formData.valuation"
+              name="valuation"
+              label="价值（元）"
+              type="number"
+              :min="0"
+              :max="999999"
+              :step="0.01"
+              placeholder="请填写物品残余估值0-999999"
+              :rules="[{ required: true, message: '请填写物品残余估值' }]"
+            />
           </van-cell-group>
         </div>
       </van-form>
@@ -355,7 +366,8 @@ export default defineComponent({
       description: '',
       images: [] as UploaderFileListItem[],
       originalPrice: '',
-      depreciation: 5
+      depreciation: 5,
+      valuation: 10
     })
 
     // 返回上一页
@@ -515,7 +527,8 @@ export default defineComponent({
           itemType: formData.clazzText,
           itemImageList: validImages.map(img => img.url || ''),
           itemDescription: formData.description,
-          depreciation: formData.depreciation
+          depreciation: formData.depreciation,
+          valuation: formData.valuation
         };
 
         // 调用发布接口

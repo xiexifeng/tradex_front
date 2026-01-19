@@ -19,6 +19,7 @@ export const publishItem = async (data: {
   itemImageList: string[];
   itemDescription: string;
   depreciation: number;
+  valuation: number;
 }): Promise<ApiResponse> => {
   return request.post('/client/item/publish', data, {
     headers: {
