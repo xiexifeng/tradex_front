@@ -82,7 +82,9 @@
           <van-cell title="期望物品" :value="itemDetail.expectItem" />
         </template>
         <van-cell v-if="itemDetail.deliveryMethod" title="交付方式" :value="getValueText(itemDetail.deliveryMethod, 'deliveryMethod')" />
-        <van-cell v-if="itemDetail.contactInfo" title="联系方式" :value="itemDetail.contactInfo" />
+        <van-cell v-if="itemDetail.contactInfo" title="联系人" :value="itemDetail.contactInfo.linkman" />
+        <van-cell v-if="itemDetail.contactInfo" title="联系方式" :value="itemDetail.contactInfo.phone" />
+        <van-cell v-if="itemDetail.contactInfo" title="交易地址" :value="itemDetail.contactInfo.address" />
       </div>
     </van-cell-group>
 
@@ -201,11 +203,42 @@
 
           <!-- 联系方式 -->
           <van-field
-            v-model="transferForm.contactInfo"
-            name="contactInfo"
+            v-model="transferForm.phone"
+            name="phone"
             label="联系方式"
             placeholder="请输入联系方式"
             :rules="[{ required: true, message: '请输入联系方式' }]"
+          />
+
+          <!-- 交易地址（省市区 + 街道小区） -->
+          <van-field
+            v-model="transferForm.tradeAreaText"
+            name="tradeAreaText"
+            label="交易地址"
+            placeholder="请选择省市区"
+            readonly
+            is-link
+            :rules="[{ required: true, message: '请选择省市区' }]"
+            @click="showTradeAddressPopup = true"
+          >
+            <template #right-icon>
+              <van-button
+                size="mini"
+                type="primary"
+                plain
+                @click.stop="requestLocation"
+              >
+                使用定位
+              </van-button>
+            </template>
+          </van-field>
+
+          <van-field
+            v-model="transferForm.tradeAddressDetail"
+            name="tradeAddressDetail"
+            label="街道小区"
+            placeholder="请输入街道/小区/门牌号"
+            :rules="[{ required: true, message: '请输入街道小区信息' }]"
           />
 
           <div class="submit-button">
@@ -214,6 +247,31 @@
             </van-button>
           </div>
         </van-form>
+      </div>
+    </van-popup>
+
+    <!-- 交易地址选择弹窗 -->
+    <van-popup
+      v-model:show="showTradeAddressPopup"
+      position="bottom"
+      round
+      closeable
+      :style="{ height: '70%' }"
+    >
+      <div class="transfer-popup">
+        <div class="popup-title">选择交易地址</div>
+        <van-area
+          :area-list="tradeAreaList"
+          :columns-num="3"
+          title="选择省市区"
+          @confirm="onTradeAreaConfirm"
+          @cancel="showTradeAddressPopup = false"
+        />
+        <div style="padding: 12px;">
+          <div style="color: #969799; font-size: 12px; line-height: 1.4;">
+            如未能自动获取定位，可手动选择省市区并补充街道小区。
+          </div>
+        </div>
       </div>
     </van-popup>
 
@@ -256,6 +314,7 @@ import { getItemDetail, transferItem } from '@/api/stuff'
 import type { ItemDetail } from '@/api/types'
 import { getValueText, DELIVERY_COLUMNS, TRADE_METHOD_COLUMNS } from '@/constants/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
+import { areaList } from '@vant/area-data'
 
 export default defineComponent({
   components: {
@@ -288,7 +347,7 @@ export default defineComponent({
       transferPrice: 0,
       transferPoints: 0,
       expectItem: '',
-      contactInfo: '',
+      contactInfo: {linkman:'', phone:'', address:''},
       deliveryMethod: ''
     })
 
@@ -324,6 +383,9 @@ export default defineComponent({
     const showDeliveryPicker = ref(false)
     const showTradeMethodPicker = ref(false)
     const showCancelTransfer = ref(false)
+    const showTradeAddressPopup = ref(false)
+    const locationGranted = ref(false)
+    const tradeAreaList = areaList
 
     const transferForm = ref({
       deliveryMethod: '',
@@ -333,7 +395,9 @@ export default defineComponent({
       transferPrice: '',
       transferPoints: '',
       expectItem: '',
-      contactInfo: ''
+      phone: '',
+      tradeAreaText: '',
+      tradeAddressDetail: ''
     })
 
     // 使用导入的常量
@@ -365,6 +429,8 @@ export default defineComponent({
           showCancelButton: true,
         })
         
+        const tradeAddress = `${transferForm.value.tradeAreaText}${transferForm.value.tradeAddressDetail ? ' ' + transferForm.value.tradeAddressDetail : ''}`.trim()
+
         // 构建请求参数
         const params = {
           itemId: itemDetail.value.id,
@@ -372,7 +438,7 @@ export default defineComponent({
           transferPrice: transferForm.value.tradeMethod === 'ITEM_TO_MONEY' ? Number(values.transferPrice) : 0,
           transferPoints: transferForm.value.tradeMethod === 'ITEM_TO_POINTS' ? Number(values.transferPoints) : 0,
           expectItem: transferForm.value.tradeMethod === 'ITEM_TO_ITEM' ? values.expectItem : '',
-          contactInfo: values.contactInfo,
+          contactInfo: {phone:values.phone, address: tradeAddress},
           deliveryMethod: transferForm.value.deliveryMethod
         }
 
@@ -417,6 +483,53 @@ export default defineComponent({
       }
     }
 
+    const onTradeAreaConfirm = ({ selectedOptions }: any) => {
+      // selectedOptions: [province, city, county]
+      console.log('[tradeAddress] area confirm selectedOptions:', selectedOptions)
+      const texts = (selectedOptions || []).map((o: any) => o?.text).filter(Boolean)
+      const codes = (selectedOptions || []).map((o: any) => o?.value).filter(Boolean)
+      console.log('[tradeAddress] area confirm texts:', texts, 'codes:', codes)
+      transferForm.value.tradeAreaText = texts.join('')
+      showTradeAddressPopup.value = false
+    }
+
+    const requestLocation = () => {
+      if (!navigator.geolocation) {
+        showToast('当前设备不支持定位')
+        return
+      }
+      console.log('[tradeAddress] requestLocation: start')
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          console.log('[tradeAddress] geolocation success:', {
+            timestamp: pos?.timestamp,
+            coords: pos?.coords ? {
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+              altitude: pos.coords.altitude,
+              altitudeAccuracy: (pos.coords as any).altitudeAccuracy,
+              heading: pos.coords.heading,
+              speed: pos.coords.speed
+            } : null
+          })
+          locationGranted.value = true
+          showToast('已获取定位权限，请选择省市区并补充街道小区')
+          showTradeAddressPopup.value = true
+        },
+        (err) => {
+          console.warn('[tradeAddress] geolocation error:', {
+            code: err?.code,
+            message: err?.message
+          })
+          locationGranted.value = false
+          showToast('未获取到定位权限，请手动选择地址')
+          showTradeAddressPopup.value = true
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      )
+    }
+
     onMounted(() => {
       fetchItemDetail()
     })
@@ -442,7 +555,12 @@ export default defineComponent({
       onTradeMethodConfirm,
       onTransferSubmit,
       onCancelTransferSuccess,
-      copyBlockchainId
+      copyBlockchainId,
+      tradeAreaList,
+      showTradeAddressPopup,
+      onTradeAreaConfirm,
+      requestLocation,
+      locationGranted
     }
   }
 })

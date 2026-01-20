@@ -75,7 +75,11 @@ export interface ItemDetail extends Item {
   transferPrice: number;
   transferPoints: number;
   expectItem: string;
-  contactInfo: string;
+  contactInfo: {
+    linkman?: string | undefined;
+    phone?: string | undefined;
+    address?: string | undefined;  
+  };
   deliveryMethod: string;
 }
 

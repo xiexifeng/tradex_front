@@ -65,7 +65,7 @@ export const transferItem = async (data: {
   transferPrice: number;
   transferPoints: number;
   expectItem: string;
-  contactInfo: string;
+  contactInfo: {linkman?: string, phone: string, address: string};
   deliveryMethod: string;
 }): Promise<ApiResponse> => {
   return request.post('/client/item/transfer', data, {
