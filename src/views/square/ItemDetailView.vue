@@ -168,11 +168,11 @@
         <div class="trade-grid">
           <div class="trade-item">
             <span class="item-label">联系人</span>
-            <span class="item-value">{{ itemDetail.contactInfo.linkman }}</span>
+            <span class="item-value">{{ itemDetail.contactInfo?.linkman }}</span>
           </div>
           <div class="trade-item">
             <span class="item-label">联系电话</span>
-            <span class="item-value">{{ itemDetail.contactInfo.phone }}</span>
+            <span class="item-value">{{ itemDetail.contactInfo?.phone }}</span>
           </div>
           <div class="trade-item">
             <span class="item-label">交付方式</span>
@@ -180,7 +180,7 @@
           </div>
           <div class="trade-item">
             <span class="item-label">交付地址</span>
-            <span class="item-value">{{ itemDetail.contactInfo.address }}</span>
+            <span class="item-value">{{ itemDetail.contactInfo?.address }}</span>
           </div>
         </div>
       </BaseCard>
@@ -793,7 +793,8 @@ export default defineComponent({
         await confirmPay(params)
         showToast('支付成功')
         showPayPopup.value = false
-        router.push('/stuff/trades')
+        //跳转到首页
+        setTimeout(() => {router.push('/')}, 2000)
         
       } catch (e) {
         const msg = (e as Error)?.message || '支付失败，请重试'
