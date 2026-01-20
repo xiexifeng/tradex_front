@@ -790,23 +790,16 @@ export default defineComponent({
           paymentMethod: null
         }
         console.log('提交时 tradePassword:', payForm.value.tradePassword)
-        const res = await confirmPay(params)
-        if (res.success) {
-          showToast('支付成功')
-          showPayPopup.value = false
-          // 可跳转到订单详情页等
-        } else {
-          if (res.desc && res.desc.includes('密码')) {
-            showToast(res.desc)
-            payForm.value.tradePassword = ''
-          } else {
-            showToast(res.desc || '支付失败')
-            showPayPopup.value = false
-          }
-        }
-      } catch (e) {
-        showToast('支付失败')
+        await confirmPay(params)
+        showToast('支付成功')
         showPayPopup.value = false
+        router.push('/stuff/trades')
+        
+      } catch (e) {
+        const msg = (e as Error)?.message || '支付失败，请重试'
+        showToast(msg)
+        // 允许继续输入密码重试
+        payForm.value.tradePassword = ''
       } finally {
         isPaying.value = false
       }
