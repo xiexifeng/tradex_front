@@ -752,18 +752,18 @@ export default defineComponent({
           }
         }
         const res = await createOrderForPay(params)
-        if (res.success) {
-          showToast('下单成功')
-          showBuyForm.value = false
-          // 判断是否为积分支付
-          if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
-            payTradeId.value = res.data?.tradeId || ''
-            payForm.value.tradePoints = itemDetail.value.transferPoints
-            // payForm.value.tradePassword = ''
-            showPayPopup.value = true
-          }
-        } else {
-          showToast(res.desc || '下单失败')
+        showToast('下单成功')
+        showBuyForm.value = false
+        // 判断是否为积分支付
+        if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS') {
+          payTradeId.value = res.data?.tradeId || ''
+          payForm.value.tradePoints = itemDetail.value.transferPoints
+          payForm.value.tradePassword = ''
+          showPayPopup.value = true
+        }else if(itemDetail.value.tradeMethod === 'ITEM_TO_MONEY' && res.data.paymentMethod === 'CASH'){
+          showToast({message:'下单成功!请尽快与出让方联系确认交易事项。', duration:3000, onClose: () => {
+            router.push('/')
+          }})
         }
       } catch (e) {
         showToast('下单失败')
@@ -789,12 +789,12 @@ export default defineComponent({
           tradePoints: payForm.value.tradePoints,
           paymentMethod: null
         }
-        console.log('提交时 tradePassword:', payForm.value.tradePassword)
         await confirmPay(params)
-        showToast('支付成功')
         showPayPopup.value = false
         //跳转到首页
-        setTimeout(() => {router.push('/')}, 2000)
+        showToast({message:'支付成功', duration:3000, onClose: () => {
+            router.push('/')
+          }})
         
       } catch (e) {
         const msg = (e as Error)?.message || '支付失败，请重试'

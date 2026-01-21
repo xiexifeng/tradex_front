@@ -194,6 +194,7 @@ export interface TradeOrderForPay {
   tradeMethod: string;
   tradePrice: number|null;
   tradePoints: number|null;
+  paymentMethod: string|null;
 }
 
 export interface TradeDetail {
