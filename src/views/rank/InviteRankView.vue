@@ -39,7 +39,7 @@
                 round
                 width="48"
                 height="48"
-                :src="item.avatarUrl || 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'"
+                src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
                 class="avatar"
               />
               <div class="user-details">
@@ -96,9 +96,9 @@ const shareUrl = computed(() => {
   const baseUrl = window.location.origin;
   const userInfo = userStore.userInfo;
   if (userInfo?.userId) {
-    return `${baseUrl}/register?inviteUserId=${userInfo.userId}&inviteTime=${Date.now()}`;
+    return `${baseUrl}/client/auth/register?inviteUserId=${userInfo.userId}&inviteTime=${Date.now()}`;
   }
-  return `${baseUrl}/register`;
+  return `${baseUrl}/client/auth/register`;
 });
 
 // 获取排名样式类
@@ -125,7 +125,8 @@ const loadRankList = async () => {
   try {
     const res = await getInviteRank();
     if (res.success && res.data) {
-      rankList.value = res.data.slice(0, 10); // 只显示前十名
+      // 接口返回的数据已经按排名排序，直接使用前10条
+      rankList.value = res.data.slice(0, 10);
       finished.value = true;
     }
   } catch (error) {

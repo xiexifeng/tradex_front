@@ -62,25 +62,20 @@ export const userApi = {
   // 注册
   register(data: {
     phone: string;
+    verfiyCode: string;
+    nickName?: string;
     password: string;
     gender?: string;
     birthday?: string;
     avatarUrl?: string;
+    brief?: string;
     email?: string;
     inviteUserId?: string;
-    inviteTime?: string;
-  }): Promise<ApiResponse> {
-    const params = new URLSearchParams();
-    params.append('phoneNumbers', data.phone);
-    params.append('password', data.password);
-    if (data.gender) params.append('gender', data.gender);
-    if (data.birthday) params.append('birthday', data.birthday);
-    if (data.avatarUrl) params.append('avatarUrl', data.avatarUrl);
-    if (data.email) params.append('email', data.email);
-    if (data.inviteUserId) params.append('inviteUserId', data.inviteUserId);
-    if (data.inviteTime) params.append('inviteTime', data.inviteTime);
-    
-    return request.post('/client/auth/register', params.toString());
+    inviteTime?: number;
+  }): Promise<ApiResponse<boolean>> {
+    return request.post('/client/auth/register', data, {
+      headers: { 'Content-Type': 'application/json' }
+    });
   },
 };
 
@@ -107,11 +102,10 @@ export function getTradeScoreTransactions(params: { pageNo: number; pageSize: nu
 export interface InviteRankItem {
   userId: string;
   nickname: string;
-  avatarUrl: string | null;
   inviteCount: number;
   rank: number;
 }
 
 export function getInviteRank(): Promise<ApiResponse<InviteRankItem[]>> {
-  return request.get('/client/user/invite-rank');
+  return request.get('/client/rank/invite-list');
 }
