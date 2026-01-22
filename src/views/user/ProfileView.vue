@@ -237,7 +237,7 @@
                               发起出让
                             </van-button>
                           </template>
-                          <template v-if="item.transferStatus === 'transferring'">
+                          <template v-if="item.isCanCancel">
                             <van-button 
                               size="small" 
                               plain
@@ -320,7 +320,7 @@ export default defineComponent({
     }
     const router = useRouter()
     const activeTab = ref(0)
-    const activeNames = ref('1')
+    const activeNames = ref('0')
     const items = ref<Item[]>([])
     const loading = ref(false)
     const finished = ref(false)

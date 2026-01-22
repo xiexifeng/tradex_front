@@ -64,6 +64,7 @@ export interface Item {
   transferTimes: number;
   lastUserId: string;
   blockchainId: string;
+  isCanCancel: boolean;
 }
 
 // 物品详情接口，继承自Item

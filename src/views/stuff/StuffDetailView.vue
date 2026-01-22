@@ -114,9 +114,12 @@
         </van-button>
       </template>
       <template v-if="itemDetail.transferStatus === 'transferring'">
-        <van-button type="primary" block round plain @click="cancelTransferShow">
-          取消出让
-        </van-button>
+        <template v-if="itemDetail.isCanCancel">
+          <van-button type="primary" block round plain @click="cancelTransferShow">
+            取消出让
+          </van-button>
+        </template>
+       
         <van-button type="primary" block round @click="viewOffers">
           查看报价
         </van-button>
@@ -348,7 +351,8 @@ export default defineComponent({
       transferPoints: 0,
       expectItem: '',
       contactInfo: {linkman:'', phone:'', address:''},
-      deliveryMethod: ''
+      deliveryMethod: '',
+      isCanCancel: false
     })
 
     // 获取物品详情
