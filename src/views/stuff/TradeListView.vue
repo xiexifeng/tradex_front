@@ -146,13 +146,14 @@ export default defineComponent({
 
     // 交易状态列表
     const statusList = [
-      { text: '全部', value: 'all' },
+      
       { text: '交易中', value: 'trading' },
       { text: '已达成', value: 'accepted' },
       { text: '已完成', value: 'completed' },
       { text: '已取消', value: 'cancelled' },
       { text: '已拒绝', value: 'rejected' },
-      { text: '已退款', value: 'refunded' }
+      { text: '已退款', value: 'refunded' },
+      { text: '全部', value: 'all' }
     ]
 
     // 获取状态样式
@@ -284,6 +285,8 @@ export default defineComponent({
       }).then(() => {
         showToast('交易已取消')
         trade.tradeStatus = 'cancelled'
+      }).catch(() => {
+        // on cancel
       })
     }
     const goPayTrade = (trade: TradeListItem) => {
@@ -294,6 +297,8 @@ export default defineComponent({
       }).then(() => {
         showToast('支付已成功')
         trade.tradeStatus = 'accepted'
+      }).catch(() => {
+        // on cancel
       })
     }
 

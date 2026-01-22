@@ -211,7 +211,7 @@ export const tradeScore = async (data: {
   tradeId: string;
   tradeScore: number;
 }): Promise<ApiResponse> => {
-  return request.post('/client/trade/submit-socre', data, {
+  return request.post('/client/trade/score', data, {
     headers: { 'Content-Type': 'application/json' }
   });
 };
