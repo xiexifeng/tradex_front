@@ -215,3 +215,13 @@ export const tradeScore = async (data: {
     headers: { 'Content-Type': 'application/json' }
   });
 };
+
+// 取消交易
+export const cancelTrade = async (data: {
+  tradeId: string;
+  cancelReason: string | null;
+}): Promise<ApiResponse> => {
+  return request.post('/client/trade/cancel', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};

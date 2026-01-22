@@ -1,5 +1,5 @@
 import { showToast, showDialog } from 'vant'
-import { acceptTransferApply, rejectTransferApply, completeTrade } from '@/api/stuff'
+import { acceptTransferApply, rejectTransferApply, completeTrade, cancelTrade } from '@/api/stuff'
 
 export const useTradeActions = () => {
   // 接受交易
@@ -74,9 +74,36 @@ export const useTradeActions = () => {
     }
   }
 
+  // 取消交易
+  const handleCancelTrade = async (tradeId: string, onSuccess?: () => void) => {
+    try {
+      await showDialog({
+        title: '确认取消',
+        message: '确定要取消这个交易吗？',
+        showCancelButton: true,
+      })
+      
+      const res = await cancelTrade({ 
+        tradeId, 
+        cancelReason: '用户取消交易'
+      })
+      if (res.success) {
+        showToast('已取消交易')
+        onSuccess?.()
+      } else {
+        showToast(res.desc || '取消交易失败')
+      }
+    } catch (error) {
+      if (error !== 'cancel') {
+        showToast('取消交易失败')
+      }
+    }
+  }
+
   return {
     handleAcceptTrade,
     handleRejectTrade,
-    handleConfirmTrade
+    handleConfirmTrade,
+    handleCancelTrade
   }
 } 

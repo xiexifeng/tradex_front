@@ -142,7 +142,7 @@ export default defineComponent({
     const pageSize = ref(10)
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
-    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade } = useTradeActions()
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade } = useTradeActions()
 
     // 交易状态列表
     const statusList = [
@@ -278,15 +278,9 @@ export default defineComponent({
       })
     }
     const cancelTrade = (trade: TradeListItem) => {
-      showDialog({
-        title: '取消交易',
-        message: '确定要取消这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('交易已取消')
+      handleCancelTrade(trade.id, () => {
         trade.tradeStatus = 'cancelled'
-      }).catch(() => {
-        // on cancel
+        fetchTrades(true)
       })
     }
     const goPayTrade = (trade: TradeListItem) => {
