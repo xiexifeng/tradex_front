@@ -322,7 +322,7 @@ export default defineComponent({
     }
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
-    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade } = useTradeActions()
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade } = useTradeActions()
 
     onMounted(async () => {
       const tradeId = route.params.id as string
@@ -381,16 +381,10 @@ export default defineComponent({
     }
 
     // 取消交易
-    const cancelTrade = (trade: any) => {
-      showDialog({
-        title: '取消交易',
-        message: '确定要取消这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('交易已取消')
-        trade.tradeStatus = 'cancelled'
-      }).catch(() => {
-        console.log('cancel')
+    const cancelTrade = () => {
+      if(!tradeInfo.value) return
+      handleCancelTrade(tradeInfo.value.id, () => {
+        tradeInfo.value!.tradeStatus = 'cancelled'
       })
     }
     // 继续支付/去支付
