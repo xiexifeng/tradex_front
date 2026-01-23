@@ -190,7 +190,7 @@
         <template v-if="tradeInfo.fromUserId !== userInfo?.userId">
           <van-button size="large" type="danger" plain hairline @click="cancelTrade">取消交易</van-button>
           <template v-if="tradeInfo.tradeMethod === 'ITEM_TO_POINTS'">
-            <van-button size="large" type="primary" @click="goPayTrade">去支付</van-button>
+            <van-button size="large" type="primary" @click="openPayPopup">去支付</van-button>
           </template>
         </template>
       </template>
@@ -202,6 +202,12 @@
       </template>
     </div>
   </div>
+  <PointsPayPopup
+    v-model:show="showPayPopup"
+    :trade-points="payPoints"
+    :loading="false"
+    @submit="onPayPopupSubmit"
+  />
 </template>
 
 <script lang="ts">
@@ -211,11 +217,15 @@ import { showToast, showDialog } from 'vant'
 import type { TradeDetail } from '@/api/types'
 import { getTradeDetail } from '@/api/stuff'
 import { useUserStore } from '@/store/modules/user'
+import PointsPayPopup from '@/components/ui/PointsPayPopup.vue'
 import { useTradeActions } from '@/composables/useTradeActions'
 import { tradeScore } from '@/api/stuff'
 
 export default defineComponent({
   name: 'TradeDetailView',
+  components: {
+    PointsPayPopup
+  },
   setup() {
     const router = useRouter()
     const route = useRoute()
@@ -256,58 +266,13 @@ export default defineComponent({
       }
     }
 
-    // 交换物品列表
-    const exchangeItems = ref([
-      {
-        id: 'ITEM002',
-        mainImage: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        description: '平板电脑，95新',
-        location: '商场B',
-        time: '2024-02-21',
-        contact: '13900139000'
-      },
-      {
-        id: 'ITEM003',
-        mainImage: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
-        description: '平板电脑，98新',
-        location: '地铁站C',
-        time: '2024-02-22',
-        contact: '13700137000'
-      }
-    ])
 
     // 返回上一页
     const onClickLeft = () => {
       router.back()
     }
 
-    // 达成交易
-    const acceptExchange = (item: any) => {
-      showDialog({
-        title: '确认交易',
-        message: `确定要与物品 ${item.id} 达成交易吗？`,
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已达成交易')
-        tradeInfo.value!.tradeStatus = 'accepted'
-      }).catch(() => {
-        console.log('cancel')
-      })
-    }
 
-    // 拒绝交易
-    const rejectExchange = (item: any) => {
-      showDialog({
-        title: '拒绝交易',
-        message: `确定要拒绝与物品 ${item.id} 的交易吗？`,
-        showCancelButton: true,
-      }).then(() => {
-        showToast('已拒绝交易')
-        exchangeItems.value = exchangeItems.value.filter(i => i.id !== item.id)
-      }).catch(() => {
-        console.log('cancel')
-      })
-    }
     // 获取状态文本
     const getStatusText = (status: string) => {
       const textMap: Record<string, string> = {
@@ -322,7 +287,7 @@ export default defineComponent({
     }
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
-    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade } = useTradeActions()
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade, handleGoPayTrade } = useTradeActions()
 
     onMounted(async () => {
       const tradeId = route.params.id as string
@@ -387,38 +352,54 @@ export default defineComponent({
         tradeInfo.value!.tradeStatus = 'cancelled'
       })
     }
-    // 继续支付/去支付
-    const goPayTrade = (trade: any) => {
-      showDialog({
-        title: '继续支付',
-        message: '确定要支付这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('支付已成功')
-        trade.tradeStatus = 'accepted'
-      }).catch(() => {
-        console.log('accepted')
-      })
+
+    const showPayPopup = ref(false)
+    const payPoints = ref(0)
+
+    const openPayPopup = () => {
+      if (!tradeInfo.value) return
+      payPoints.value = tradeInfo.value.tradePoints || 0
+      showPayPopup.value = true
     }
+
+    const onPayPopupSubmit = ({ tradePassword }: { tradePassword: string }) => {
+      if (!tradeInfo.value) return
+      handleGoPayTrade(
+        {
+          itemId: tradeInfo.value.itemId,
+          tradeId: tradeInfo.value.id,
+          tradePassword,
+          tradeMethod: tradeInfo.value.tradeMethod,
+          tradePrice: tradeInfo.value.tradePrice,
+          tradePoints: tradeInfo.value.tradePoints,
+          paymentMethod: null
+        },
+        () => {
+          tradeInfo.value!.tradeStatus = 'accepted' // 或根据业务更新状态
+          showPayPopup.value = false
+        }
+      )
+    }
+
 
     return {
       tradeInfo,
       userInfo,
       getStatusText,
-      exchangeItems,
       onClickLeft,
-      acceptExchange,
-      rejectExchange,
       acceptTrade,
       rejectTrade,
-      goPayTrade,
       refundTrade,
       confirmTrade,
       cancelTrade,
+      openPayPopup,
       fromScoreSafe,
       toScoreSafe,
       rateValue,
       isSeller,
+      showPayPopup,
+      payPoints,
+      onPayPopupSubmit,
       submitScore
     }
   }

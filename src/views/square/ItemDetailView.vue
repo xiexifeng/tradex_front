@@ -276,45 +276,12 @@
     </van-popup>
 
     <!-- 积分支付弹窗 -->
-    <van-popup
+    <PointsPayPopup
       v-model:show="showPayPopup"
-      position="bottom"
-      round
-      closeable
-      :style="{ height: '40%' }"
-    >
-      <div class="exchange-popup">
-        <div class="popup-title">积分支付</div>
-        <van-form @submit="onPaySubmit">
-          <van-cell-group inset>
-            <van-field
-              v-model="payForm.tradePoints"
-              name="tradePoints"
-              label="支付积分"
-              type="number"
-              :readonly="true"
-            />
-            <van-field
-              v-model="payForm.tradePassword"
-              name="tradePassword"
-              label="支付密码"
-              type="password"
-              maxlength="6"
-              placeholder="请输入6位支付密码"
-              :rules="[
-                { required: true, message: '请输入支付密码' },
-                { pattern: /^\d{6}$/, message: '请输入6位数字密码' }
-              ]"
-            />
-          </van-cell-group>
-          <div class="submit-button">
-            <van-button round block type="primary" native-type="submit" :loading="isPaying">
-              确认支付
-            </van-button>
-          </div>
-        </van-form>
-      </div>
-    </van-popup>
+      :trade-points="payForm.tradePoints"
+      :loading="isPaying"
+      @submit="onPaySubmit"
+    />
 
     <!-- 物品类型选择弹出层 -->
     <van-popup v-model:show="showItemTypePopup" position="bottom" round>
@@ -430,6 +397,7 @@ import type { SquareItemDetail } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BottomBar from '@/components/ui/BottomBar.vue'
+import PointsPayPopup from '@/components/ui/PointsPayPopup.vue'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -446,7 +414,8 @@ export default defineComponent({
   name: 'ItemDetailView',
   components: {
     BaseCard,
-    BottomBar
+    BottomBar,
+    PointsPayPopup
   },
   setup() {
     const router = useRouter()
@@ -776,39 +745,39 @@ export default defineComponent({
       }
     }
 
-    const onPaySubmit = async () => {
-      console.log('提交时 tradePassword:', payForm.value.tradePassword)
-      if (!payForm.value.tradePassword || payForm.value.tradePassword.length !== 6) {
-        showToast('请输入6位支付密码')
-        return
-      }
-      isPaying.value = true
-      try {
-        const params = {
-          itemId: itemDetail.value.id,
-          tradeId: payTradeId.value,
-          tradePassword: payForm.value.tradePassword,
-          tradeMethod: itemDetail.value.tradeMethod,
-          tradePrice: null,
-          tradePoints: payForm.value.tradePoints,
-          paymentMethod: null
+
+    const onPaySubmit = async ({ tradePassword }: { tradePassword: string }) => {
+        if (!tradePassword || tradePassword.length !== 6) {
+          showToast('请输入6位支付密码')
+          return
         }
-        await confirmPay(params)
-        showPayPopup.value = false
-        //跳转到首页
-        showToast({message:'支付成功', duration:3000, onClose: () => {
-            router.push('/')
-          }})
-        
-      } catch (e) {
-        const msg = (e as Error)?.message || '支付失败，请重试'
-        showToast(msg)
-        // 允许继续输入密码重试
-        payForm.value.tradePassword = ''
-      } finally {
-        isPaying.value = false
+        isPaying.value = true
+        try {
+          const params = {
+            itemId: itemDetail.value.id,
+            tradeId: payTradeId.value,
+            tradePassword,
+            tradeMethod: itemDetail.value.tradeMethod,
+            tradePrice: null,
+            tradePoints: payForm.value.tradePoints,
+            paymentMethod: null
+          }
+          const res = await confirmPay(params)
+          if (res.success) {
+            //跳转到首页
+            showToast({message:'支付成功', duration:3000, onClose: () => {
+              router.push('/')
+            }})
+            showPayPopup.value = false
+          } 
+        } catch(e) {
+          const msg = (e as Error)?.message || '支付失败，请重试'
+          showToast(msg)
+          showPayPopup.value = false
+        } finally {
+          isPaying.value = false
+        }
       }
-    }
 
     const handleScoreClick = () => {
       // 如果评分是-999（未登录状态），跳转到登录页面

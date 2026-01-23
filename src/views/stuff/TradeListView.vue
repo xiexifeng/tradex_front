@@ -94,7 +94,7 @@
                   <template v-if="trade.fromUserId !== userInfo?.userId">
                     <van-button size="small" type="danger" @click="cancelTrade(trade)">取消交易</van-button>
                     <template v-if="trade.tradeMethod === 'ITEM_TO_POINTS'">
-                      <van-button size="small" type="primary" @click="goPayTrade(trade)">去支付</van-button>
+                      <van-button size="small" type="primary" @click="openPayPopup(trade)">去支付</van-button>
                     </template>
                   </template>
                 </template>
@@ -111,6 +111,12 @@
       </van-tab>
     </van-tabs>
   </div>
+  <PointsPayPopup
+    v-model:show="showPayPopup"
+    :trade-points="payPoints"
+    :loading="false"
+    @submit="onPayPopupSubmit"
+  />
 
   <!-- 底部导航栏 -->
   <AppTabBar />
@@ -123,13 +129,15 @@ import { showToast, showDialog } from 'vant'
 import { getTradeList } from '@/api/stuff'
 import type { TradeListItem } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
+import PointsPayPopup from '@/components/ui/PointsPayPopup.vue'
 import { useTradeActions } from '@/composables/useTradeActions'
 import AppTabBar from '@/components/ui/AppTabBar.vue'
 
 export default defineComponent({
   name: 'TradeListView',
   components: {
-    AppTabBar
+    AppTabBar,
+    PointsPayPopup
   },
   setup() {
     const router = useRouter()
@@ -142,7 +150,10 @@ export default defineComponent({
     const pageSize = ref(10)
     const userStore = useUserStore()
     const userInfo = computed(() => userStore.userInfo)
-    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade } = useTradeActions()
+    const showPayPopup = ref(false)
+    const payPoints = ref(0)
+    const currentTradeForPay = ref<TradeListItem | null>(null)
+    const { handleAcceptTrade, handleRejectTrade, handleConfirmTrade, handleCancelTrade, handleGoPayTrade } = useTradeActions()
 
     // 交易状态列表
     const statusList = [
@@ -283,17 +294,33 @@ export default defineComponent({
         fetchTrades(true)
       })
     }
-    const goPayTrade = (trade: TradeListItem) => {
-      showDialog({
-        title: '继续支付',
-        message: '确定要支付这个交易吗？',
-        showCancelButton: true,
-      }).then(() => {
-        showToast('支付已成功')
-        trade.tradeStatus = 'accepted'
-      }).catch(() => {
-        // on cancel
-      })
+
+
+    const openPayPopup = (trade: TradeListItem) => {
+      currentTradeForPay.value = trade
+      payPoints.value = trade.tradePoints || 0
+      showPayPopup.value = true
+    }
+
+    const onPayPopupSubmit = ({ tradePassword }: { tradePassword: string }) => {
+      if (!currentTradeForPay.value) return
+      const trade = currentTradeForPay.value
+      handleGoPayTrade(
+        {
+          itemId: trade.itemId,
+          tradeId: trade.id,
+          tradePassword,
+          tradeMethod: trade.tradeMethod,
+          tradePrice: trade.tradePrice,
+          tradePoints: trade.tradePoints,
+          paymentMethod: null
+        },
+        () => {
+          trade.tradeStatus = 'accepted'
+          showPayPopup.value = false
+          fetchTrades(true)
+        }
+      )
     }
 
     const onClickLeft = () => {
@@ -308,6 +335,8 @@ export default defineComponent({
       statusList,
       trades,
       userInfo,
+      showPayPopup,
+      payPoints,
       getStatusType,
       getStatusText,
       onRefresh,
@@ -315,7 +344,8 @@ export default defineComponent({
       viewDetail,
       acceptTrade,
       rejectTrade,
-      goPayTrade,
+      openPayPopup,
+      onPayPopupSubmit,
       refundTrade,
       confirmTrade,
       cancelTrade,

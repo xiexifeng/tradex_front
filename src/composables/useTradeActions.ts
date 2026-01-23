@@ -1,5 +1,5 @@
 import { showToast, showDialog } from 'vant'
-import { acceptBiddingApply, rejectBiddingApply, completeTrade, cancelTrade } from '@/api/stuff'
+import { acceptBiddingApply, rejectBiddingApply, completeTrade, cancelTrade, confirmPay } from '@/api/stuff'
 
 export const useTradeActions = () => {
   // 接受交易
@@ -100,10 +100,43 @@ export const useTradeActions = () => {
     }
   }
 
+  // 继续支付
+  const handleGoPayTrade = async (params:{
+    itemId: string;
+    tradeId: string;
+    tradePassword: string;
+    tradeMethod: string;
+    tradePrice: number|null;
+    tradePoints: number|null;
+    paymentMethod: string|null;
+  }, onSuccess?: () => void) => {
+    try {
+      await showDialog({
+        title: '继续支付',
+        message: '确定要支付这个交易吗？',
+        showCancelButton: true,
+      })
+      
+      const res =  await confirmPay(params)
+      if (res.success) {
+        showToast('支付成功')
+        onSuccess?.()
+      } else {
+        showToast(res.desc || '取消交易失败')
+      }
+    } catch (e) {
+      const msg = (e as Error)?.message || '支付失败，请重试'
+      showToast(msg)
+    }
+  }
+
+  
+
   return {
     handleAcceptTrade,
     handleRejectTrade,
     handleConfirmTrade,
-    handleCancelTrade
+    handleCancelTrade,
+    handleGoPayTrade
   }
 } 
