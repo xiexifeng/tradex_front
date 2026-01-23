@@ -217,7 +217,7 @@
             <template #icon>
               <van-icon :name="itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? 'exchange' : 'cash-back-record'" />
             </template>
-            {{ itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起交换' : '立即购买' }}
+            {{ itemDetail.tradeMethod !== 'ITEM_TO_POINTS' ? '申请交易' : '立即购买' }}
           </van-button>
         </div>
       </template>
@@ -347,9 +347,37 @@
       :style="{ height: '70%' }"
     >
       <div class="exchange-popup">
-        <div class="popup-title">发起交换</div>
+        <template v-if="itemDetail.tradeMethod === 'ITEM_TO_ITEM'">
+          <div class="popup-title">发起以物换物交易申请</div>
+        </template>
+        <template v-if="itemDetail.tradeMethod === 'ITEM_TO_MONEY'">
+          <div class="popup-title">发起线下支付交易申请</div>
+        </template>
+        
         <van-form @submit="onExchangeSubmit">
           <van-cell-group inset>
+            <template v-if="itemDetail.tradeMethod === 'ITEM_TO_ITEM'">
+              <van-field
+                v-model="exchangeForm.itemType"
+                name="itemType"
+                label="物品类型"
+                placeholder="请选择物品类型"
+                readonly
+                is-link
+                @click="showItemTypePopup = true"
+                :rules="[{ required: true, message: '请选择物品类型' }]"
+              />
+              <van-field
+                v-model="selectedItemTitle"
+                name="exchangeItem"
+                label="交换物品"
+                placeholder="请选择要交换的物品"
+                readonly
+                is-link
+                @click="openItemListPopup"
+                :rules="[{ required: true, message: '请选择交换物品' }]"
+              />
+            </template>
             <van-field
               v-model="exchangeForm.linkman"
               name="linkman"
@@ -365,24 +393,11 @@
               :rules="[{ required: true, message: '请填写联系电话' }]"
             />
             <van-field
-              v-model="exchangeForm.itemType"
-              name="itemType"
-              label="物品类型"
-              placeholder="请选择物品类型"
-              readonly
-              is-link
-              @click="showItemTypePopup = true"
-              :rules="[{ required: true, message: '请选择物品类型' }]"
-            />
-            <van-field
-              v-model="selectedItemTitle"
-              name="exchangeItem"
-              label="交换物品"
-              placeholder="请选择要交换的物品"
-              readonly
-              is-link
-              @click="openItemListPopup"
-              :rules="[{ required: true, message: '请选择交换物品' }]"
+              v-model="exchangeForm.address"
+              name="address"
+              label="联系地址"
+              placeholder="请输入联系地址"
+              :rules="[{ required: true, message: '请填写联系地址' }]"
             />
             <van-field
               v-model="exchangeForm.remark"
@@ -392,13 +407,6 @@
               rows="2"
               autosize
               placeholder="请输入备注信息（选填）"
-            />
-            <van-field
-              v-model="exchangeForm.address"
-              name="address"
-              label="联系地址"
-              placeholder="请输入联系地址"
-              :rules="[{ required: true, message: '请填写联系地址' }]"
             />
           </van-cell-group>
           <div class="submit-button">
@@ -427,7 +435,7 @@ type ExchangeForm = {
   targetItemId: string,
   linkman: string,
   phone: string,
-  itemId: string,
+  itemId: string | null,
   itemTitle: string,
   itemType: string,
   remark: string,
@@ -621,10 +629,10 @@ export default defineComponent({
     const selectedItemTitle = ref('')
 
     const exchangeForm = ref<ExchangeForm>({
-      targetItemId: '0',
+      targetItemId: '',
       linkman: '',
       phone: '',
-      itemId: '0',
+      itemId: null,
       itemTitle: '',
       itemType: '',
       remark: '',
@@ -697,15 +705,15 @@ export default defineComponent({
             address: exchangeForm.value.address
           }
         };
-        const res = await applySquareExchange(params);
-        if (res.success) {
-          showToast('申请已提交');
-          showExchangeForm.value = false;
-        } else {
-          showToast(res.desc || '提交失败');
-        }
+        await applySquareExchange(params);
+        showExchangeForm.value = false;
+        showToast({message:'申请已提交!请尽快与出让方联系确认交易事项。', duration:3000, onClose: () => {
+          router.push('/')
+        }})
+        exchangeForm.value.itemId = null;
       } catch (e) {
-        showToast('提交失败');
+        const msg = (e as Error)?.message || '申请失败，请重试'
+        showToast(msg)
       }
     }
 
@@ -760,10 +768,6 @@ export default defineComponent({
           payForm.value.tradePoints = itemDetail.value.transferPoints
           payForm.value.tradePassword = ''
           showPayPopup.value = true
-        }else if(itemDetail.value.tradeMethod === 'ITEM_TO_MONEY' && res.data.paymentMethod === 'CASH'){
-          showToast({message:'下单成功!请尽快与出让方联系确认交易事项。', duration:3000, onClose: () => {
-            router.push('/')
-          }})
         }
       } catch (e) {
         showToast('下单失败')
@@ -818,7 +822,7 @@ export default defineComponent({
         router.push('/login')
         return
       }
-      if (itemDetail?.value && itemDetail.value.tradeMethod === 'ITEM_TO_ITEM') {
+      if (itemDetail?.value && (itemDetail.value.tradeMethod === 'ITEM_TO_ITEM' || itemDetail.value.tradeMethod === 'ITEM_TO_MONEY')) {
         exchange()
       } else {
         buy()

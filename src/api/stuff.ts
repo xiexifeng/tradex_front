@@ -105,14 +105,14 @@ export const getSquareItemDetail = async (itemId: string): Promise<ApiResponse<S
 export const applySquareExchange = async (data: {
   itemId: string;
   fromUserId: string;
-  swapItemId: string;
+  swapItemId?: string | null;
   contactInfo: {
     linkman: string;
     phone: string;
     address: string;
   };
 }): Promise<ApiResponse> => {
-  return request.post('/client/trade/transfer-apply', data, {
+  return request.post('/client/trade/bidding-apply', data, {
     headers: { 'Content-Type': 'application/json' }
   });
 };
@@ -164,20 +164,20 @@ export const getTradeDetail = async (tradeId: string): Promise<ApiResponse<Trade
 };
 
 // 以物换物-卖方接受交易
-export const acceptTransferApply = async (data: {
+export const acceptBiddingApply = async (data: {
   tradeId: string;
 }): Promise<ApiResponse> => {
-  return request.post('/client/trade/accept-transfer-apply', data, {
+  return request.post('/client/trade/accept-bidding-apply', data, {
     headers: { 'Content-Type': 'application/json' }
   });
 };
 
 // 以物换物-卖方拒绝交易
-export const rejectTransferApply = async (data: {
+export const rejectBiddingApply = async (data: {
   tradeId: string;
   rejectReason: string;
 }): Promise<ApiResponse> => {
-  return request.post('/client/trade/reject-transfer-apply', data, {
+  return request.post('/client/trade/reject-bidding-apply', data, {
     headers: { 'Content-Type': 'application/json' }
   });
 };

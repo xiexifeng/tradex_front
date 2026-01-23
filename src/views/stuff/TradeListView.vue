@@ -87,22 +87,22 @@
                   查看详情
                 </van-button>
                 <template v-if="trade.tradeStatus === 'trading'">
-                  <template v-if="trade.fromUserId === userInfo?.userId && trade.tradeMethod === 'ITEM_TO_ITEM'">
-                    <van-button size="small" type="primary" @click="acceptTrade(trade)">接受交易</van-button>
+                  <template v-if="trade.fromUserId === userInfo?.userId && (trade.tradeMethod === 'ITEM_TO_ITEM' || trade.tradeMethod === 'ITEM_TO_MONEY')">
                     <van-button size="small" type="danger" @click="rejectTrade(trade)">拒绝交易</van-button>
+                    <van-button size="small" type="primary" @click="acceptTrade(trade)">接受交易</van-button>
                   </template>
                   <template v-if="trade.fromUserId !== userInfo?.userId">
                     <van-button size="small" type="danger" @click="cancelTrade(trade)">取消交易</van-button>
-                    <template v-if="trade.tradeMethod !== 'ITEM_TO_ITEM'">
+                    <template v-if="trade.tradeMethod === 'ITEM_TO_POINTS'">
                       <van-button size="small" type="primary" @click="goPayTrade(trade)">去支付</van-button>
                     </template>
                   </template>
                 </template>
                 <template v-if="trade.toUserId === userInfo?.userId && trade.tradeStatus === 'accepted'">
                   <van-button size="small" type="success" @click="confirmTrade(trade)">确认交易</van-button>
-                  <template v-if="trade.fromUserId !== userInfo?.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
+                  <!-- <template v-if="trade.fromUserId !== userInfo?.userId && trade.tradeMethod !== 'ITEM_TO_ITEM'">
                     <van-button size="small" type="warning" @click="refundTrade(trade)">发起退款</van-button>
-                  </template>
+                  </template> -->
                 </template>
               </div>
             </div>

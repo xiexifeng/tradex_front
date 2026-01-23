@@ -1,5 +1,5 @@
 import { showToast, showDialog } from 'vant'
-import { acceptTransferApply, rejectTransferApply, completeTrade, cancelTrade } from '@/api/stuff'
+import { acceptBiddingApply, rejectBiddingApply, completeTrade, cancelTrade } from '@/api/stuff'
 
 export const useTradeActions = () => {
   // 接受交易
@@ -11,7 +11,7 @@ export const useTradeActions = () => {
         showCancelButton: true,
       })
       
-      const res = await acceptTransferApply({ tradeId })
+      const res = await acceptBiddingApply({ tradeId })
       if (res.success) {
         showToast('已接受交易')
         onSuccess?.()
@@ -34,7 +34,7 @@ export const useTradeActions = () => {
         showCancelButton: true,
       })
       
-      const res = await rejectTransferApply({ 
+      const res = await rejectBiddingApply({ 
         tradeId, 
         rejectReason: '用户拒绝交易'
       })

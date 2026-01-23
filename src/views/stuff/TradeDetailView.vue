@@ -183,22 +183,22 @@
     <!-- 底部按钮 -->
     <div class="action-buttons" v-if="tradeInfo && tradeInfo.tradeStatus !== 'completed'">
       <template v-if="tradeInfo.tradeStatus === 'trading'">
-        <template v-if="tradeInfo.fromUserId === userInfo?.userId && tradeInfo.tradeMethod === 'ITEM_TO_ITEM'">
-          <van-button size="large" type="primary" @click="acceptTrade">接受交易</van-button>
+        <template v-if="tradeInfo.fromUserId === userInfo?.userId && (tradeInfo.tradeMethod === 'ITEM_TO_ITEM' || tradeInfo.tradeMethod === 'ITEM_TO_MONEY')">
           <van-button size="large" type="danger" plain hairline @click="rejectTrade">拒绝交易</van-button>
+          <van-button size="large" type="primary" @click="acceptTrade">接受交易</van-button>
         </template>
         <template v-if="tradeInfo.fromUserId !== userInfo?.userId">
           <van-button size="large" type="danger" plain hairline @click="cancelTrade">取消交易</van-button>
-          <template v-if="tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
+          <template v-if="tradeInfo.tradeMethod === 'ITEM_TO_POINTS'">
             <van-button size="large" type="primary" @click="goPayTrade">去支付</van-button>
           </template>
         </template>
       </template>
       <template v-if="tradeInfo.toUserId === userInfo?.userId && tradeInfo.tradeStatus === 'accepted'">
         <van-button size="large" type="success" @click="confirmTrade">确认交易</van-button>
-        <template v-if="tradeInfo.toUserId === userInfo.userId && tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
+        <!-- <template v-if="tradeInfo.toUserId === userInfo.userId && tradeInfo.tradeMethod !== 'ITEM_TO_ITEM'">
           <van-button size="large" type="warning" plain hairline @click="refundTrade">发起退款</van-button>
-        </template>
+        </template> -->
       </template>
     </div>
   </div>
