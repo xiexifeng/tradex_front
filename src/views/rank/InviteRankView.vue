@@ -57,8 +57,65 @@
         </div>
 
         <van-empty v-if="!loading && rankList.length === 0" description="暂无排行榜数据" />
+
+        <!-- 查看上一榜单链接 -->
+        <div class="latest-rank-link-wrap">
+          <span class="latest-rank-link" @click="onViewLatestRank">查看上一榜单</span>
+        </div>
       </van-list>
     </div>
+
+    <!-- 上一榜单弹窗 -->
+    <van-popup
+      v-model:show="showLatestRankPopup"
+      position="bottom"
+      round
+      :style="{ height: '80%' }"
+      closeable
+    >
+      <div class="latest-rank-popup">
+        <div class="latest-rank-title">上一期榜单</div>
+        <div v-if="latestRankLoading" class="latest-rank-loading">
+          <van-loading size="24px">加载中...</van-loading>
+        </div>
+        <template v-else-if="latestRankData">
+          <div class="latest-rank-period">
+            排行周期：{{ formatRankPeriod(latestRankData.beginTime, latestRankData.endTime) }}
+          </div>
+          <div class="latest-rank-list">
+            <div
+              v-for="(item, index) in latestRankUsers"
+              :key="`${item.userId}-${index}`"
+              class="rank-item"
+              :class="{ 'top-three': index < 3 }"
+            >
+              <div class="rank-number" :class="getRankClass(index)">
+                <span v-if="index >= 3">{{ index + 1 }}</span>
+                <van-icon v-else :name="getRankIcon(index)" />
+              </div>
+              <div class="user-info">
+                <van-image
+                  round
+                  width="40"
+                  height="40"
+                  src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                  class="avatar"
+                />
+                <div class="user-details">
+                  <div class="nickname">{{ item.nickname || '未设置昵称' }}</div>
+                  <div class="user-id">用户ID: {{ item.userId || '-' }}</div>
+                </div>
+              </div>
+              <div class="invite-count">
+                <div class="count-value">{{ item.inviteCount }}</div>
+                <div class="count-label">拉新人数</div>
+              </div>
+            </div>
+          </div>
+          <van-empty v-if="latestRankUsers.length === 0" description="暂无排名数据" />
+        </template>
+      </div>
+    </van-popup>
 
     <!-- 分享弹窗 -->
     <ShareDialog
@@ -75,7 +132,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { showToast } from 'vant';
 import { useRouter } from 'vue-router';
-import { getInviteRank, type InviteRankItem } from '@/api/user';
+import { getInviteRank, getLatestRank, type InviteRankItem, type LatestRankData } from '@/api/user';
 import { useUserStore } from '@/store/modules/user';
 import ShareDialog from '@/components/ShareDialog.vue';
 import { APP_CONFIG } from '@/config';
@@ -87,6 +144,16 @@ const loading = ref(false);
 const finished = ref(false);
 const rankList = ref<InviteRankItem[]>([]);
 const showShareDialog = ref(false);
+
+// 上一榜单
+const showLatestRankPopup = ref(false);
+const latestRankLoading = ref(false);
+const latestRankData = ref<LatestRankData | null>(null);
+const latestRankUsers = computed(() => {
+  const data = latestRankData.value;
+  if (!data?.rankUsers?.length) return [];
+  return data.rankUsers.slice(0, 19);
+});
 
 // 分享信息
 const shareTitle = computed(() => '拉新排行榜 - 区块链电商平台');
@@ -124,14 +191,21 @@ const loadRankList = async () => {
 
   try {
     const res = await getInviteRank();
-    if (res.success && res.data) {
-      // 接口返回的数据已经按排名排序，直接使用前10条
-      rankList.value = res.data.slice(0, 10);
+    if (res.success) {
+      if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+        // 接口返回的数据已经按排名排序，直接使用前10条
+        rankList.value = res.data.slice(0, 10);
+      } else {
+        // 如果返回 null 或空数组，设置为空数组
+        rankList.value = [];
+      }
       finished.value = true;
     }
   } catch (error) {
     console.error('加载排行榜失败:', error);
     showToast('加载排行榜失败');
+    rankList.value = [];
+    finished.value = true;
   } finally {
     loading.value = false;
   }
@@ -145,6 +219,35 @@ const onShare = () => {
 // 返回
 const onClickLeft = () => {
   router.back();
+};
+
+// 格式化榜单周期
+const formatRankPeriod = (beginTime: number, endTime: number) => {
+  const format = (t: number) => {
+    const d = new Date(t);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  };
+  return `${format(beginTime)} 至 ${format(endTime)}`;
+};
+
+// 查看上一榜单（GET 请求）
+const onViewLatestRank = async () => {
+  showLatestRankPopup.value = true;
+  latestRankData.value = null;
+  latestRankLoading.value = true;
+  try {
+    const res = await getLatestRank();
+    if (res.success && res.data) {
+      latestRankData.value = res.data;
+    } else {
+      showToast(res.desc || '获取上一榜单失败');
+    }
+  } catch (error) {
+    console.error('获取上一榜单失败:', error);
+    showToast('获取上一榜单失败');
+  } finally {
+    latestRankLoading.value = false;
+  }
 };
 
 onMounted(() => {
@@ -278,5 +381,59 @@ onMounted(() => {
       }
     }
   }
+}
+
+.latest-rank-link-wrap {
+  text-align: center;
+  padding: 20px 0;
+}
+.latest-rank-link {
+  color: #1989fa;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.latest-rank-popup {
+  padding: 16px;
+  padding-top: 40px;
+}
+.latest-rank-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #323233;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.latest-rank-period {
+  font-size: 13px;
+  color: #969799;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.latest-rank-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+.latest-rank-list .rank-item {
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.latest-rank-list .rank-number {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  margin-right: 8px;
+}
+.latest-rank-list .user-info .avatar {
+  width: 40px;
+  height: 40px;
+}
+.latest-rank-list .nickname {
+  font-size: 14px;
+}
+.latest-rank-list .count-value {
+  font-size: 16px;
 }
 </style>

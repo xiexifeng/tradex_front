@@ -55,7 +55,7 @@ export const userApi = {
   verifyPhone(phone: string) {
     return request.post<ApiResponse<boolean>>(
       '/client/auth/verify-phone',
-      `phoneNumbers=${phone}`
+      `phoneNo=${phone}`
     ).then(res => res.data);
   },
 
@@ -108,4 +108,24 @@ export interface InviteRankItem {
 
 export function getInviteRank(): Promise<ApiResponse<InviteRankItem[]>> {
   return request.get('/client/rank/invite-list');
+}
+
+// 上一期榜单（上一榜单排名数据）
+export interface LatestRankUser {
+  userId: string | null;
+  nickname: string | null;
+  inviteCount: number;
+  rank: number;
+}
+
+export interface LatestRankData {
+  rankId: string;
+  rankType: number;
+  beginTime: number;
+  endTime: number;
+  rankUsers: LatestRankUser[];
+}
+
+export function getLatestRank(): Promise<ApiResponse<LatestRankData>> {
+  return request.get('/client/rank/latest-rank');
 }

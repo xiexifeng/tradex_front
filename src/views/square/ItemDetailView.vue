@@ -409,6 +409,15 @@
         </van-form>
       </div>
     </van-popup>
+
+    <!-- 分享弹窗 -->
+    <ShareDialog
+      v-model:show="showShareDialog"
+      :share-title="shareTitle"
+      :share-desc="shareDesc"
+      :share-image="shareImage"
+      :share-url="shareUrl"
+    />
   </div>
 </template>
 
@@ -422,6 +431,7 @@ import type { SquareItemDetail } from '@/api/types'
 import { useUserStore } from '@/store/modules/user'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BottomBar from '@/components/ui/BottomBar.vue'
+import ShareDialog from '@/components/ShareDialog.vue'
 
 type ExchangeForm = {
   targetItemId: string,
@@ -438,7 +448,8 @@ export default defineComponent({
   name: 'ItemDetailView',
   components: {
     BaseCard,
-    BottomBar
+    BottomBar,
+    ShareDialog
   },
   setup() {
     const router = useRouter()
@@ -601,8 +612,47 @@ export default defineComponent({
       }
     }
 
+    const showShareDialog = ref(false)
+
+    // 分享信息
+    const shareTitle = computed(() => itemDetail.value.itemTitle || '物品详情')
+    const shareDesc = computed(() => {
+      let desc = itemDetail.value.itemDescription || ''
+      
+      // 添加价格信息
+      let priceInfo = ''
+      if (itemDetail.value.tradeMethod === 'ITEM_TO_MONEY' && itemDetail.value.transferPrice) {
+        priceInfo = `¥${itemDetail.value.transferPrice}`
+      } else if (itemDetail.value.tradeMethod === 'ITEM_TO_POINTS' && itemDetail.value.transferPoints) {
+        priceInfo = `${itemDetail.value.transferPoints}积分`
+      } else if (itemDetail.value.tradeMethod === 'ITEM_TO_ITEM' && itemDetail.value.expectItem) {
+        priceInfo = `换${itemDetail.value.expectItem}`
+      }
+      
+      // 组合描述
+      let fullDesc = desc
+      if (priceInfo) {
+        fullDesc = priceInfo + (desc ? ' | ' + desc : '')
+      }
+      
+      // 如果描述太长，截取前100个字符
+      return fullDesc.length > 100 ? fullDesc.substring(0, 100) + '...' : fullDesc
+    })
+    const shareImage = computed(() => {
+      // 使用第一张图片作为分享图片
+      return itemDetail.value.firstImage || 
+             (itemDetail.value.itemImageList && itemDetail.value.itemImageList.length > 0 
+               ? itemDetail.value.itemImageList[0] 
+               : 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg')
+    })
+    const shareUrl = computed(() => {
+      const baseUrl = window.location.origin
+      const itemId = route.params.id as string
+      return `${baseUrl}/square/item/detail/${itemId}`
+    })
+
     const share = () => {
-      showToast('分享功能开发中')
+      showShareDialog.value = true
     }
 
     const contactSeller = () => {
@@ -890,6 +940,11 @@ export default defineComponent({
       handleBuyOrExchange,
       copyBlockchainId,
       showImagePreview,
+      showShareDialog,
+      shareTitle,
+      shareDesc,
+      shareImage,
+      shareUrl,
     }
   }
 })
