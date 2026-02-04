@@ -265,4 +265,35 @@ export interface Notification {
   content: string;
   status: number;
   createTime: number;
+  relatedContent?: string; // 关联内容，用于审核任务等
+}
+
+// 我的物品详情接口
+export interface AuditItemDetailCO {
+  id: string;
+  userId: string;
+  itemTitle: string;
+  itemType: string;
+  itemTypeName: string;
+  itemDescription: string;
+  firstImage: string;
+  itemImageList: string[];
+  depreciation: number;
+  valuation: number;
+  status: string;
+  lastUserId: string;
+  blockchainId: string;
+  publishTime: number;
+  nickname: string;
+  avatarUrl: string;
+  auditResult: string;
+  auditRemark?: string;
+}
+
+// 审核结果提交请求
+export interface SubmitAuditResultReq {
+  relatedId: string;
+  taskId: string;
+  result: boolean;
+  auditRemark?: string;
 }

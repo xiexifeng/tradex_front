@@ -130,6 +130,17 @@ export default defineComponent({
     }
 
     const viewDetail = (notification: any) => {
+      if (notification.notificationType === 'AUDIT' && notification.relatedContent) {
+        try {
+          const auditInfo = JSON.parse(notification.relatedContent)
+          if (auditInfo.taskId && auditInfo.itemId) {
+            router.push(`/audit/${auditInfo.taskId}?itemId=${auditInfo.itemId}`)
+            return
+          }
+        } catch (e) {
+          console.error('解析审核信息失败:', e)
+        }
+      }
       router.push(`/notification/detail/${notification.id}`)
     }
 

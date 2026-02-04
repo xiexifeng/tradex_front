@@ -116,17 +116,25 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/notification',
     name: 'Notification',
-    component: () => import('@/views/notification/NotificationView.vue')
+    component: () => import('@/views/notification/NotificationView.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/notification/detail/:id',
     name: 'NotificationDetail',
-    component: () => import('@/views/notification/NotificationDetailView.vue')
+    component: () => import('@/views/notification/NotificationDetailView.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/user/security',
     name: 'security',
     component: () => import(/* webpackChunkName: "security" */ '../views/user/SecurityView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/audit/:id',
+    name: 'audit',
+    component: () => import(/* webpackChunkName: "audit" */ '../views/audit/AuditView.vue'),
     meta: { requiresAuth: true }
   }
 ]

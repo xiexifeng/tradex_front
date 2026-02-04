@@ -9,8 +9,8 @@
         <div v-if="item.status === 1" class="unread-dot"></div>
         
         <!-- 图标 -->
-        <div :class="['type-icon', item.notificationType.toLowerCase() === 'system' ? 'system' : 'trade']">
-          <van-icon :name="item.notificationType.toLowerCase() === 'system' ? 'info-o' : 'exchange'"/>
+        <div :class="['type-icon', getIconClass(item.notificationType)]">
+          <van-icon :name="getIconName(item.notificationType)"/>
         </div>
         
         <!-- 内容区域 -->
@@ -75,8 +75,33 @@ export default defineComponent({
       const min = String(date.getMinutes()).padStart(2, '0');
       return `${m}-${d} ${h}:${min}`;
     }
+    
+    const getIconClass = (type: string) => {
+      switch (type.toLowerCase()) {
+        case 'system':
+          return 'system';
+        case 'audit':
+          return 'audit';
+        default:
+          return 'trade';
+      }
+    }
+    
+    const getIconName = (type: string) => {
+      switch (type.toLowerCase()) {
+        case 'system':
+          return 'info-o';
+        case 'audit':
+          return 'check-circle-o';
+        default:
+          return 'exchange';
+      }
+    }
+    
     return {
-      formatTime
+      formatTime,
+      getIconClass,
+      getIconName
     }
   }
 })
@@ -144,6 +169,11 @@ export default defineComponent({
       &.trade {
         color: #07c160;
         background: linear-gradient(135deg, rgba(7, 193, 96, 0.1), rgba(7, 193, 96, 0.15));
+      }
+      
+      &.audit {
+        color: #fa8c16;
+        background: linear-gradient(135deg, rgba(250, 140, 22, 0.1), rgba(250, 140, 22, 0.15));
       }
     }
     

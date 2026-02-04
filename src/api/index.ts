@@ -1,5 +1,5 @@
 // 导出所有 API
 export * from './user';
-// 后续可以导出其他模块的 API
-// export * from './stuff';
-// export * from './trade';
+export * as stuffApi from './stuff';
+export * as auditApi from './audit';
+export * as notificationApi from './notification';
