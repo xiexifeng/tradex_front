@@ -247,3 +247,11 @@ export interface Notification {
   status: number;
   createTime: number;
 }
+
+// 每日登录奖励 - 单日记录
+// rewardStatus: -1 未登录 0 已登录未领取 1 已领取 2 已过期
+export interface LoginRewardDayItem {
+  loginDate: string; // yyyymmdd
+  rewardPoint: number;
+  rewardStatus: number;
+}

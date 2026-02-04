@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction } from './types';
+import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction, LoginRewardDayItem } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -128,4 +128,16 @@ export interface LatestRankData {
 
 export function getLatestRank(): Promise<ApiResponse<LatestRankData>> {
   return request.get('/client/rank/latest-rank');
+}
+
+// 每日登录奖励 - 当月列表
+export function getLoginRewardMonthList(userId: string): Promise<ApiResponse<LoginRewardDayItem[]>> {
+  return request.get('/client/user/login-reward/month-list', { params: { userId } });
+}
+
+// 每日登录奖励 - 领取
+export function receiveLoginReward(data: { userId: string; loginDate: string; rewardPoint: number }): Promise<ApiResponse<void>> {
+  return request.post('/client/user/login-reward/receive', data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
 }

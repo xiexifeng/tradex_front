@@ -249,6 +249,12 @@ export default defineComponent({
         action: () => router.push('/square')
       },
       {
+        icon: 'calendar-o',
+        text: '每日签到',
+        color: '#ff976a',
+        action: () => router.push('/user/login-reward')
+      },
+      {
         icon: 'gift-o',
         text: '区块链验证',
         color: '#07c160',

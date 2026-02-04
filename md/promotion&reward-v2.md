@@ -1,87 +1,89 @@
-V1：
-先简单实现邀请新用户注册、分享功能，对应积分奖励机制增加用户粘性
+V2：每日登录奖励和每日任务奖励
 
-一、邀请新用户
-1、邀请码直接用userId，使用userId、不生成专门的邀请码具有天然优势，更适合推广场景：
-1）没有时效，目的就是为了推广不设时效
-2）不限制邀请次数，注册的人越多越好
-邀请链接里带着userId和时间戳
+一、每日登录奖励
+1、登录日历：日历上显示奖励积分数，每连续10天额外赠送5积分，每月满勤额外赠送10积分
+为增强用户参与感，引导用户进入任务中心，使用手动领取登录奖励方式，登录但不领取算连续登录但是当天积分就没了
+界面设计：
+首页和个人中心都有每日登录奖励和每日任务入口（分别满足不同操作习惯的用户，增加便利性），每日登录和每日任务在一个页面
 
-2、安全处理：
-1）为防止预测userId、预测用户数，userId不用自增数字生成，而且分享链接里userId可以做base64编码隐藏处理
-2）新用户得用未注册过的手机号才能注册，不会存在刷奖励的情况
+2、登录奖励处理逻辑
+a、登录成功后：插入user_login_reward，先获取昨天的登录奖励记录，取不到的话连续登录天数=1，取到的话连续登录天数=昨天的连续天数+1；奖励状态初始为0
+    移动端免登录怎么办？
+    页面首次加载完的时候调用登录奖励接口，将首次登录标识存储到客户端缓存里，下次加载进来后不需要再次发起请求
+b、用户点击领取积分：调用登录奖励接口做幂等校验，先判断是否存在当天的user_login_reward记录，如果已经存在且奖励状态=0，则更新奖励状态=1；奖励状态=1，忽略；不存在则插入记录，奖励状态=1
+c、每日0点将奖励状态=0的更新为2
+d、登录日历显示逻辑：按用户id查出当月用户所有user_login_reward记录
+    1）不存在的日期是未登录状态
+    2）存在但奖励状态未领取：一般是当天，显示未领取，可以点击领取
+    3）存在但奖励状态已领取：显示领取，不可点击领取
+    4）存在但奖励状态已过期：显示过期
 
-3、奖励机制
-每邀请一个人奖励5积分（可配置），累计邀请人数额外奖励积分（可配置）：
-邀请5人：50积分
-邀请10人：100积分
-邀请20人：200积分
-邀请30人：300积分
+3、后续功能扩展：
+增加登录奖励积分未领取通知提醒
+增加节假日登录奖励机制，比如节假日双倍
 
 4、表结构
-用户表增加：invite_user_id 邀请人userId、 can_invite 是否能邀请
+-- 用户登录奖励记录表
+CREATE TABLE user_login_reward (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    user_id VARCHAR(50) NOT NULL COMMENT '用户ID',
+    login_date VARCHAR(10) NOT NULL COMMENT '登录日期（yyyymmdd）',
+    continuous_days INT NOT NULL COMMENT '连续登录天数',
+    reward_point INT NOT NULL COMMENT '奖励积分',
+    reward_status TINYINT NOT NULL DEFAULT 0 COMMENT '奖励状态：0未领取，1已领取，2已过期',
+    received_time DATETIME COMMENT '领取时间',
+    ip VARCHAR(50) COMMENT '领取IP',
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_user_date(user_id, login_date),
+    INDEX idx_user_status(user_id, reward_status, login_date)
+) comment '用户登录奖励记录表';
 
-5、前端页面
-用户注册页面，分享链接就是链接到用户注册页面，该页面url接收参数userId和邀请时间时间戳
-用户注册完成后发放奖励，注册按钮在原来接口基础上添加邀请userId和邀请时间的传参
 
-6、后台注册接口添加发放奖励逻辑：
-为防止发送积分奖励后注册失败，积分奖励逻辑可以发消息异步执行
-添加邀请记录表的插入操作，跟用户表插入是一个事务，注册完成后发用户注册消息
+二、每日任务
+1、每日完成当日任务可领取对应积分，任务有每日、每周等类型
+每完成一次任务记录一条用户任务记录表user_task_record，未完成不记录，完成次数/目标次数即任务完成进度
+任务状态及奖励触发时机：
+用户完成后实时触发，比如点赞、发布物品后触发任务判定及奖励逻辑，目前单机环境只能放在各个业务逻辑里，以后应该独立出消息来异步处理
 
-7、订阅用户注册消息
-invite_user_id 增加5积分，统计累计邀请人数，发放额外奖励，
-插入积分变更记录
+2、任务判定逻辑
+任务完成后判断用户当前任务记录表的完成情况：
+1）查到记录且已完成：退出
+2）查到记录但是未完成：更新任务，判断完成次数，如果达到目标次数则更新完成次数+1、发放积分奖励；如果未达到次数，仅更新完成次数+1
+3）未查到记录：插入记录，判断完成次数，如果达到目标次数则更新完成次数+1、发放积分奖励；如果未达到次数，仅更新完成次数+1
 
-二、分享物品到社交网站
-分享物品链接点开肯定到的是商品详情页，商品详情页也要接收userId参数，并且向注册登录页面跳转时要带着
-分享链接怎么算有效点击，点击暂时不设置奖励，分享链接带来用户注册获得拉新的奖励积分
+3、表结构
+CREATE TABLE task_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    task_code VARCHAR(50) UNIQUE NOT NULL COMMENT '任务编码',
+    task_name VARCHAR(100) NOT NULL COMMENT '任务名称',
+    task_desc VARCHAR(255) COMMENT '任务描述',
+    task_period TINYINT NOT NULL DEFAULT 1 COMMENT '任务周期：1-每日，2-每周，3-节假日',
+	task_type TINYINT NOT NULL DEFAULT 1 COMMENT '任务类型：1-点赞，2-发布物品，3-评价，4-分享',
+    priority INT DEFAULT 0 COMMENT '显示优先级',
+    target_num INT DEFAULT 1 COMMENT '目标次数',
+    effect_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '生效时间',
+	end_time TIMESTAMP COMMENT '截止时间',
+    reward_point INT NOT NULL DEFAULT 0 COMMENT '奖励积分',
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+	UNIQUE KEY uk_task_code (task_code),
+    INDEX idx_period_type (task_period, task_type, priority),
+    INDEX idx_active_time (effect_time, end_time)
+) COMMENT = '任务配置表';
 
-三、每周拉新排行榜
-1、定时任务1：每10分钟更新一次排行榜，统计周一0点到周日23点59分的拉新数量（从邀请记录表统计），从大到小排列
-排行榜只展示前10名
 
-2、新增邀请记录表、排行榜主表、排行榜明细表：
-CREATE TABLE invite_record (
-	id BIGINT PRIMARY KEY AUTO_INCREMENT comment '自增主键id',
-    invite_user_id VARCHAR(32) NOT NULL comment '邀请人用户id',
-	invited_user_id VARCHAR(32) NOT NULL comment '被邀请人用户id',
-	invite_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '邀请时间',
-	reg_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '注册时间',
-	reg_ip varchar(32) comment '注册ip',
-	channel VARCHAR(50) COMMENT '来源渠道',
-	create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '创建时间',
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '修改时间',
-	INDEX idx_invite (invite_user_id)
-) comment '邀请记录表';
+CREATE TABLE user_task_record (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    task_code VARCHAR(50) NOT NULL COMMENT '任务编码',
+    finish_num INT DEFAULT 0 COMMENT '完成次数',
+    target_num INT DEFAULT 1 COMMENT '目标次数',
+    task_state TINYINT NOT NULL DEFAULT 1 COMMENT '任务状态：1-进行中，2-已完成，3-过期',
+    is_received TINYINT DEFAULT 0 COMMENT '奖励是否领取：0-未领取，1-已领取',
+    complete_time DATETIME COMMENT '完成时间',
+    task_data VARCHAR(500) COMMENT '任务完成数据',
+    UNIQUE KEY uk_user_task_date (user_id, task_code, DATE(complete_time)),
+    INDEX idx_user_status (user_id, task_state)
+) COMMENT = '用户任务记录表';
 
-CREATE TABLE rank (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT comment '自增主键id',
-	rank_id varchar(30) comment '排行榜id',
-	rank_type tinyint comment '榜单类型(1-拉新 2-点赞 3-物品成交)',
-    begin_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '开始时间',
-	end_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '结束时间',
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '创建时间',
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '修改时间',
-	INDEX idx_rank_id (rank_id)
-) comment '排行榜表';
-
-CREATE TABLE rank_detail (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT comment '自增主键id',
-    rank_id varchar(30) comment '排行榜id',
-	user_id VARCHAR(32) NOT NULL comment '用户id',
-	rank_level tinyint comment '排名(1,2,3...)',
-	score_num int default 0 comment '得分数量(拉新数量/点赞数量/成交数量)',
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '创建时间',
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP comment '修改时间',
-	INDEX idx_rank_user (rank_id, user_id)
-) comment '排行榜明细表';
-
-3、定时任务2：每周日0点执行
-获取最新排行榜，插入排行榜主表和排行榜明细表
-发放积分奖励，记录积分变更明细
-
-前三名获得额外积分奖励-阶梯奖励机制:
-* 邀请5人: 额外500积分（可配置）
-* 邀请20人: 额外2000积分（可配置）
-* 邀请50人: 额外10000积分（可配置）

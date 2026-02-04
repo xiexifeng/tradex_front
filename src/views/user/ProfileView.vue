@@ -114,6 +114,16 @@
         </div>
       </BaseCard>
 
+      <!-- 每日登录奖励入口 -->
+      <div class="login-reward-entry" @click="goLoginReward">
+        <van-icon name="calendar-o" class="entry-icon" />
+        <div class="entry-text">
+          <span class="entry-title">每日登录领积分</span>
+          <span class="entry-desc">签到领积分，连续签到有额外奖励</span>
+        </div>
+        <van-icon name="arrow" class="entry-arrow" />
+      </div>
+
       <!-- 交易记录卡片 - 紧凑折叠 -->
       <BaseCard class="records-card-compact">
         <van-collapse v-model="activeNames" accordion>
@@ -636,6 +646,9 @@ export default defineComponent({
     },
     goToSettings() {
       this.$router.push('/user/settings')
+    },
+    goLoginReward() {
+      this.$router.push('/user/login-reward')
     }
   }
 })
@@ -888,6 +901,53 @@ export default defineComponent({
       cursor: pointer;
       flex-shrink: 0;
     }
+  }
+}
+
+// 交易记录卡片 - 紧凑样式
+// 每日登录奖励入口
+.login-reward-entry {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+  border: 1px solid #ffe58f;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  .entry-icon {
+    font-size: 28px;
+    color: #ff976a;
+    margin-right: 12px;
+  }
+
+  .entry-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .entry-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #323233;
+    }
+
+    .entry-desc {
+      font-size: 12px;
+      color: #969799;
+    }
+  }
+
+  .entry-arrow {
+    color: #c8c9cc;
+    font-size: 16px;
   }
 }
 

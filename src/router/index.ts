@@ -132,6 +132,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/rank/invite',
     name: 'inviteRank',
     component: () => import(/* webpackChunkName: "inviteRank" */ '../views/rank/InviteRankView.vue')
+  },
+  {
+    path: '/user/login-reward',
+    name: 'loginReward',
+    component: () => import(/* webpackChunkName: "loginReward" */ '../views/user/LoginRewardView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
