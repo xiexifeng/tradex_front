@@ -266,6 +266,7 @@ export interface Notification {
   status: number;
   createTime: number;
   relatedContent?: string; // 关联内容，用于审核任务等
+  isDone: boolean;
 }
 
 // 我的物品详情接口

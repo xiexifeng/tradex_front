@@ -22,8 +22,7 @@
         <h3 class="title">{{ notification.title }}</h3>
         <div class="meta">
           <van-tag 
-            :type="getTypeTag(notification.notificationType)"
-            round
+            :type="getTypeTag(notification.notificationType) as any"
           >
             {{ getTypeText(notification.notificationType) }}
           </van-tag>
@@ -33,6 +32,11 @@
       <div class="content">
         {{ notification.content }}
       </div>
+      <div class="related-content" v-if="notification.relatedContent && notification.notificationType === 'STUFF' && parseRelatedContent">
+        <div class="related-info" v-if="parseRelatedContent.auditRemark">
+          <p class="info-item" :style="{ color: parseRelatedContent.auditResult === false ? 'red' : '' }">原因：{{ parseRelatedContent.auditRemark }}</p>
+        </div>
+      </div>
       <div class="actions" v-if="notification.relatedId">
         <van-button 
           type="primary" 
@@ -40,7 +44,8 @@
           round
           @click="viewRelated"
         >
-          {{ notification.notificationType === 'AUDIT' ? '前往审核' : '查看相关详情' }}
+          {{ notification.notificationType === 'AUDIT' ? (notification.isDone ? '查看已完成审核' : '前往审核') : '查看详情' }}
+
         </van-button>
       </div>
       <div class="related-content" v-if="notification.relatedContent && notification.notificationType === 'AUDIT'">
@@ -143,8 +148,10 @@ export default defineComponent({
       // 根据通知类型跳转到相应页面
       switch (notification.value.notificationType) {
         case 'STUFF':
+          router.push(`/stuff/detail/${parseRelatedContent.value.itemId}`)
+          break
         case 'TRADE':
-          router.push(`/stuff/detail/${notification.value.relatedId}`)
+          router.push(`/stuff/trade/${notification.value.relatedId}`)
           break
         // 添加其他类型的跳转逻辑
       }

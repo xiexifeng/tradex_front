@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { useUserStore } from '@/store/modules/user'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -142,6 +143,27 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+  
+  // 检查路由是否需要认证
+  if (to.meta.requiresAuth) {
+    // 检查用户是否登录（有token且有用户信息）
+    if (userStore.token && userStore.userInfo) {
+      next()
+    } else {
+      // 未登录，重定向到登录页
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath } // 保存原路径
+      })
+    }
+  } else {
+    // 不需要认证的路由，直接通过
+    next()
+  }
 })
 
 export default router
