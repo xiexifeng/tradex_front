@@ -14,7 +14,7 @@
     </div>
     <div class="info">
       <h3 class="title">{{ item.itemTitle }}</h3>
-      <p class="desc">{{ item.itemDescription }}</p>
+      <!-- <p class="desc">{{ item.itemDescription }}</p> -->
       <div class="meta">
         <div class="price-block">
           <span v-if="item.tradeMethod === 'ITEM_TO_MONEY'" class="price">¥{{ item.transferPrice }}</span>
