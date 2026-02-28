@@ -99,6 +99,13 @@
       <van-button plain type="primary" size="small">忘记密码？</van-button>
       <van-button plain type="primary" size="small">立即注册</van-button>
     </div>
+
+    <div class="agreement-entry">
+      <span class="text">登录即表示您已阅读并同意</span>
+      <span class="link" @click="goPrivacyAgreement">《用户隐私协议》</span>
+      <span class="text">与</span>
+      <span class="link" @click="goSwapAgreement">《换物使用协议》</span>
+    </div>
   </div>
 </template>
 
@@ -135,6 +142,14 @@ const togglePasswordVisibility = () => {
 
 const onClickLeft = () => {
   router.push('/');
+};
+
+const goPrivacyAgreement = () => {
+  router.push('/agreement/privacy');
+};
+
+const goSwapAgreement = () => {
+  router.push('/agreement/swap');
 };
 
 // 发送验证码
@@ -273,6 +288,20 @@ const onCodeSubmit = async (values: any) => {
     &:active {
       opacity: 0.8;
     }
+  }
+}
+
+.agreement-entry {
+  margin-top: 14px;
+  padding: 0 18px;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  color: #777;
+
+  .link {
+    color: #1989fa;
+    cursor: pointer;
   }
 }
 

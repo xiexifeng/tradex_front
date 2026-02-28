@@ -22,6 +22,16 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "login" */ '../views/user/LoginView.vue')
   },
   {
+    path: '/agreement/privacy',
+    name: 'privacyAgreement',
+    component: () => import(/* webpackChunkName: "agreement" */ '../views/agreement/PrivacyAgreementView.vue')
+  },
+  {
+    path: '/agreement/swap',
+    name: 'swapUsageAgreement',
+    component: () => import(/* webpackChunkName: "agreement" */ '../views/agreement/SwapUsageAgreementView.vue')
+  },
+  {
     path: '/user/profile',
     name: 'profile',
     component: () => import(/* webpackChunkName: "userProfile" */ '../views/user/ProfileView.vue'),
