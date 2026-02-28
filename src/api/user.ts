@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction, LoginRewardDayItem } from './types';
+import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction, LoginRewardDayItem, DailyTaskItem } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -140,4 +140,9 @@ export function receiveLoginReward(data: { userId: string; loginDate: string; re
   return request.post('/client/user/login-reward/receive', data, {
     headers: { 'Content-Type': 'application/json' }
   });
+}
+
+// 每日任务列表
+export function getDailyTaskList(userId: string): Promise<ApiResponse<DailyTaskItem[]>> {
+  return request.get('/client/user/task/daily-list', { params: { userId } });
 }

@@ -255,3 +255,16 @@ export interface LoginRewardDayItem {
   rewardPoint: number;
   rewardStatus: number;
 }
+
+// 每日任务 - taskType: 1-点赞 2-发布物品 3-评价 4-分享; taskState: 1-进行中 2-已完成 3-过期; isReceived: 0-未领取 1-已领取
+export interface DailyTaskItem {
+  taskCode: string;
+  taskName: string;
+  taskDesc: string;
+  taskType: number;
+  targetNum: number;
+  finishNum: number;
+  taskState: number;
+  rewardPoint: number;
+  isReceived: number;
+}
