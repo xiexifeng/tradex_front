@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <!-- 顶部导航栏 -->
-    <van-nav-bar class="custom-nav" title="区块链电商">
+    <van-nav-bar class="custom-nav" title="X平台">
       <template #right>
         <template v-if="userInfo">
           <van-icon name="user-o" size="20" class="nav-icon" @click="goToProfile"/>
@@ -12,11 +12,11 @@
       </template>
     </van-nav-bar>
 
-    <!-- 搜索框 -->
+    <!-- 搜索 + 首屏引导 -->
     <div class="search-wrapper">
       <van-search
         v-model="searchValue"
-        placeholder="搜索你想要的商品"
+        placeholder="搜索你想要的好物"
         shape="round"
         background="transparent"
         readonly
@@ -26,6 +26,22 @@
           <van-icon name="search" size="18" color="#1989fa"/>
         </template>
       </van-search>
+    </div>
+
+    <div class="hero-section">
+      <div class="hero-text">
+        <div class="hero-title">让闲置重新流转</div>
+        <div class="hero-subtitle">发布闲置 · 寻找好物 · 安全换物</div>
+      </div>
+      <van-button
+        round
+        type="primary"
+        size="small"
+        class="hero-button"
+        @click="goToPublish"
+      >
+        立即发布闲置
+      </van-button>
     </div>
 
     <!-- 轮播图 -->
@@ -76,13 +92,20 @@
         loading-text="加载中..."
         @load="loadMore"
       >
-        <div class="products-grid">
+        <div v-if="items.length" class="products-grid">
           <ItemCard
             v-for="product in items"
             :key="product.id"
             :item="product"
             @select="onViewClick"
           />
+        </div>
+        <div v-else class="empty-state">
+          <div class="empty-title">还没有发现合适的好物</div>
+          <div class="empty-subtitle">去发布一件闲置，或稍后再来逛逛</div>
+          <van-button round type="primary" size="small" @click="goToPublish">
+            发布我的第一件闲置
+          </van-button>
         </div>
       </van-list>
     </div>
@@ -97,7 +120,7 @@
 
 .page-container {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 220px);
   padding-bottom: 50px;
 }
 
@@ -116,15 +139,45 @@
 
 .search-wrapper {
   padding: 8px 12px;
-  background: #fff;
+  background: transparent;
   
   :deep(.van-search) {
     padding: 0;
   }
   
   :deep(.van-search__content) {
-    background: #f5f6fa;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
+}
+
+.hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px 4px;
+  color: #323233;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hero-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #707070;
+}
+
+.hero-button {
+  border: none;
+  background: linear-gradient(135deg, #ff9f43, #ff6b6b);
 }
 
 .banner-wrapper {
@@ -181,6 +234,23 @@
   gap: 12px;
 }
 
+.empty-state {
+  padding: 36px 16px 24px;
+  text-align: center;
+  color: #646566;
+
+  .empty-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .empty-subtitle {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+}
+
 </style>
 
 <script lang="ts">
@@ -229,6 +299,10 @@ export default defineComponent({
       router.push('/login')
     }
 
+    const goToPublish = () => {
+      router.push('/stuff/publish')
+    }
+
     const goToProfile = () => {
       router.push('/user/profile')
     }
@@ -244,27 +318,27 @@ export default defineComponent({
     const features = [
       {
         icon: 'shop-o',
-        text: '全部商品',
+        text: '逛换物广场',
         color: '#1989fa',
-        action: () => router.push('/square')
+        action: () => router.push('/stuff/list')
       },
       {
-        icon: 'gift-o',
-        text: '区块链验证',
+        icon: 'plus',
+        text: '发布闲置',
+        color: '#ff6b6b',
+        action: () => router.push('/stuff/publish')
+      },
+      {
+        icon: 'records',
+        text: '我的交易',
         color: '#07c160',
-        action: () => router.push('/blockchain')
+        action: () => router.push('/stuff/trades')
       },
       {
-        icon: 'medal-o',
-        text: '信用排行',
+        icon: 'bell',
+        text: '消息通知',
         color: '#ff976a',
-        action: () => router.push('/credit-rank')
-      },
-      {
-        icon: 'balance-o',
-        text: '积分排行',
-        color: '#ee0a24',
-        action: () => router.push('/points-rank')
+        action: () => router.push('/notification')
       }
     ]
 
@@ -296,6 +370,7 @@ export default defineComponent({
       finished,
       items,
       onClickRight,
+      goToPublish,
       goToProfile,
       onViewClick,
       onSearchClick,
