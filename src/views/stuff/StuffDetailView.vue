@@ -359,14 +359,13 @@ export default defineComponent({
     const fetchItemDetail = async () => {
       try {
         const res = await getItemDetail(itemId)
-        if (res.success) {
-          itemDetail.value = res.data
-        } else {
-          showToast(res.desc || '获取物品详情失败')
-        }
+        itemDetail.value = res.data
+        
       } catch (error) {
-        console.error('获取物品详情失败:', error)
-        showToast('获取物品详情失败')
+        // console.error('获取物品详情失败:', error)
+        showToast({message: '物品已逃走', duration:3000, onClose: () => {
+          router.back()
+        }})
       }
     }
 
