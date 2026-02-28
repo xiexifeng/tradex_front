@@ -11,23 +11,21 @@
         :area-list="areaList"
         show-delete
         show-set-default
-        show-search-result
-        :search-result="searchResult"
         :address-info="addressInfo"
         @save="onSave"
         @delete="onDelete"
-        @change-detail="onChangeDetail"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { showToast, Area } from 'vant'
+import { showToast } from 'vant'
 import type { AddressEditInfo, AddressEditSearchItem } from 'vant'
 import { areaList } from '@vant/area-data'
+import { addressApi } from '@/api/address'
 
 export default defineComponent({
   name: 'AddressEditView',
@@ -36,8 +34,7 @@ export default defineComponent({
     const route = useRoute()
     
     const isEdit = computed(() => route.params.id !== undefined)
-    
-    
+    const currentId = computed(() => route.params.id as string | undefined)
     const addressInfo = ref<Partial<AddressEditInfo>>({
       name: '',
       tel: '',
@@ -49,45 +46,120 @@ export default defineComponent({
       isDefault: false,
     })
 
+    const findAreaCode = (provinceName: string, cityName: string, countyName: string): string => {
+      const { province_list, city_list, county_list } = areaList as any
+
+      let provinceCode = ''
+      let cityCode = ''
+      let countyCode = ''
+
+      if (provinceName) {
+        provinceCode =
+          Object.keys(province_list).find(code => province_list[code] === provinceName) || ''
+      }
+
+      if (cityName) {
+        cityCode =
+          Object.keys(city_list).find(code => {
+            if (city_list[code] !== cityName) return false
+            if (!provinceCode) return true
+            return code.startsWith(provinceCode.slice(0, 2))
+          }) || ''
+      }
+
+      if (countyName) {
+        countyCode =
+          Object.keys(county_list).find(code => {
+            if (county_list[code] !== countyName) return false
+            if (cityCode) return code.startsWith(cityCode.slice(0, 4))
+            if (provinceCode) return code.startsWith(provinceCode.slice(0, 2))
+            return true
+          }) || ''
+      }
+
+      return countyCode || cityCode || provinceCode || ''
+    }
+
     const onClickLeft = () => {
       router.back()
     }
 
-    const onSave = (content: AddressEditInfo) => {
-      showToast('保存成功')
-      router.back()
-    }
+    const initFromRoute = () => {
+      if (!isEdit.value) return
+      const q = route.query || {}
 
-    const onDelete = () => {
-      showToast('删除成功')
-      router.back()
-    }
-    const searchResult = ref<AddressEditSearchItem[]>([]);
+      const province = (q.province as string) || ''
+      const city = (q.city as string) || ''
+      const district = (q.district as string) || ''
 
-    const onChangeDetail = (val: any) => {
-      
-      if (val) {
-        searchResult.value = [
-        {
-            name: '黄龙万科中心',
-            address: '杭州市西湖区',
-          },
-        ];
-        console.log(searchResult)
-      } else {
-        searchResult.value = [];
+      const isDefaultRaw = q.isDefault as string | undefined
+      const areaCode = findAreaCode(province, city, district)
+
+      addressInfo.value = {
+        name: (q.recipientName as string) || '',
+        tel: (q.phone as string) || '',
+        province,
+        city,
+        county: district,
+        addressDetail: (q.address as string) || '',
+        isDefault: isDefaultRaw === '1' || isDefaultRaw === 'true',
+        areaCode,
       }
-    };
+    }
+
+    const onSave = async (content: AddressEditInfo) => {
+      const payload = {
+        recipientName: content.name,
+        phone: content.tel,
+        province: content.province,
+        city: content.city,
+        district: content.county,
+        address: content.addressDetail,
+        isDefault: !!content.isDefault,
+      }
+
+      try {
+        if (isEdit.value && currentId.value) {
+          await addressApi.updateReceiveAddress({
+            id: currentId.value,
+            ...payload,
+          })
+        } else {
+          await addressApi.addReceiveAddress(payload)
+        }
+        showToast('保存成功')
+        router.back()
+      } catch (error) {
+        console.error('保存地址失败:', error)
+      }
+    }
+
+    const onDelete = async () => {
+      if (!currentId.value) {
+        router.back()
+        return
+      }
+      try {
+        await addressApi.deleteReceiveAddress(currentId.value)
+        showToast('删除成功')
+        router.back()
+      } catch (error) {
+        console.error('删除地址失败:', error)
+      }
+    }
+    onMounted(() => {
+      if (isEdit.value) {
+        initFromRoute()
+      }
+    })
 
     return {
       isEdit,
       areaList,
       addressInfo,
-      searchResult,
       onClickLeft,
       onSave,
-      onDelete,
-      onChangeDetail
+      onDelete
     }
   }
 })

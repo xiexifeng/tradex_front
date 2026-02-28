@@ -38,6 +38,19 @@ export interface UserInfo {
 
 }
 
+// 收货地址
+export interface ReceiveAddress {
+  id: string;
+  userId: string;
+  recipientName: string;
+  phone: string;
+  province: string;
+  city: string;
+  district: string;
+  address: string;
+  isDefault: boolean;
+}
+
 // 登录响应类型
 export interface LoginResponse {
   token: string;

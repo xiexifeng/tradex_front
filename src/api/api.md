@@ -195,6 +195,105 @@ curl -X POST http://47.122.125.199/tradex/client/user/update \
     "data": null
 }
 ```
+
+
+### 用户收货地址列表查询
+```bash
+curl -X GET http://47.122.125.199/tradex/client/user/receive-address/list \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json"
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": [{
+        "id": "2025052500001",
+        "userId": "2025052500001",
+        "recipientName": "张三",
+        "phone": "17334567890",
+        "province": "广东省",
+        "city": "深圳市",
+        "district": "龙华区",
+        "address": "民治阶段 xx小区",
+        "isDefault": true
+    }]
+}
+```
+### 用户收货地址新增
+```bash
+curl -X POST http://47.122.125.199/tradex/client/user/receive-address/add \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json" \
+-d '{
+    "recipientName": "张三",
+    "phone": "17334567890",
+    "province": "广东省",
+    "city": "深圳市",
+    "district": "龙华区",
+    "address": "民治阶段 xx小区",
+    "isDefault": true
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+### 用户收获地址修改
+```bash
+curl -X POST http://47.122.125.199/tradex/client/user/receive-address/update \
+-H "Authorization: {token}" \
+-H "Content-Type: application/json" \
+-d '{
+    "id": "2025052500001",
+    "recipientName": "张三",
+    "phone": "17334567890",
+    "province": "广东省",
+    "city": "深圳市",
+    "district": "龙华区",
+    "address": "民治街道 xx小区",
+    "isDefault": true
+}'
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+### 用户收获地址删除
+```bash
+curl -X POST http://47.122.125.199/tradex/client/user/receive-address/delete/{id} \
+
+```
+
+**响应：**
+
+```json
+{
+    "success": true,
+    "code": "000000",
+    "desc": "请求成功",
+    "data": null
+}
+```
+
 ## 公共接口
 
 ### oss 上传文件

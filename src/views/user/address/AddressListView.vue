@@ -19,31 +19,43 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import type { AddressListAddress } from 'vant';
+import { addressApi } from '@/api/address';
+import type { ReceiveAddress } from '@/api/types';
 
 export default defineComponent({
   name: 'AddressListView',
   setup() {
     const router = useRouter()
-    const selectedAddressId = ref('1')
-    
-    const addressList = ref<AddressListAddress[]>([
-      {
-        id: '1',
-        name: '张三',
-        tel: '13000000000',
-        address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
-        isDefault: true,
-      },
-      {
-        id: '2',
-        name: '李四',
-        tel: '1310000000',
-        address: '浙江省杭州市拱墅区莫干山路 50 号',
-      },
-    ]);
+    const selectedAddressId = ref<string | undefined>(undefined)
+    const addressList = ref<AddressListAddress[]>([])
+    const rawList = ref<ReceiveAddress[]>([])
+
+    const loadAddresses = async () => {
+      try {
+        const res = await addressApi.listReceiveAddress()
+        const list = (res.data as unknown as ReceiveAddress[]) || []
+        rawList.value = list
+        addressList.value = list.map(item => ({
+          id: item.id,
+          name: item.recipientName,
+          tel: item.phone,
+          address: `${item.province}${item.city}${item.district}${item.address}`,
+          isDefault: item.isDefault
+        }))
+
+        const defaultItem = list.find(i => i.isDefault) || list[0]
+        selectedAddressId.value = defaultItem ? defaultItem.id : undefined
+      } catch (error) {
+        console.error('加载地址列表失败:', error)
+      }
+    }
+
+    onMounted(() => {
+      loadAddresses()
+    })
 
     const onClickLeft = () => {
       router.back()
@@ -54,12 +66,30 @@ export default defineComponent({
     }
 
     const onEdit = (item: AddressListAddress) => {
-      router.push(`/user/address/edit/${item.id}`)
+      const source = rawList.value.find(addr => addr.id === String(item.id))
+
+      if (source) {
+        router.push({
+          path: `/user/address/edit/${source.id}`,
+          query: {
+            recipientName: source.recipientName,
+            phone: source.phone,
+            province: source.province,
+            city: source.city,
+            district: source.district,
+            address: source.address,
+            isDefault: source.isDefault ? '1' : '0',
+          },
+        })
+      } else {
+        router.push(`/user/address/edit/${item.id}`)
+      }
     }
 
     return {
       selectedAddressId,
       addressList,
+      rawList,
       onClickLeft,
       onAdd,
       onEdit
