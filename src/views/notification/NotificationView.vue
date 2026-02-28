@@ -170,29 +170,40 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+$nav-gradient: linear-gradient(135deg, #1989fa 0%, #39a0ff 100%);
+$tab-active: #1989fa;
+$bg-page: #f5f6f8;
+$card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
 .notification {
   min-height: 100vh;
-  background-color: #f7f8fa;
-  padding-bottom: 50px;
+  background: $bg-page;
+  padding-bottom: calc(50px + env(safe-area-inset-bottom, 0));
 }
 
 .van-nav-bar {
   position: sticky;
   top: 0;
   z-index: 100;
-  
+
   :deep(.van-nav-bar__content) {
-    background: linear-gradient(to right, #1989fa, #39a0ff);
+    background: $nav-gradient;
+    box-shadow: 0 2px 8px rgba(25, 137, 250, 0.2);
   }
-  
+
   :deep(.van-nav-bar__title) {
     color: #fff;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
-  
+
   :deep(.van-icon) {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  :deep(.van-nav-bar__arrow) {
+    font-size: 20px;
   }
 }
 
@@ -200,52 +211,61 @@ export default defineComponent({
   :deep(.van-tabs__wrap) {
     height: 48px;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    
+    box-shadow: $card-shadow;
+
     .van-tabs__nav {
-      padding: 6px 0;
-      
+      padding: 6px 12px 0;
+
       &::before {
         display: none;
       }
     }
-    
+
     .van-tab {
-      font-size: 14px;
-      color: #666;
+      font-size: 15px;
+      color: #646566;
       line-height: 36px;
-      transition: all 0.3s ease;
+      transition: color 0.25s ease, transform 0.2s ease;
       position: relative;
-      
+
       &--active {
-        color: #1989fa;
-        font-weight: 500;
-        transform: scale(1.05);
+        color: $tab-active;
+        font-weight: 600;
       }
     }
-    
+
     .van-tabs__line {
-      background: linear-gradient(to right, #1989fa, #39a0ff);
+      background: $nav-gradient;
       height: 3px;
-      border-radius: 3px;
+      border-radius: 2px;
       bottom: 8px;
-      transition: all 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
+      width: 24px;
+      margin: 0 auto;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
-  
+
   :deep(.van-tabs__content) {
     background: transparent;
-    
+    min-height: 50vh;
+
     .van-tab__pane {
       animation: fadeIn 0.3s ease-out;
     }
+  }
+
+  :deep(.van-list__finished-text),
+  :deep(.van-list__loading-text) {
+    color: #969799;
+    font-size: 13px;
+    padding: 16px 0;
   }
 }
 
 @keyframes fadeIn {
   from {
-    opacity: 0.8;
-    transform: translateY(10px);
+    opacity: 0.85;
+    transform: translateY(8px);
   }
   to {
     opacity: 1;

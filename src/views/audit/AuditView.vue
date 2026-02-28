@@ -20,25 +20,18 @@
     </div>
     
     <div v-else-if="itemDetail" class="audit-content">
-      <!-- 图片展示区域 -->
-      <div class="swipe-container" @click="handleImagePreview">
-        <van-swipe class="item-swipe" :autoplay="3000">
-          <van-swipe-item v-for="(image, index) in (itemDetail.itemImageList || [])" :key="index">
-            <img
-              :src="image"
-              alt="物品图片"
-              class="audit-image"
-            />
-          </van-swipe-item>
-          <template #indicator="{ active, total }">
-            <div class="custom-indicator">
-              <van-icon name="photograph" class="indicator-icon" />
-              <span>{{ active + 1 }}/{{ total }}</span>
-            </div>
-          </template>
-        </van-swipe>
-      </div>
-      
+      <!-- 图片轮播（全宽，与物品详情页一致） -->
+      <van-swipe
+        class="item-swipe"
+        :autoplay="3000"
+        indicator-color="white"
+        @click="handleImagePreview"
+      >
+        <van-swipe-item v-for="(image, index) in (itemDetail.itemImageList || [])" :key="index">
+          <van-image :src="image" fit="cover" width="100%" height="100%" />
+        </van-swipe-item>
+      </van-swipe>
+
       <!-- 基本信息卡片 -->
       <div class="info-card">
         <div class="section-title">
@@ -48,17 +41,13 @@
         <div class="item-info">
           <h3 class="item-title">{{ itemDetail.itemTitle }}</h3>
           <p class="item-description">{{ itemDetail.itemDescription }}</p>
+          <div class="item-tags">
+            <van-tag round plain type="primary" size="medium">{{ itemDetail.itemTypeName || itemDetail.itemType || '未知' }}</van-tag>
+            <van-tag round plain type="success" size="medium">{{ itemDetail.depreciation != null ? itemDetail.depreciation + '成新' : '未知' }}</van-tag>
+          </div>
           <div class="item-meta">
             <div class="meta-item">
-              <span class="meta-label">物品类型：</span>
-              <span class="meta-value">{{ itemDetail.itemTypeName || itemDetail.itemType || '未知' }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="meta-label">折旧程度：</span>
-              <span class="meta-value">{{ itemDetail.depreciation || '未知' }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="meta-label">残余估值：</span>
+              <span class="meta-label">残余估值(元)：</span>
               <span class="meta-value">{{ itemDetail.valuation || '未知' }}</span>
             </div>
             <div class="meta-item">
@@ -115,13 +104,13 @@
             <div class="result-status" :class="itemDetail.auditResult === 'PASS_AUDIT' ? 'status-pass' : 'status-reject'">
               <van-icon 
                 :name="itemDetail.auditResult === 'PASS_AUDIT' ? 'success' : 'close'" 
-                size="48"
+                size="40"
               />
               <h3>{{ itemDetail.auditResult === 'PASS_AUDIT' ? '审核通过' : '审核不通过' }}</h3>
             </div>
             <div v-if="itemDetail.auditRemark" class="result-remark">
-              <h4>审核备注</h4>
-              <p>{{ itemDetail.auditRemark }}</p>
+              <span class="remark-label">审核备注：</span>
+              <p class="remark-value">{{ itemDetail.auditRemark }}</p>
             </div>
           </div>
         </div>
@@ -285,51 +274,66 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-/* 重置默认样式 */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-img {
-  border: none;
-  outline: none;
-}
-
-button {
-  border: none;
-  outline: none;
-}
-
-input,
-textarea {
-  border: none;
-  outline: none;
-}
+/* 与物品详情页 StuffDetailView 保持一致的变量与结构 */
+$nav-gradient: linear-gradient(to right, #1989fa, #39a0ff);
+$primary: #1989fa;
+$danger: #ff4d4f;
+$success: #52c41a;
+$text-title: #323233;
+$text-body: #646566;
+$text-meta: #969799;
+$bg-page: #f7f8fa;
+$border-card: #f5f5f5;
+$card-radius: 12px;
+$card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 
 .audit-page {
   min-height: 100vh;
-  background-color: #f8f9fa;
-  padding-bottom: 32px;
+  background: $bg-page;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0));
 }
 
 .audit-nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  
+
   :deep(.van-nav-bar__content) {
-    background: linear-gradient(to right, #1989fa, #39a0ff);
-    
-    .van-nav-bar__title,
-    .van-icon {
-      color: #fff;
-    }
+    background: $nav-gradient;
   }
-  
-  :deep(.van-nav-bar__left .van-icon) {
+
+  :deep(.van-nav-bar__title) {
     color: #fff;
+  }
+
+  :deep(.van-icon),
+  :deep(.van-nav-bar__text) {
+    color: #fff;
+  }
+}
+
+/* 图片轮播：与物品详情页 .item-swipe 一致 */
+.item-swipe {
+  height: 300px;
+  background: #fff;
+  cursor: pointer;
+
+  :deep(.van-swipe__indicator) {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  :deep(.van-swipe__indicator--active) {
+    width: 12px;
+    background: #fff;
+    border-radius: 3px;
+  }
+
+  :deep(.van-image) {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
 
@@ -338,13 +342,13 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
-  gap: 20px;
+  min-height: 60vh;
+  gap: 14px;
 }
 
 .loading-text {
-  font-size: 15px;
-  color: #999;
+  font-size: 14px;
+  color: $text-meta;
 }
 
 .error-container {
@@ -352,16 +356,20 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  min-height: 60vh;
   gap: 20px;
-  padding: 0 24px;
+  padding: 24px 20px;
   text-align: center;
+
+  .van-button {
+    min-width: 120px;
+  }
 }
 
 .error-text {
-  font-size: 15px;
-  color: #666;
-  line-height: 1.5;
+  font-size: 14px;
+  color: $text-body;
+  line-height: 1.6;
 }
 
 .empty-container {
@@ -370,368 +378,276 @@ textarea {
 }
 
 .audit-content {
-  padding: 16px;
+  padding-bottom: 24px;
 }
 
-/* 图片展示区域 */
-.swipe-container {
-  height: 360px;
-  background: #f5f6fa;
-  cursor: pointer;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  
-  .item-swipe {
-    height: 100%;
-    
-    :deep(.van-swipe-item) {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .audit-image {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-  
-  .custom-indicator {
-    position: absolute;
-    right: 16px;
-    bottom: 16px;
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 16px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    
-    .indicator-icon {
-      font-size: 16px;
-    }
-  }
-}
-
-/* 信息卡片 */
+/* 信息卡片、审核卡片：与物品详情页 .info-group / .blockchain-group 一致 */
 .info-card,
 .audit-card {
+  margin: 12px;
+  border-radius: $card-radius;
+  overflow: hidden;
   background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: $card-shadow;
 }
 
 .section-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  padding: 16px;
   font-size: 16px;
   font-weight: bold;
-  color: #323233;
-  
+  color: $text-title;
+  border-bottom: 1px solid $border-card;
+
   .van-icon {
-    color: #1989fa;
+    color: $primary;
   }
+}
+
+.info-card .item-info {
+  padding: 0 16px 16px;
 }
 
 .item-info {
   .item-title {
     font-size: 18px;
-    font-weight: 600;
-    color: #323233;
-    margin-bottom: 12px;
+    font-weight: bold;
+    color: $text-title;
+    padding: 16px 0 0;
+    margin: 0;
     line-height: 1.4;
   }
-  
+
   .item-description {
+    padding: 16px 0;
     font-size: 14px;
-    color: #646566;
-    line-height: 1.5;
-    margin-bottom: 16px;
+    color: $text-body;
+    line-height: 1.6;
     white-space: pre-wrap;
-    padding: 12px 16px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border-left: 3px solid #1989fa;
+    word-break: break-word;
   }
-  
+
+  .item-tags {
+    display: flex;
+    gap: 8px;
+    padding: 0 0 12px;
+    flex-wrap: wrap;
+
+    .van-tag {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+  }
+
   .item-meta {
-    background-color: #fafafa;
-    border-radius: 8px;
-    padding: 16px;
-    
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid $border-card;
+
     .meta-item {
       display: flex;
-      margin-bottom: 12px;
       align-items: center;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
+      min-height: 32px;
+
       .meta-label {
         font-size: 14px;
-        color: #969799;
-        min-width: 90px;
-        font-weight: 500;
+        color: $text-meta;
+        width: 8em;
+        flex-shrink: 0;
+        text-align: left;
       }
-      
+
       .meta-value {
         font-size: 14px;
-        color: #323233;
+        color: $text-title;
         flex: 1;
-        font-weight: 500;
-        background-color: #fff;
-        padding: 6px 12px;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        text-align: left;
+        min-width: 0;
       }
     }
   }
 }
 
-/* 用户信息样式 */
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 0;
-  
-  .user-avatar {
-    flex-shrink: 0;
-    
-    :deep(.van-image) {
-      border: 2px solid #f0f0f0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-  }
-  
-  .user-details {
-    flex: 1;
-    
-    .user-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #323233;
-      margin-bottom: 12px;
-    }
-    
-    .user-stats {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      
-      .stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        padding: 8px 12px;
-        background-color: #f7f8fa;
-        border-radius: 8px;
-        min-width: 80px;
-        
-        .stat-label {
-          font-size: 12px;
-          color: #969799;
-        }
-        
-        .stat-value {
-          font-size: 14px;
-          font-weight: 600;
-          color: #1989fa;
-        }
-      }
-    }
-  }
+.audit-card .section-title {
+  margin-bottom: 0;
 }
 
-/* 审核表单 */
+/* 审核表单：与物品详情页表单位于卡片内一致 */
 .audit-form {
+  padding: 0 16px 16px;
+
   .audit-actions {
     display: flex;
-    gap: 16px;
-    margin-top: 24px;
-    
+    gap: 12px;
+    margin-top: 20px;
+
     .action-btn {
       flex: 1;
-      height: 44px;
+      height: 40px;
       font-size: 15px;
-      font-weight: 600;
-      border-radius: 22px;
-      transition: all 0.3s ease;
-      
-      &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-      
+      font-weight: 500;
+      border-radius: 20px;
+      transition: transform 0.2s ease;
+
       &:active {
-        transform: translateY(0);
+        transform: scale(0.98);
       }
     }
-    
+
     .reject-btn {
-      background-color: #ff4d4f;
+      background: $danger;
       border: none;
-      
-      &:hover {
-        background-color: #ff7875;
-      }
     }
-    
+
     .approve-btn {
-      background-color: #1989fa;
+      background: $nav-gradient;
       border: none;
-      
-      &:hover {
-        background-color: #40a9ff;
-      }
     }
   }
 }
 
-/* 优化van-field样式 */
-:deep(.van-field) {
-  margin-bottom: 8px;
-  
-  .van-field__control {
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 120px;
-    padding: 12px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #f0f0f0;
-    
-    &:focus {
-      border-color: #1989fa;
-      box-shadow: 0 0 0 2px rgba(25, 137, 250, 0.1);
-    }
-  }
-  
+.audit-card :deep(.van-field) {
+  padding: 0 0 12px;
+
   .van-field__label {
-    font-size: 15px;
-    font-weight: 500;
-    color: #323233;
-    padding: 12px 0;
+    color: $text-title;
+  }
+
+  .van-field__control {
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 88px;
+    padding: 12px;
+    background: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #ebedf0;
+
+    &::placeholder {
+      color: $text-meta;
+    }
+
+    &:focus {
+      border-color: $primary;
+    }
   }
 }
 
-/* 审核结果样式 */
+/* 审核结果 */
 .audit-result {
-  padding: 20px 0;
-  
+  padding: 0 16px 16px;
+
   .result-status {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 0;
-    margin-bottom: 24px;
-    border-radius: 12px;
-    background-color: #f7f8fa;
-    
+    padding: 18px 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background: #f7f8fa;
+
     &.status-pass {
-      background-color: #f6ffed;
-      
+      background: #f6ffed;
+
       .van-icon {
-        color: #52c41a;
+        color: $success;
       }
-      
+
       h3 {
-        color: #52c41a;
+        color: $success;
       }
     }
-    
+
     &.status-reject {
-      background-color: #fff2f0;
-      
+      background: #fff2f0;
+
       .van-icon {
-        color: #ff4d4f;
+        color: $danger;
       }
-      
+
       h3 {
-        color: #ff4d4f;
+        color: $danger;
       }
     }
-    
+
     .van-icon {
-      margin-bottom: 16px;
+      margin-bottom: 6px;
     }
-    
+
     h3 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: bold;
       margin: 0;
     }
   }
-  
+
   .result-remark {
-    padding: 20px;
-    background-color: #f7f8fa;
-    border-radius: 12px;
-    border-left: 4px solid #1989fa;
-    
-    h4 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #323233;
-      margin-bottom: 12px;
-    }
-    
-    p {
-      font-size: 15px;
-      color: #646566;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding: 16px 12px 16px 0;
+    background: #f7f8fa;
+    border-radius: 8px;
+    border-left: 4px solid $primary;
+
+    .remark-label {
+      font-size: 14px;
+      font-weight: bold;
+      color: $text-title;
+      width: 8em;
+      flex-shrink: 0;
+      text-align: left;
       line-height: 1.6;
+    }
+
+    .remark-value {
+      font-size: 14px;
+      color: $text-body;
+      line-height: 1.7;
       margin: 0;
+      flex: 1;
+      min-width: 0;
       white-space: pre-wrap;
+      word-break: break-word;
     }
   }
 }
 
 @media (max-width: 375px) {
-  .audit-content {
-    padding: 12px;
+  .item-swipe {
+    height: 260px;
   }
-  
-  .swipe-container {
-    height: 280px;
-  }
-  
+
   .info-card,
   .audit-card {
-    padding: 16px;
+    margin: 10px;
   }
-  
-  .item-info {
-    .item-title {
-      font-size: 16px;
-    }
-    
-    .item-meta {
-      .meta-item {
-        .meta-label {
-          min-width: 80px;
-        }
-      }
-    }
-  }
-  
+
+  .section-title,
+  .item-info .item-title,
   .audit-form {
-    .audit-actions {
-      .action-btn {
-        height: 40px;
-        font-size: 14px;
-      }
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .item-info .item-title {
+    font-size: 17px;
+  }
+
+  .item-info .item-meta .meta-item .meta-label {
+    width: 7.5em;
+  }
+
+  .audit-result {
+    padding-left: 14px;
+    padding-right: 14px;
+
+    .result-remark .remark-label {
+      width: 7.5em;
     }
   }
 }

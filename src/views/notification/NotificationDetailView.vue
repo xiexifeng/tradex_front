@@ -204,10 +204,37 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$nav-gradient: linear-gradient(135deg, #1989fa 0%, #39a0ff 100%);
+$primary: #1989fa;
+$text-title: #323233;
+$text-body: #646566;
+$text-meta: #969799;
+$bg-page: #f5f6f8;
+$border-light: #ebedf0;
+$card-radius: 14px;
+$card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
 .notification-detail {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background: $bg-page;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* 导航栏与列表页一致 */
+.van-nav-bar {
+  :deep(.van-nav-bar__content) {
+    background: $nav-gradient;
+    box-shadow: 0 2px 8px rgba(25, 137, 250, 0.2);
+  }
+  :deep(.van-nav-bar__title) {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  :deep(.van-icon) {
+    color: rgba(255, 255, 255, 0.95);
+  }
 }
 
 .loading-container {
@@ -215,13 +242,13 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
-  gap: 16px;
+  min-height: 60vh;
+  gap: 14px;
 }
 
 .loading-text {
   font-size: 14px;
-  color: #999;
+  color: $text-meta;
 }
 
 .error-container {
@@ -229,88 +256,109 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
-  gap: 16px;
-  padding: 0 20px;
+  min-height: 60vh;
+  gap: 20px;
+  padding: 24px 20px;
   text-align: center;
+
+  .van-button {
+    margin-top: 8px;
+    min-width: 120px;
+  }
 }
 
 .error-text {
   font-size: 14px;
-  color: #666;
-  line-height: 1.5;
+  color: $text-body;
+  line-height: 1.6;
 }
 
 .empty-container {
-  padding: 60px 20px;
+  padding: 80px 24px;
   text-align: center;
 }
 
 .detail-card {
-  margin: 12px;
-  padding: 20px;
+  margin: 14px;
+  padding: 22px 20px;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: $card-radius;
+  box-shadow: $card-shadow;
 }
 
 .detail-header {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $border-light;
 }
 
 .title {
-  margin: 0 0 12px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #323233;
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-weight: 600;
+  color: $text-title;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 
 .meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .time {
   font-size: 12px;
-  color: #969799;
+  color: $text-meta;
 }
 
 .content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #666;
-  margin-bottom: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: $text-body;
+  margin-bottom: 24px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .actions {
   margin-top: 24px;
+
+  :deep(.van-button) {
+    height: 44px;
+    font-size: 15px;
+    font-weight: 500;
+    background: $nav-gradient;
+    border: none;
+  }
 }
 
 .related-content {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid $border-light;
 }
 
 .related-title {
   font-size: 14px;
   font-weight: 600;
-  color: #323233;
+  color: $text-title;
   margin: 0 0 12px;
 }
 
 .related-info {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 6px;
+  background: #f7f8fa;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #eee;
 }
 
 .info-item {
   font-size: 13px;
-  color: #646566;
+  color: $text-body;
   margin: 0 0 8px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .info-item:last-child {
@@ -319,16 +367,16 @@ export default defineComponent({
 
 @media (max-width: 375px) {
   .detail-card {
-    margin: 8px;
-    padding: 16px;
+    margin: 10px;
+    padding: 18px 16px;
   }
-  
+
   .title {
-    font-size: 16px;
+    font-size: 17px;
   }
-  
+
   .content {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 </style> 
