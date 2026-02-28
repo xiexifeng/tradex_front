@@ -289,9 +289,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue'
+import { defineComponent, ref, onMounted, computed, nextTick } from 'vue'
 import { showToast } from 'vant'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getMyItems } from '@/api/stuff'
 import CancelTransferDialog from '@/components/CancelTransferDialog.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
@@ -319,6 +319,7 @@ export default defineComponent({
       showToast('分享')
     }
     const router = useRouter()
+    const route = useRoute()
     const activeTab = ref(0)
     const activeNames = ref('0')
     const items = ref<Item[]>([])
@@ -495,6 +496,16 @@ export default defineComponent({
         console.error('刷新用户信息失败:', error);
         // 错误已在 request.ts 中统一处理并显示提示
       })
+
+      if (route.query.section === 'items') {
+        activeTab.value = 0
+        nextTick(() => {
+          const el = document.querySelector('.items-section')
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        })
+      }
     })
 
     return {

@@ -320,7 +320,7 @@ export default defineComponent({
         icon: 'shop-o',
         text: '逛换物广场',
         color: '#1989fa',
-        action: () => router.push('/stuff/list')
+        action: () => router.push({ name: 'profile', query: { section: 'items' } })
       },
       {
         icon: 'plus',
