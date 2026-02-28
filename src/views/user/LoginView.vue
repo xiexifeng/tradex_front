@@ -7,6 +7,14 @@
       @click-left="onClickLeft"
     />
 
+    <!-- 登录页 Slogan 区 -->
+    <div class="hero-section">
+      <div class="hero-text">
+        <div class="hero-title">欢迎来到 X平台</div>
+        <div class="hero-subtitle">登录后即可发布闲置、发起换物并查看交易进度</div>
+      </div>
+    </div>
+
     <!-- 登录方式切换 -->
     <van-tabs v-model:active="activeTab" animated swipeable>
       <van-tab title="密码登录">
@@ -41,6 +49,10 @@
               </template>
             </van-field>
           </van-cell-group>
+
+          <div class="forgot-row">
+            <span class="forgot-link">忘记密码？</span>
+          </div>
 
           <div class="form-actions">
             <van-button round block type="primary" native-type="submit" size="large">
@@ -96,8 +108,8 @@
     </van-tabs>
 
     <div class="additional-links">
-      <van-button plain type="primary" size="small">忘记密码？</van-button>
-      <van-button plain type="primary" size="small">立即注册</van-button>
+      <!-- 预留后续注册入口 -->
+      <!-- <van-button plain type="primary" size="small">立即注册</van-button> -->
     </div>
 
     <div class="agreement-entry">
@@ -209,7 +221,7 @@ const onCodeSubmit = async (values: any) => {
 <style lang="scss" scoped>
 .login-container {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 260px);
   padding-bottom: 50px;
 }
 
@@ -221,6 +233,27 @@ const onCodeSubmit = async (values: any) => {
   :deep(.van-nav-bar__title), :deep(.van-icon) {
     color: #fff;
   }
+}
+
+.hero-section {
+  padding: 12px 18px 4px;
+  color: #323233;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hero-subtitle {
+  font-size: 12px;
+  color: #707070;
 }
 
 .van-tabs {
@@ -272,6 +305,18 @@ const onCodeSubmit = async (values: any) => {
     &:active {
       opacity: 0.9;
     }
+  }
+}
+
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px;
+  margin-top: 4px;
+
+  .forgot-link {
+    font-size: 12px;
+    color: #1989fa;
   }
 }
 
