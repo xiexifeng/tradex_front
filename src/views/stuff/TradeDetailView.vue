@@ -21,6 +21,43 @@
         </div>
       </div>
 
+      <!-- 交易流程提示 -->
+      <div class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title">这是一笔 {{ tradeInfo.tradeMethod === 'ITEM_TO_ITEM' ? '以物换物' : tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? '线下支付' : '积分支付' }} 交易</div>
+          <div class="flow-subtitle">按步骤完成双方确认、发货收货与评分，交易即告完成</div>
+        </div>
+        <div class="flow-steps">
+          <div class="flow-step" :class="{ active: tradeInfo.tradeStatus === 'trading' }">
+            <div class="flow-icon">
+              <van-icon name="edit" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">发起申请 · 等待对方处理</div>
+              <div class="flow-step-desc">一方提交换物/购买申请，另一方可以接受、拒绝或取消</div>
+            </div>
+          </div>
+          <div class="flow-step" :class="{ active: tradeInfo.tradeStatus === 'accepted' }">
+            <div class="flow-icon">
+              <van-icon name="friends-o" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">达成一致 · 安排交付</div>
+              <div class="flow-step-desc">双方确认换物/价格与交付方式，准备线下/快递交接</div>
+            </div>
+          </div>
+          <div class="flow-step" :class="{ active: tradeInfo.tradeStatus === 'completed' }">
+            <div class="flow-icon">
+              <van-icon name="passed" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">完成交付 · 互评打分</div>
+              <div class="flow-step-desc">确认物品无误后完成交易，并为本次交易打分</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 交易物品信息卡片 -->
       <van-cell-group inset class="info-group">
         <div class="section-title">
@@ -409,7 +446,7 @@ export default defineComponent({
 <style scoped>
 .trade-detail {
   min-height: 100vh;
-  background-color: #f7f8fa;
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 220px);
   padding-bottom: 24px;
 }
 
@@ -435,6 +472,81 @@ export default defineComponent({
 
 .detail-content {
   padding: 16px;
+}
+
+.flow-card {
+  margin-bottom: 16px;
+  padding: 14px 16px 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .flow-header {
+    margin-bottom: 8px;
+  }
+
+  .flow-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #323233;
+  }
+
+  .flow-subtitle {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #969799;
+  }
+
+  .flow-steps {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    opacity: 0.65;
+  }
+
+  .flow-step.active {
+    opacity: 1;
+  }
+
+  .flow-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #f2f6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .van-icon {
+      font-size: 16px;
+      color: #1989fa;
+    }
+  }
+
+  .flow-text {
+    flex: 1;
+  }
+
+  .flow-step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #323233;
+    margin-bottom: 2px;
+  }
+
+  .flow-step-desc {
+    font-size: 12px;
+    color: #969799;
+    line-height: 1.5;
+  }
 }
 
 .trade-header {
