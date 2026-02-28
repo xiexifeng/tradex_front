@@ -85,6 +85,18 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/user/help',
+    name: 'help',
+    component: () => import(/* webpackChunkName: "help" */ '../views/help/HelpView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user/about',
+    name: 'userAbout',
+    component: () => import(/* webpackChunkName: "help" */ '../views/help/AboutPlatformView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/user/edit-profile',
     name: 'editProfile',
     component: () => import(/* webpackChunkName: "editProfile" */ '../views/user/EditProfileView.vue'),

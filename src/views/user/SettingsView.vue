@@ -145,48 +145,80 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .settings {
   min-height: 100vh;
-  background-color: #f7f8fa;
-  padding-bottom: 120px; /* 为底部操作区留出空间 */
   position: relative;
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 200px);
+  padding-bottom: 140px; /* 为底部操作区留出空间 */
+}
+
+.van-nav-bar {
+  :deep(.van-nav-bar__content) {
+    background: linear-gradient(to right, #1989fa, #0066ff);
+  }
+
+  :deep(.van-nav-bar__title),
+  :deep(.van-icon) {
+    color: #fff;
+  }
 }
 
 .settings-content {
-  padding: 12px;
+  padding: 12px 12px 0;
 }
 
 .settings-group {
   margin-bottom: 12px;
+
+  :deep(.van-cell-group--inset) {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
 }
 
 .bottom-actions {
   position: fixed;
-  bottom: 0;
   left: 0;
   right: 0;
-  padding: 12px;
-  background-color: #f7f8fa;
+  bottom: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(247, 248, 250, 0.9);
+  backdrop-filter: blur(8px);
+
+  :deep(.van-cell-group--inset) {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .cell-icon {
-  margin-right: 8px;
+  margin-right: 10px;
   font-size: 20px;
-  color: #969799;
+  color: #1989fa;
 }
 
 :deep(.van-cell) {
   align-items: center;
-  padding: 16px;
+  padding: 16px 14px;
+}
+
+::deep(.van-cell:active) {
+  background-color: #f2f3f5;
 }
 
 .switch-account {
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #f2f3f5;
 }
 
 .logout-cell {
-  color: #ee0a24;
+  :deep(.van-cell__title),
+  :deep(.van-cell__value),
+  :deep(.van-icon) {
+    color: #ee0a24;
+  }
 }
 
 .logout-icon {
