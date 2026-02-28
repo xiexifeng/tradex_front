@@ -58,6 +58,43 @@
         </van-tag>
       </BaseCard>
 
+      <!-- 换物流程提示 -->
+      <BaseCard class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title">安全换物 · 简单三步</div>
+          <div class="flow-subtitle">发起申请后，请与对方确认细节再线下/快递完成交付</div>
+        </div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-icon">
+              <van-icon name="edit" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">第 1 步 · 发起申请</div>
+              <div class="flow-step-desc">选择换物/购买方式，填写联系人与地址信息并提交</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-icon">
+              <van-icon name="friends-o" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">第 2 步 · 双方沟通确认</div>
+              <div class="flow-step-desc">与对方确认物品状态、价格/积分、发货与收货方式</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-icon">
+              <van-icon name="passed" />
+            </div>
+            <div class="flow-text">
+              <div class="flow-step-title">第 3 步 · 完成交付</div>
+              <div class="flow-step-desc">按约定完成线下/快递交接，并在平台内完成后续操作</div>
+            </div>
+          </div>
+        </div>
+      </BaseCard>
+
       <!-- 商品基本信息卡片 -->
       <BaseCard class="info-card">
         <h1 class="title">{{ itemDetail.itemTitle }}</h1>
@@ -865,7 +902,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .page-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 260px);
   padding-bottom: 60px;
 }
 
@@ -952,6 +989,76 @@ export default defineComponent({
   .van-icon {
     font-size: 16px;
     color: #1989fa;
+  }
+}
+
+.flow-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef1f6;
+
+  .flow-header {
+    margin-bottom: 10px;
+  }
+
+  .flow-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #323233;
+  }
+
+  .flow-subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #969799;
+  }
+
+  .flow-steps {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .flow-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #f2f6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .van-icon {
+      font-size: 16px;
+      color: #1989fa;
+    }
+  }
+
+  .flow-text {
+    flex: 1;
+  }
+
+  .flow-step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #323233;
+    margin-bottom: 2px;
+  }
+
+  .flow-step-desc {
+    font-size: 12px;
+    color: #969799;
+    line-height: 1.5;
   }
 }
 
