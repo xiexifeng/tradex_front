@@ -219,15 +219,17 @@ const onCodeSubmit = async (values: any) => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/theme.scss';
+
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 260px);
+  background: linear-gradient(180deg, #eaf2ff 0%, $background-color 260px);
   padding-bottom: 50px;
 }
 
 .van-nav-bar {
   :deep(.van-nav-bar__content) {
-    background: linear-gradient(to right, #1989fa, #0066ff);
+    background: $primary-gradient;
   }
   
   :deep(.van-nav-bar__title), :deep(.van-icon) {
@@ -237,7 +239,7 @@ const onCodeSubmit = async (values: any) => {
 
 .hero-section {
   padding: 12px 18px 4px;
-  color: #323233;
+  color: $text-primary;
 }
 
 .hero-text {
@@ -247,20 +249,20 @@ const onCodeSubmit = async (values: any) => {
 }
 
 .hero-title {
-  font-size: 18px;
+  font-size: $font-size-xl;
   font-weight: 600;
 }
 
 .hero-subtitle {
-  font-size: 12px;
-  color: #707070;
+  font-size: $font-size-xs;
+  color: $text-regular;
 }
 
 .van-tabs {
   :deep(.van-tabs__wrap) {
     height: 48px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background: $white;
+    box-shadow: $shadow-sm;
     
     .van-tabs__nav {
       padding: 6px 0;
@@ -271,20 +273,20 @@ const onCodeSubmit = async (values: any) => {
     }
     
     .van-tab {
-      font-size: 14px;
-      color: #666;
+      font-size: $font-size-md;
+      color: $text-regular;
       line-height: 36px;
       transition: all 0.3s ease;
       
       &--active {
-        color: #1989fa;
+        color: $primary-color;
         font-weight: 500;
         transform: scale(1.05);
       }
     }
     
     .van-tabs__line {
-      background: linear-gradient(to right, #1989fa, #0066ff);
+      background: $primary-gradient;
       height: 3px;
       border-radius: 3px;
       bottom: 8px;
@@ -296,7 +298,7 @@ const onCodeSubmit = async (values: any) => {
   margin: 24px 16px;
   
   :deep(.van-button) {
-    background: linear-gradient(to right, #1989fa, #0066ff);
+    background: $primary-gradient;
     border: none;
     height: 44px;
     font-size: 16px;
@@ -315,8 +317,8 @@ const onCodeSubmit = async (values: any) => {
   margin-top: 4px;
 
   .forgot-link {
-    font-size: 12px;
-    color: #1989fa;
+    font-size: $font-size-xs;
+    color: $primary-color;
   }
 }
 
@@ -327,8 +329,8 @@ const onCodeSubmit = async (values: any) => {
   margin-top: 16px;
   
   :deep(.van-button) {
-    color: #1989fa;
-    border-color: #1989fa;
+    color: $primary-color;
+    border-color: $primary-color;
     
     &:active {
       opacity: 0.8;
@@ -339,13 +341,13 @@ const onCodeSubmit = async (values: any) => {
 .agreement-entry {
   margin-top: 14px;
   padding: 0 18px;
-  font-size: 12px;
+  font-size: $font-size-xs;
   line-height: 18px;
   text-align: center;
-  color: #777;
+  color: $text-regular;
 
   .link {
-    color: #1989fa;
+    color: $primary-color;
     cursor: pointer;
   }
 }
