@@ -9,6 +9,14 @@
     />
 
     <div class="transfer-form">
+      <!-- 交易方式提示 -->
+      <div class="notice-card">
+        <div class="notice-content">
+          <van-icon name="info-circle" color="#1989fa" />
+          <span>平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</span>
+        </div>
+      </div>
+
       <!-- 物品基本信息展示 -->
       <van-cell-group inset class="item-info">
         <van-cell title="物品编号" :value="itemInfo.id" />
@@ -164,7 +172,7 @@ export default defineComponent({
         await formRef.value.validate()
         await showDialog({
           title: '确认提交',
-          message: '确定要发起转让申请吗？',
+          message: '平台仅提供信息撮合服务，不参与任何交易环节。发起转让后，所有交易均由您与对方线下自行协商完成，平台不承担交易责任。确定要发起转让申请吗？',
           showCancelButton: true,
         })
         
@@ -203,6 +211,27 @@ export default defineComponent({
 
 .transfer-form {
   padding: 12px;
+}
+
+.notice-card {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
 }
 
 .item-info {

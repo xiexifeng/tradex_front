@@ -6,6 +6,14 @@
       @click-left="onClickLeft"
     />
 
+    <!-- 积分使用范围提示 -->
+    <div class="points-usage-notice">
+      <div class="notice-content">
+        <van-icon name="info-circle" color="#1989fa" />
+        <span>积分使用范围：可用于交换其他用户发布的闲置物品、参与平台积分兑换活动、提升账号信用等级。积分不可兑换现金，不可转让给其他用户。</span>
+      </div>
+    </div>
+
     <van-tabs v-model:active="activeTab" sticky>
       <van-tab 
         v-for="status in statusList" 
@@ -225,6 +233,27 @@ export default defineComponent({
 .stuff-list {
   min-height: 100vh;
   background-color: #f7f8fa;
+}
+
+.points-usage-notice {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 12px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
 }
 
 .van-card {

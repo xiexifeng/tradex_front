@@ -63,7 +63,10 @@
             </div>
             <div class="core-stat-content">
               <div class="core-stat-value">{{ pointsAccount?.pointsBalance || 0 }}</div>
-              <div class="core-stat-label">积分余额</div>
+              <div class="core-stat-label">
+                <span>积分余额</span>
+                <van-icon name="question" class="rule-icon" @click="showPointsRule" />
+              </div>
             </div>
           </div>
           <div class="core-stat-item highlight">
@@ -280,6 +283,49 @@
 
   <!-- 底部导航栏 -->
   <AppTabBar />
+
+  <!-- 积分规则弹窗 -->
+  <van-popup v-model:show="showPointsRulePopup" position="top" :style="{ height: '80%' }">
+    <div class="points-rule-popup">
+      <div class="popup-header">
+        <h3>积分规则说明</h3>
+        <van-icon name="cross" class="close-icon" @click="showPointsRulePopup = false" />
+      </div>
+      <div class="popup-content">
+        <div class="rule-section">
+          <h4>积分获取方式</h4>
+          <ul>
+            <li>完成平台任务获取积分</li>
+            <li>参与平台活动获取积分</li>
+            <li>邀请新用户注册获取积分</li>
+            <li>发布闲置物品获取积分</li>
+            <li>成功完成交易获取积分</li>
+          </ul>
+        </div>
+        <div class="rule-section">
+          <h4>积分使用范围</h4>
+          <ul>
+            <li>用于交换其他用户发布的闲置物品</li>
+            <li>参与平台积分兑换活动</li>
+            <li>提升账号信用等级</li>
+          </ul>
+        </div>
+        <div class="rule-section">
+          <h4>积分使用规则</h4>
+          <ul>
+            <li>积分不可兑换现金</li>
+            <li>积分不可转让给其他用户</li>
+            <li>积分长期有效，可累积使用</li>
+            <li>积分使用需遵守平台相关规定</li>
+          </ul>
+        </div>
+        <div class="rule-section">
+          <h4>平台免责声明</h4>
+          <p>平台仅提供信息撮合服务，积分仅作为用户参与平台活动的虚拟奖励，不涉及任何资金交易。</p>
+        </div>
+      </div>
+    </div>
+  </van-popup>
 
     <cancel-transfer-dialog
       v-model="showCancelTransfer"
@@ -546,6 +592,8 @@ export default defineComponent({
       // 分页参数
       pageNo: 1,
       pageSize: 5,
+      // 积分规则弹窗
+      showPointsRulePopup: false,
     };
   },
   mounted() {
@@ -614,6 +662,9 @@ export default defineComponent({
     },
     goToSettings() {
       this.$router.push('/user/settings')
+    },
+    showPointsRule() {
+      this.showPointsRulePopup = true
     }
   }
 })
@@ -800,6 +851,16 @@ export default defineComponent({
         .core-stat-label {
           font-size: 11px;
           color: #969799;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          
+          .rule-icon {
+            font-size: 12px;
+            color: #1989fa;
+            cursor: pointer;
+            margin-left: 4px;
+          }
         }
       }
     }
@@ -1176,6 +1237,72 @@ export default defineComponent({
   background: #fff;
   border-radius: 12px;
   margin: 12px;
+}
+
+// 积分规则弹窗样式
+.points-rule-popup {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px 12px 0 0;
+  
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f5f5f5;
+    
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #323233;
+      margin: 0;
+    }
+    
+    .close-icon {
+      font-size: 20px;
+      color: #969799;
+      cursor: pointer;
+    }
+  }
+  
+  .popup-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    
+    .rule-section {
+      margin-bottom: 24px;
+      
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #323233;
+        margin: 0 0 12px 0;
+      }
+      
+      ul {
+        padding-left: 20px;
+        margin: 0;
+        
+        li {
+          font-size: 13px;
+          color: #666;
+          line-height: 22px;
+          margin-bottom: 6px;
+        }
+      }
+      
+      p {
+        font-size: 13px;
+        color: #666;
+        line-height: 20px;
+        margin: 0;
+      }
+    }
+  }
 }
 
 </style>

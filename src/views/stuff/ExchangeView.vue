@@ -9,6 +9,40 @@
     />
 
     <div class="exchange-form">
+      <!-- 交易方式提示 -->
+      <div class="notice-card">
+        <div class="notice-content">
+          <van-icon name="info-circle" color="#1989fa" />
+          <span>平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</span>
+        </div>
+      </div>
+
+      <!-- 交换流程说明 -->
+      <div class="process-card">
+        <div class="process-title">
+          <van-icon name="flow" color="#1989fa" />
+          <span>以物换物流程</span>
+        </div>
+        <div class="process-steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <span class="step-text">提交交换请求</span>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <span class="step-text">与对方线下沟通</span>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <span class="step-text">约定时间地点</span>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <span class="step-text">线下完成交换</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 目标物品信息 -->
       <van-cell-group inset title="目标物品信息" class="target-info">
         <van-cell title="物品编号" :value="targetItem.id" />
@@ -210,7 +244,7 @@ export default defineComponent({
         await formRef.value.validate()
         await showDialog({
           title: '确认提交',
-          message: '确定要发起交换请求吗？',
+          message: '平台仅提供信息撮合服务，不参与任何交易环节。发起交换请求后，所有交易均由您与对方线下自行协商完成，平台不承担交易责任。确定要发起交换请求吗？',
           showCancelButton: true,
         })
         
@@ -256,6 +290,75 @@ export default defineComponent({
 
 .exchange-form {
   padding: 12px;
+}
+
+.notice-card {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
+}
+
+.process-card {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  
+  .process-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #389e0d;
+  }
+  
+  .process-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #52c41a;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      
+      .step-text {
+        font-size: 14px;
+        color: #389e0d;
+      }
+    }
+  }
 }
 
 .target-info {

@@ -7,6 +7,44 @@
       class="nav-bar"
     />
 
+    <!-- 交易方式提示 -->
+    <div class="notice-card">
+      <div class="notice-content">
+        <van-icon name="info-circle" color="#1989fa" />
+        <span>平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</span>
+      </div>
+    </div>
+
+    <!-- 交易状态说明 -->
+    <div class="status-info-card">
+      <div class="status-info-title">
+        <van-icon name="help-circle" color="#1989fa" />
+        <span>交易状态说明</span>
+      </div>
+      <div class="status-info-content">
+        <div class="status-item">
+          <span class="status-dot trading"></span>
+          <span class="status-text">交易中：等待对方确认交易</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot accepted"></span>
+          <span class="status-text">已达成：双方已确认交易，等待线下完成</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot completed"></span>
+          <span class="status-text">已完成：交易已线下完成</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot cancelled"></span>
+          <span class="status-text">已取消：交易已取消</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot rejected"></span>
+          <span class="status-text">已拒绝：交易请求被拒绝</span>
+        </div>
+      </div>
+    </div>
+
     <van-tabs 
       v-model:active="activeTab" 
       sticky 
@@ -367,6 +405,72 @@ export default defineComponent({
   min-height: 100vh;
   background-color: #f7f8fa;
   padding-bottom: 50px;
+}
+
+.notice-card {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 12px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
+}
+
+.status-info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  .status-info-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .status-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #555;
+      
+      .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        
+        &.trading { background: #1989fa; }
+        &.accepted { background: #07c160; }
+        &.completed { background: #ff976a; }
+        &.cancelled { background: #969799; }
+        &.rejected { background: #ee0a24; }
+      }
+    }
+  }
 }
 
 // 导航栏样式优化

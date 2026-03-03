@@ -22,6 +22,14 @@
 
     <div class="publish-content">
       <van-form @submit="onSubmit" :show-error=true ref="formRef">
+        <!-- 交易方式提示 -->
+        <div class="notice-card">
+          <div class="notice-content">
+            <van-icon name="info-circle" color="#1989fa" />
+            <span>平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</span>
+          </div>
+        </div>
+
         <!-- 图片上传区域 -->
         <div class="upload-card">
           <div class="section-title">
@@ -196,6 +204,27 @@
 
 .publish-content {
   padding: 16px;
+}
+
+.notice-card {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
 }
 
 .upload-card,
@@ -517,7 +546,7 @@ export default defineComponent({
         // 确认对话框
         await showDialog({
           title: '确认提交',
-          message: '确定要发布吗？',
+          message: '平台仅提供信息撮合服务，不参与任何交易环节。发布后，所有交易均由您与对方线下自行协商完成，平台不承担交易责任。确定要发布吗？',
           showCancelButton: true,
         });
         

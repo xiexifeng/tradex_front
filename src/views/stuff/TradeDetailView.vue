@@ -8,6 +8,14 @@
     />
 
     <div class="detail-content" v-if="tradeInfo">
+      <!-- 交易方式提示 -->
+      <div class="notice-card">
+        <div class="notice-content">
+          <van-icon name="info-circle" color="#1989fa" />
+          <span>平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</span>
+        </div>
+      </div>
+
       <!-- 交易状态卡片 -->
       <div class="trade-header">
         <div class="status-wrap">
@@ -25,7 +33,7 @@
       <div class="flow-card">
         <div class="flow-header">
           <div class="flow-title">这是一笔 {{ tradeInfo.tradeMethod === 'ITEM_TO_ITEM' ? '以物换物' : tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? '线下支付' : '积分支付' }} 交易</div>
-          <div class="flow-subtitle">按步骤完成双方确认、发货收货与评分，交易即告完成</div>
+          <div class="flow-subtitle">按步骤完成双方确认、线下交付与评分，交易即告完成</div>
         </div>
         <div class="flow-steps">
           <div class="flow-step" :class="{ active: tradeInfo.tradeStatus === 'trading' }">
@@ -43,7 +51,7 @@
             </div>
             <div class="flow-text">
               <div class="flow-step-title">达成一致 · 安排交付</div>
-              <div class="flow-step-desc">双方确认换物/价格与交付方式，准备线下/快递交接</div>
+              <div class="flow-step-desc">双方确认换物/价格与交付方式，约定线下交易时间地点</div>
             </div>
           </div>
           <div class="flow-step" :class="{ active: tradeInfo.tradeStatus === 'completed' }">
@@ -52,8 +60,24 @@
             </div>
             <div class="flow-text">
               <div class="flow-step-title">完成交付 · 互评打分</div>
-              <div class="flow-step-desc">确认物品无误后完成交易，并为本次交易打分</div>
+              <div class="flow-step-desc">线下确认物品无误后完成交易，并为本次交易打分</div>
             </div>
+          </div>
+        </div>
+        <!-- 线下交易安全提示 -->
+        <div class="safety-tips">
+          <div class="tips-title">
+            <van-icon name="shield" color="#1989fa" />
+            <span>线下交易安全提示</span>
+          </div>
+          <div class="tips-content">
+            <ul>
+              <li>选择公共场所进行交易，如商场、地铁站等</li>
+              <li>交易时最好有朋友陪同</li>
+              <li>仔细检查物品的真实性和完好性</li>
+              <li>现金交易时注意验钞</li>
+              <li>保留好交易凭证和沟通记录</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -474,6 +498,27 @@ export default defineComponent({
   padding: 16px;
 }
 
+.notice-card {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  
+  .notice-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    
+    span {
+      flex: 1;
+      font-size: 14px;
+      color: #1989fa;
+      line-height: 20px;
+    }
+  }
+}
+
 .flow-card {
   margin-bottom: 16px;
   padding: 14px 16px 10px;
@@ -546,6 +591,35 @@ export default defineComponent({
     font-size: 12px;
     color: #969799;
     line-height: 1.5;
+  }
+}
+
+.safety-tips {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f5f5f5;
+  
+  .tips-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .tips-content {
+    ul {
+      padding-left: 20px;
+      
+      li {
+        font-size: 12px;
+        color: #666;
+        line-height: 20px;
+        margin-bottom: 6px;
+      }
+    }
   }
 }
 

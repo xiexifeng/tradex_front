@@ -32,6 +32,7 @@
       <div class="hero-text">
         <div class="hero-title">让闲置重新流转</div>
         <div class="hero-subtitle">发布闲置 · 寻找好物 · 安全换物</div>
+        <div class="hero-notice">平台仅提供信息撮合，所有交易均为线下进行</div>
       </div>
       <van-button
         round
@@ -173,6 +174,16 @@
   margin-top: 4px;
   font-size: 12px;
   color: #707070;
+}
+
+.hero-notice {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #969799;
+  background: #f5f7fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .hero-button {
