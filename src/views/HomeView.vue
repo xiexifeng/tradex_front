@@ -343,7 +343,7 @@ export default defineComponent({
         icon: 'records',
         text: '我的交易',
         color: '#07c160',
-        action: () => router.push('/stuff/trades')
+        action: () => router.push('/trade/list')
       },
       {
         icon: 'bell',

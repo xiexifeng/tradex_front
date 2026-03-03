@@ -43,39 +43,28 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "publish" */ '../views/stuff/PublishView.vue'),
     meta: { requiresAuth: true }
   },
+  // {
+  //   path: '/stuff/list',
+  //   name: 'stuffList',
+  //   component: () => import(/* webpackChunkName: "stuffList" */ '../views/stuff/StuffListView.vue'),
+  //   meta: { requiresAuth: true }
+  // },
   {
-    path: '/stuff/list',
-    name: 'stuffList',
-    component: () => import(/* webpackChunkName: "stuffList" */ '../views/stuff/StuffListView.vue'),
+    path: '/stuff/detail/:id',
+    name: 'stuffDetail',
+    component: () => import(/* webpackChunkName: "stuffDetail" */ '../views/stuff/StuffDetailView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/stuff/barter',
-    name: 'barter',
-    component: () => import(/* webpackChunkName: "barter" */ '../views/stuff/BarterView.vue')
-  },
-  {
-    path: '/stuff/transfer/:id',
-    name: 'transfer',
-    component: () => import(/* webpackChunkName: "transfer" */ '../views/stuff/TransferView.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/stuff/exchange/:id',
-    name: 'exchange',
-    component: () => import(/* webpackChunkName: "exchange" */ '../views/stuff/ExchangeView.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/stuff/trades',
+    path: '/trade/list',
     name: 'tradeList',
-    component: () => import(/* webpackChunkName: "tradeList" */ '../views/stuff/TradeListView.vue'),
+    component: () => import(/* webpackChunkName: "tradeList" */ '../views/trade/TradeListView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/stuff/trade/:id',
+    path: '/trade/:id',
     name: 'tradeDetail',
-    component: () => import(/* webpackChunkName: "tradeDetail" */ '../views/stuff/TradeDetailView.vue'),
+    component: () => import(/* webpackChunkName: "tradeDetail" */ '../views/trade/TradeDetailView.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -130,12 +119,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'itemDetail',
     component: () => import(/* webpackChunkName: "itemDetail" */ '../views/square/ItemDetailView.vue')
   },
-  {
-    path: '/stuff/detail/:id',
-    name: 'stuffDetail',
-    component: () => import(/* webpackChunkName: "stuffDetail" */ '../views/stuff/StuffDetailView.vue'),
-    meta: { requiresAuth: true }
-  },
+
   {
     path: '/notification',
     name: 'Notification',

@@ -151,7 +151,7 @@ export default defineComponent({
           router.push(`/stuff/detail/${parseRelatedContent.value.itemId}`)
           break
         case 'TRADE':
-          router.push(`/stuff/trade/${notification.value.relatedId}`)
+          router.push(`/trade/${notification.value.relatedId}`)
           break
         // 添加其他类型的跳转逻辑
       }

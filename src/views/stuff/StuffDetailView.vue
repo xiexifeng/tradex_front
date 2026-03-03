@@ -472,7 +472,7 @@ export default defineComponent({
     }
 
     const viewTradeDetails = () => {
-      router.push(`/stuff/trade/${itemDetail.value.id}`)
+      router.push(`/trade/${itemDetail.value.id}`)
     }
     const copyBlockchainId = (blockchainId: string) => {
       if (blockchainId) {

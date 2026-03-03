@@ -14,7 +14,7 @@
           </div>
         </template>
       </van-tabbar-item>
-      <van-tabbar-item icon="orders-o" to="/stuff/trades">
+      <van-tabbar-item icon="orders-o" to="/trade/list">
         交易
       </van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/user/profile">

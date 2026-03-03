@@ -288,7 +288,7 @@ export default defineComponent({
 
     // 查看详情
     const viewDetail = (trade: TradeListItem) => {
-      router.push(`/stuff/trade/${trade.id}`)
+      router.push(`/trade/${trade.id}`)
     }
 
     // 接受交易
