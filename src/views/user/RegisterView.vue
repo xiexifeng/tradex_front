@@ -401,11 +401,13 @@ const onSubmit = async (values: any) => {
       showToast('注册成功');
       router.push('/login');
     } else {
-      showToast(res.desc || '注册失败');
+      const reason = res.desc || '未知原因';
+      showToast(`注册失败（${reason}）`);
     }
   } catch (error: any) {
     console.error('注册失败:', error);
-    showToast(error.message || '注册失败，请稍后重试');
+    const reason = error?.message || error?.response?.data?.desc || '请稍后重试';
+    showToast(`注册失败（${reason}）`);
   } finally {
     submitting.value = false;
   }
