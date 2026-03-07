@@ -188,7 +188,8 @@ export default defineComponent({
 
     const dayMap = computed(() => {
       const map: Record<string, LoginRewardDayItem> = {}
-      list.value.forEach(item => {
+      const arr = Array.isArray(list.value) ? list.value : []
+      arr.forEach(item => {
         map[item.loginDate] = item
       })
       return map
@@ -234,8 +235,8 @@ export default defineComponent({
       loading.value = true
       try {
         const res = await getLoginRewardMonthList(id)
-        if (res.success && res.data) {
-          list.value = res.data
+        if (res.success && res.data != null) {
+          list.value = Array.isArray(res.data) ? res.data : []
         }
       } catch (e) {
         console.error('获取登录奖励月列表失败', e)
@@ -250,8 +251,8 @@ export default defineComponent({
       taskLoading.value = true
       try {
         const res = await getDailyTaskList(id)
-        if (res.success && res.data) {
-          dailyTasks.value = res.data
+        if (res.success && res.data != null) {
+          dailyTasks.value = Array.isArray(res.data) ? res.data : []
         }
       } catch (e) {
         console.error('获取每日任务失败', e)
