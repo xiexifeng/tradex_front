@@ -345,20 +345,13 @@ export default defineComponent({
     const onGoTask = (task: DailyTaskItem) => {
       if (task.taskState === 2) return
       const type = task.taskType
-      if (type === 1) {
+      if (type === 1 || type === 4) {
+        // 点赞、分享：跳到首页，在首页挑选物品进行点赞/分享
         router.push('/')
       } else if (type === 2) {
         router.push('/stuff/publish')
       } else if (type === 3) {
         router.push('/stuff/trades')
-      } else if (type === 4) {
-        const baseUrl = window.location.origin
-        openShare({
-          shareTitle: '每日任务 - 分享得积分',
-          shareDesc: '一起来体验区块链电商的便利吧！',
-          shareImage: userStore.userInfo?.avatarUrl || '',
-          shareUrl: `${baseUrl}/user/login-reward`
-        })
       }
     }
 
