@@ -22,14 +22,14 @@
             <div v-if="cell.empty" class="day-cell empty"></div>
             <div
               v-else
-              :class="['day-cell', 'day-' + cell.status, { clickable: cell.status === 0 }]"
-              @click="cell.status === 0 ? onReceive(cell) : null"
+              :class="['day-cell', 'day-' + cell.status, { clickable: isClaimable(cell) }]"
+              @click.stop.prevent="onDayCellClick(cell)"
             >
               <span class="day-num">{{ cell.day }}</span>
-              <span v-if="cell.status !== -1" class="day-points">+{{ cell.rewardPoint }}</span>
+              <span v-if="cell.status !== -1 && cell.rewardPoint > 0" class="day-points">+{{ cell.rewardPoint }}</span>
               <span v-if="cell.status === 0" class="day-action">领</span>
               <span v-else-if="cell.status === 1" class="day-done">已领</span>
-              <span v-else-if="cell.status === 2" class="day-expired">过期</span>
+              <span v-else-if="cell.status === 2" class="day-expired">过</span>
             </div>
           </template>
         </div>
@@ -186,11 +186,36 @@ export default defineComponent({
       return `${currentYear.value}年${currentMonth.value}月`
     })
 
+    // 将接口日期统一为 yyyymmdd，兼容 2026-03-09 / 2026/3/9 / 20260309
+    const toYyyymmdd = (v: unknown): string => {
+      if (v == null || v === '') return ''
+      const s = String(v).trim()
+      const cleaned = s.replace(/-/g, '').replace(/\//g, '')
+      if (/^\d{8}$/.test(cleaned)) return cleaned
+      const d = new Date(s)
+      if (Number.isNaN(d.getTime())) return ''
+      return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+    }
+
+    // 归一化单条记录，兼容 rewardStatus/reward_status、rewardPoint/reward_point、loginDate/login_date
+    const normalizeRewardItem = (raw: Record<string, unknown>): LoginRewardDayItem => {
+      const loginDate = toYyyymmdd(raw.loginDate ?? raw.login_date ?? '')
+      const rewardStatus = Number(raw.rewardStatus ?? raw.reward_status ?? -1)
+      const rewardPoint = Number(raw.rewardPoint ?? raw.reward_point ?? 0)
+      return {
+        loginDate,
+        rewardStatus: Number.isNaN(rewardStatus) ? -1 : rewardStatus,
+        rewardPoint: Number.isNaN(rewardPoint) ? 0 : rewardPoint
+      }
+    }
+
     const dayMap = computed(() => {
       const map: Record<string, LoginRewardDayItem> = {}
       const arr = Array.isArray(list.value) ? list.value : []
-      arr.forEach(item => {
-        map[item.loginDate] = item
+      arr.forEach((item: unknown) => {
+        const row = item as Record<string, unknown>
+        const norm = normalizeRewardItem(row)
+        if (norm.loginDate) map[norm.loginDate] = norm
       })
       return map
     })
@@ -203,6 +228,10 @@ export default defineComponent({
       const firstWeekday = first.getDay()
       const totalDays = last.getDate()
       const cells: DayCell[] = []
+      const today = new Date()
+      const todayStr =
+        `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`
+      const hasUserId = !!userId.value
 
       for (let i = 0; i < firstWeekday; i++) {
         cells.push({ empty: true, status: -1, rewardPoint: 0 })
@@ -210,11 +239,19 @@ export default defineComponent({
       for (let d = 1; d <= totalDays; d++) {
         const dateStr = `${year}${String(month).padStart(2, '0')}${String(d).padStart(2, '0')}`
         const item = dayMap.value[dateStr]
+        const isToday = dateStr === todayStr
+        const rawStatus = item != null
+          ? item.rewardStatus
+          : isToday && hasUserId
+            ? 0
+            : -1
+        const status = Number(rawStatus)
+        const rewardPoint = item != null ? Number(item.rewardPoint) : isToday && hasUserId ? 1 : 0
         cells.push({
           day: d,
           dateStr,
-          status: item ? item.rewardStatus : -1,
-          rewardPoint: item ? item.rewardPoint : 0
+          status: Number.isNaN(status) ? -1 : status,
+          rewardPoint: Number.isNaN(rewardPoint) ? 0 : rewardPoint
         })
       }
       return cells
@@ -236,7 +273,9 @@ export default defineComponent({
       try {
         const res = await getLoginRewardMonthList(id)
         if (res.success && res.data != null) {
-          list.value = Array.isArray(res.data) ? res.data : []
+          const data = res.data as { items?: unknown[] }
+          const arr = Array.isArray(data.items) ? data.items : []
+          list.value = arr.map((row: unknown) => normalizeRewardItem(row as Record<string, unknown>))
         }
       } catch (e) {
         console.error('获取登录奖励月列表失败', e)
@@ -261,8 +300,19 @@ export default defineComponent({
       }
     }
 
+    const isClaimable = (cell: DayCell) => {
+      if (cell.empty || !cell.dateStr) return false
+      return Number(cell.status) === 0
+    }
+
+    const onDayCellClick = (cell: DayCell) => {
+      if (cell.empty || cell.dateStr == null) return
+      if (Number(cell.status) !== 0) return
+      onReceive(cell)
+    }
+
     const onReceive = async (cell: DayCell) => {
-      if (cell.empty || cell.status !== 0 || !cell.dateStr) return
+      if (cell.empty || Number(cell.status) !== 0 || !cell.dateStr) return
       const id = userId.value
       if (!id) return
       try {
@@ -273,7 +323,17 @@ export default defineComponent({
         })
         if (res.code === '000000') {
           showToast('领取成功')
-          await fetchList()
+          // 领取成功：立即将当日标为已领取（rewardStatus=1），不可再次点击；不再请求 fetchList 避免接口返回覆盖导致又变可点
+          const dateStr = cell.dateStr
+          const arr = Array.isArray(list.value) ? list.value : []
+          const found = arr.find((item: LoginRewardDayItem) => item.loginDate === dateStr)
+          if (found) {
+            list.value = arr.map((item: LoginRewardDayItem) =>
+              item.loginDate === dateStr ? { ...item, rewardStatus: 1 } : item
+            )
+          } else {
+            list.value = [...arr, { loginDate: dateStr, rewardPoint: cell.rewardPoint, rewardStatus: 1 }]
+          }
         } else {
           showToast(res.desc || '领取失败')
         }
@@ -316,6 +376,8 @@ export default defineComponent({
       dailyTasks,
       taskLoading,
       progressPercent,
+      isClaimable,
+      onDayCellClick,
       onReceive,
       onGoTask,
       showShareDialog,
@@ -415,24 +477,40 @@ export default defineComponent({
 
 .day-cell {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 10px;
   min-height: 0;
   height: 28px;
   width: 100%;
   box-sizing: border-box;
   min-width: 28px;
+  white-space: nowrap;
+  padding: 0 2px;
+
+  .day-num {
+    margin-right: 2px;
+  }
 
   &.empty {
     background: transparent;
   }
 
+  /* 仅 status=0 可点击；已领取(1)、过期(2)、未登录(-1) 不响应点击 */
+  &:not(.clickable) {
+    pointer-events: none;
+    cursor: default;
+  }
+
   &.day--1 {
     background: #e8e9eb;
     color: #969799;
+    pointer-events: none;
+    cursor: default;
     .day-num { color: #969799; font-weight: 500; }
   }
 
@@ -441,9 +519,9 @@ export default defineComponent({
     border: 1.5px solid #1989fa;
     color: #1989fa;
     box-shadow: 0 1px 3px rgba(25, 137, 250, 0.2);
-    .day-num { font-weight: 700; font-size: 13px; }
-    .day-points { font-size: 10px; }
-    .day-action { font-size: 10px; margin-top: 0; font-weight: 600; }
+    .day-num { font-weight: 700; font-size: 11px; }
+    .day-points { font-size: 9px; }
+    .day-action { font-size: 9px; font-weight: 600; }
     &.clickable {
       cursor: pointer;
       &:active { opacity: 0.9; transform: scale(0.97); }
@@ -454,19 +532,24 @@ export default defineComponent({
     background: linear-gradient(145deg, #d4f0e0 0%, #e8f8f0 100%);
     border: 1px solid rgba(7, 193, 96, 0.35);
     color: #07c160;
+    pointer-events: none;
+    cursor: default;
     .day-num { font-weight: 600; }
-    .day-done { font-size: 10px; margin-top: 0; font-weight: 600; }
+    .day-done { font-size: 9px; font-weight: 600; }
   }
 
   &.day-2 {
     background: #ebeced;
     color: #969799;
+    pointer-events: none;
+    cursor: default;
     .day-num { color: #969799; }
-    .day-expired { font-size: 10px; margin-top: 0; color: #969799; }
+    .day-expired { font-size: 9px; color: #969799; }
   }
 
-  .day-num { font-size: 12px; }
-  .day-points { font-size: 10px; font-weight: 600; margin-top: 0; }
+  .day-num { font-size: 11px; }
+  .day-points { font-size: 9px; font-weight: 600; }
+  .day-action, .day-done, .day-expired { font-size: 9px; }
 }
 
 .legend-inline {

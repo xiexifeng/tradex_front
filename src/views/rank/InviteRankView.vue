@@ -156,16 +156,16 @@ const latestRankUsers = computed(() => {
 });
 
 // 分享信息
-const shareTitle = computed(() => '拉新排行榜 - 区块链电商平台');
+const shareTitle = computed(() => '拉新排行榜 - 易物平台');
 const shareDesc = computed(() => '看看谁是最强拉新达人！');
 const shareImage = computed(() => 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg');
 const shareUrl = computed(() => {
   const baseUrl = window.location.origin;
   const userInfo = userStore.userInfo;
   if (userInfo?.userId) {
-    return `${baseUrl}/client/auth/register?inviteUserId=${userInfo.userId}&inviteTime=${Date.now()}`;
+    return `${baseUrl}/register?inviteUserId=${userInfo.userId}&inviteTime=${Date.now()}`;
   }
-  return `${baseUrl}/client/auth/register`;
+  return `${baseUrl}/register`;
 });
 
 // 获取排名样式类
@@ -266,7 +266,7 @@ onMounted(() => {
 .rank-nav {
   :deep(.van-nav-bar__content) {
     background: linear-gradient(to right, #1989fa, #0066ff);
-    
+
     .van-nav-bar__title,
     .nav-icon {
       color: #fff;

@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction, LoginRewardDayItem, DailyTaskItem } from './types';
+import type { ApiResponse, LoginResponse, UserInfo, PointsAccount, PointsTransaction, TradeScoreTransaction, LoginRewardDayItem, LoginRewardMonthResult, DailyTaskItem } from './types';
 
 export const userApi = {
   // 发送验证码
@@ -15,11 +15,11 @@ export const userApi = {
     );
   },
 
-  // 密码登录
-  loginByPassword(username: string, password: string) {
+  // 密码登录（与验证码登录返回格式一致）
+  loginByPassword(phoneNumbers: string, password: string) {
     return request.post<ApiResponse<LoginResponse>>(
-      '/client/auth/login',
-      `username=${username}&password=${password}`
+      '/client/auth/login-by-password',
+      `phoneNumbers=${encodeURIComponent(phoneNumbers)}&password=${encodeURIComponent(password)}`
     );
   },
 
@@ -130,8 +130,8 @@ export function getLatestRank(): Promise<ApiResponse<LatestRankData>> {
   return request.get('/client/rank/latest-rank');
 }
 
-// 每日登录奖励 - 当月列表
-export function getLoginRewardMonthList(userId: string): Promise<ApiResponse<LoginRewardDayItem[]>> {
+// 每日登录奖励 - 当月列表（返回 { items: [...] }）
+export function getLoginRewardMonthList(userId: string): Promise<ApiResponse<LoginRewardMonthResult>> {
   return request.get('/client/user/login-reward/month-list', { params: { userId } });
 }
 

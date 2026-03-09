@@ -166,9 +166,22 @@ const startCountdown = () => {
 };
 
 // 密码登录提交
-const onPasswordSubmit = (values: any) => {
-  console.log('password submit', values);
-  showToast('登录中...');
+const onPasswordSubmit = async (values: { username: string; password: string }) => {
+  try {
+    showToast('登录中...');
+    const res = await userApi.loginByPassword(values.username, values.password);
+    const { token, userContext } = (res.data as unknown) as LoginResponse;
+
+    userStore.setToken(token);
+    userStore.setUserInfo(userContext);
+
+    showToast('登录成功');
+    router.push('/');
+  } catch (error) {
+    console.error('密码登录失败:', error);
+    const msg = (error as any)?.message ?? '登录失败，请检查手机号与密码';
+    showToast(msg);
+  }
 };
 
 // 验证码登录提交

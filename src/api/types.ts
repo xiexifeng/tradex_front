@@ -256,6 +256,14 @@ export interface LoginRewardDayItem {
   rewardStatus: number;
 }
 
+// 每日登录奖励 - 当月列表接口返回（含 items 数组）
+export interface LoginRewardMonthResult {
+  allLoginReward?: number;
+  continuousLoginReward?: number;
+  dailyLoginReward?: number;
+  items: LoginRewardDayItem[];
+}
+
 // 每日任务 - taskType: 1-点赞 2-发布物品 3-评价 4-分享; taskState: 1-进行中 2-已完成 3-过期; isReceived: 0-未领取 1-已领取
 export interface DailyTaskItem {
   taskCode: string;
