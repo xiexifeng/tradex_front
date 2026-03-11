@@ -353,13 +353,13 @@ export default defineComponent({
         color: '#ff976a',
         action: () => router.push('/notification')
       },
-	  {
+      {
         icon: 'calendar-o',
         text: '每日签到',
         color: '#ff976a',
         action: () => router.push('/user/login-reward')
       },
-	  {
+      {
         icon: 'friends-o',
         text: '拉新排行',
         color: '#ff6b9d',

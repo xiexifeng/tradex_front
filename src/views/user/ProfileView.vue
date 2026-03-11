@@ -1345,7 +1345,6 @@ export default defineComponent({
   margin: 12px;
 }
 
-<<<<<<< HEAD
 // 积分规则弹窗样式
 .points-rule-popup {
   height: 100%;
@@ -1413,6 +1412,3 @@ export default defineComponent({
 }
 
 </style>
-=======
-</style>
->>>>>>> remotes/origin/feature-1.0.4
