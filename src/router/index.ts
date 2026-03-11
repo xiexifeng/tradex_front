@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "agreement" */ '../views/agreement/SwapUsageAgreementView.vue')
   },
   {
+	path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "register" */ '../views/user/RegisterView.vue')
+  },
+  {
     path: '/user/profile',
     name: 'profile',
     component: () => import(/* webpackChunkName: "userProfile" */ '../views/user/ProfileView.vue'),
@@ -119,7 +124,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'itemDetail',
     component: () => import(/* webpackChunkName: "itemDetail" */ '../views/square/ItemDetailView.vue')
   },
-
   {
     path: '/notification',
     name: 'Notification',
@@ -142,6 +146,17 @@ const routes: Array<RouteRecordRaw> = [
     path: '/audit/:id',
     name: 'audit',
     component: () => import(/* webpackChunkName: "audit" */ '../views/audit/AuditView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/rank/invite',
+    name: 'inviteRank',
+    component: () => import(/* webpackChunkName: "inviteRank" */ '../views/rank/InviteRankView.vue')
+  },
+  {
+    path: '/user/login-reward',
+    name: 'loginReward',
+    component: () => import(/* webpackChunkName: "loginReward" */ '../views/user/LoginRewardView.vue'),
     meta: { requiresAuth: true }
   }
 ]

@@ -271,6 +271,7 @@ import { useItemList } from '@/composables/useItemList'
 import { getValueText } from '@/constants/stuff'
 import ItemCard from '@/components/ui/ItemCard.vue'
 import AppTabBar from '@/components/ui/AppTabBar.vue'
+import { useUserStore } from '@/store/modules/user'
 
 export default defineComponent({
   name: 'HomeView',
@@ -280,8 +281,9 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter()
+    const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
     const searchValue = ref('')
-    const userInfo = ref(1) // 实际项目中从vuex或pinia获取
 
     // 使用物品列表组合式函数
     const {
@@ -350,6 +352,18 @@ export default defineComponent({
         text: '消息通知',
         color: '#ff976a',
         action: () => router.push('/notification')
+      },
+	  {
+        icon: 'calendar-o',
+        text: '每日签到',
+        color: '#ff976a',
+        action: () => router.push('/user/login-reward')
+      },
+	  {
+        icon: 'friends-o',
+        text: '拉新排行',
+        color: '#ff6b9d',
+        action: () => router.push('/rank/invite')
       }
     ]
 

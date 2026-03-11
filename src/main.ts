@@ -49,6 +49,8 @@ import {
   Row,
   Slider,
   Sticky,
+  Progress,
+  Loading,
 } from 'vant'
 
 const app = createApp(App)
@@ -96,6 +98,8 @@ const vantComponents = [
   Row,
   Slider,
   Sticky,
+  Progress,
+  Loading,
 ]
 
 vantComponents.forEach(component => {
