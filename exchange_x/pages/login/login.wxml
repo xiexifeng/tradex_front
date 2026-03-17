@@ -1,0 +1,93 @@
+<view class="login-container">
+  <view class="hero-section">
+    <view class="hero-text">
+      <view class="hero-title">欢迎来到 X平台</view>
+      <view class="hero-subtitle">登录后即可发布闲置、发起换物并查看交易进度</view>
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab-header">
+      <view class="tab-item {{activeTab === 'password' ? 'active' : ''}}" data-key="password" bindtap="onTabChange">
+        密码登录
+      </view>
+      <view class="tab-item {{activeTab === 'code' ? 'active' : ''}}" data-key="code" bindtap="onTabChange">
+        验证码登录
+      </view>
+    </view>
+
+    <!-- 密码登录 -->
+    <view wx:if="{{activeTab === 'password'}}" class="tab-body">
+      <form bindsubmit="onPasswordSubmit">
+        <view class="form-group">
+          <input
+            name="username"
+            class="input"
+            type="text"
+            placeholder="请输入手机号"
+            value="{{passwordForm.username}}"
+            bindinput="onPasswordUsernameInput"
+          />
+        </view>
+        <view class="form-group">
+          <input
+            name="password"
+            class="input"
+            password="{{passwordType === 'password'}}"
+            type="text"
+            placeholder="请输入密码"
+            value="{{passwordForm.password}}"
+            bindinput="onPasswordInput"
+          />
+        </view>
+        <view class="forgot-row">
+          <text class="forgot-link">忘记密码？</text>
+        </view>
+        <button class="primary-button" formType="submit">登录</button>
+      </form>
+    </view>
+
+    <!-- 验证码登录 -->
+    <view wx:elif="{{activeTab === 'code'}}" class="tab-body">
+      <form bindsubmit="onCodeSubmit">
+        <view class="form-group">
+          <input
+            name="phone"
+            class="input"
+            type="text"
+            placeholder="请输入手机号"
+            value="{{codeForm.phone}}"
+            bindinput="onCodePhoneInput"
+          />
+        </view>
+        <view class="form-group code-group">
+          <input
+            name="code"
+            class="input"
+            type="text"
+            placeholder="请输入验证码"
+            value="{{codeForm.code}}"
+            bindinput="onCodeInput"
+          />
+          <button
+            class="code-button"
+            type="button"
+            disabled="{{!!countdown}}"
+            bindtap="onSendCode"
+          >
+            {{ countdown ? countdown + 's后重发' : '发送验证码' }}
+          </button>
+        </view>
+        <button class="primary-button" formType="submit">登录</button>
+      </form>
+    </view>
+  </view>
+
+  <view class="agreement-entry">
+    <text class="text">登录即表示您已阅读并同意</text>
+    <text class="link">《用户隐私协议》</text>
+    <text class="text">与</text>
+    <text class="link">《换物使用协议》</text>
+  </view>
+</view>
+

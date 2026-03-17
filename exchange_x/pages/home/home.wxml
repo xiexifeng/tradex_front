@@ -1,0 +1,103 @@
+<view class="page-container">
+  <!-- 顶部导航栏 -->
+  <view class="custom-nav">
+    <view class="nav-title">X平台</view>
+    <view class="nav-right">
+      <block wx:if="{{userInfo}}">
+        <text class="nav-icon">👤</text>
+      </block>
+      <block wx:else>
+        <text class="login-text" bindtap="onClickRight">登录</text>
+      </block>
+    </view>
+  </view>
+
+  <!-- 搜索 + 首屏引导 -->
+  <view class="search-wrapper">
+    <view class="search-box" bindtap="onSearchClick">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索你想要的好物</text>
+    </view>
+  </view>
+
+  <view class="hero-section">
+    <view class="hero-text">
+      <view class="hero-title">让闲置重新流转</view>
+      <view class="hero-subtitle">发布闲置 · 寻找好物 · 安全换物</view>
+      <view class="hero-notice">平台仅提供信息撮合，所有交易均为线下进行</view>
+    </view>
+    <button class="hero-button" size="mini" bindtap="goToPublish">
+      立即发布闲置
+    </button>
+  </view>
+
+  <!-- 轮播图 -->
+  <view class="banner-wrapper">
+    <swiper
+      class="banner"
+      autoplay="true"
+      interval="3000"
+      circular="true"
+      indicator-dots="false"
+    >
+      <block wx:for="{{banners}}" wx:key="*this">
+        <swiper-item>
+          <view class="banner-item">
+            <image src="{{item}}" mode="aspectFill"></image>
+          </view>
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <!-- 功能导航 -->
+  <view class="feature-section">
+    <view class="feature-grid">
+      <block wx:for="{{features}}" wx:key="text">
+        <view class="feature-item" data-key="{{item.key}}" bindtap="onFeatureTap">
+          <view class="feature-icon" style="background: {{item.color}}">
+            <text class="feature-icon-text">{{item.text.slice(0,1)}}</text>
+          </view>
+          <text class="feature-text">{{item.text}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="products-section">
+    <!-- 筛选工具栏（先做静态 UI） -->
+    <view class="filter-bar">
+      <view class="filter-item">
+        <text>类型</text>
+      </view>
+      <view class="filter-item">
+        <text>交易方式</text>
+      </view>
+      <view class="filter-item">
+        <text>排序</text>
+      </view>
+    </view>
+
+    <!-- 商品列表 -->
+    <block wx:if="{{items.length}}">
+      <view class="products-grid">
+        <block wx:for="{{items}}" wx:key="id">
+          <item-card item="{{item}}" bindselect="onViewClick" />
+        </block>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="empty-state">
+        <view class="empty-title">还没有发现合适的好物</view>
+        <view class="empty-subtitle">去发布一件闲置，或稍后再来逛逛</view>
+        <button class="empty-button" size="mini" bindtap="goToPublish">
+          发布我的第一件闲置
+        </button>
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部导航栏 -->
+  <app-tab-bar active="{{activeTab}}" bindchange="onTabChange" />
+</view>

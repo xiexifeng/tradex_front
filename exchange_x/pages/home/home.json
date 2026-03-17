@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "X平台",
+  "usingComponents": {
+    "item-card": "/components/item-card/index",
+    "app-tab-bar": "/components/app-tab-bar/index"
+  }
+}

@@ -1,0 +1,26 @@
+<view class="tabbar-wrapper">
+  <view class="tabbar">
+    <view class="tab-item {{active === 'home' ? 'active' : ''}}" data-key="home" bindtap="onTap">
+      <text class="icon">🏠</text>
+      <text class="text">首页</text>
+    </view>
+    <view class="tab-item {{active === 'notification' ? 'active' : ''}}" data-key="notification" bindtap="onTap">
+      <text class="icon">🔔</text>
+      <text class="text">消息</text>
+    </view>
+    <view class="tab-item publish" data-key="publish" bindtap="onTap">
+      <view class="publish-button">
+        <text class="publish-icon">＋</text>
+      </view>
+    </view>
+    <view class="tab-item {{active === 'trade' ? 'active' : ''}}" data-key="trade" bindtap="onTap">
+      <text class="icon">📄</text>
+      <text class="text">交易</text>
+    </view>
+    <view class="tab-item {{active === 'profile' ? 'active' : ''}}" data-key="profile" bindtap="onTap">
+      <text class="icon">👤</text>
+      <text class="text">我的</text>
+    </view>
+  </view>
+  <view class="bottom-space"></view>
+</view>

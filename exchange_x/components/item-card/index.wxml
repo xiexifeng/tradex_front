@@ -1,0 +1,43 @@
+<view class="item-card" bindtap="onTap">
+  <view class="image">
+    <image class="image-main" src="{{item.firstImage}}" mode="aspectFill"></image>
+    <view class="tags">
+      <text class="pill pill-blue">{{item.itemType}}</text>
+      <text class="pill pill-orange">{{item.depreciation}}成新</text>
+    </view>
+  </view>
+  <view class="info">
+    <view class="title">{{item.itemTitle}}</view>
+    <view class="meta">
+      <view class="price-block">
+        <block wx:if="{{item.tradeMethod === 'ITEM_TO_MONEY'}}">
+          <text class="price">¥{{item.transferPrice}}</text>
+        </block>
+        <block wx:elif="{{item.tradeMethod === 'ITEM_TO_POINTS'}}">
+          <text class="price">{{item.transferPoints}}积分</text>
+        </block>
+        <block wx:else>
+          <text class="exchange">换{{item.expectItem}}</text>
+        </block>
+      </view>
+      <view class="trade-tag">
+        <text>{{tradeMethodTextMap[item.tradeMethod] || '交易方式'}}</text>
+      </view>
+    </view>
+    <view class="footer">
+      <view class="footer-row user-row">
+        <view class="user">
+          <image class="avatar" src="{{item.userAvatar}}" mode="aspectFill"></image>
+          <text class="name">{{item.userNickname}}</text>
+        </view>
+      </view>
+      <view class="footer-row stats-row">
+        <view class="stats">
+          <text class="stat">👀 {{item.viewCount}}</text>
+          <text class="stat">👍 {{item.loveCount}}</text>
+          <text class="stat">★ {{item.collectionCount}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
