@@ -1,0 +1,50 @@
+<view class="settings-page">
+  <view class="content">
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="goToSecurity">
+        <text class="cell-icon">🛡</text>
+        <text class="cell-title">账号与安全</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="goToAddress">
+        <text class="cell-icon">📍</text>
+        <text class="cell-title">收货地址</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="goToHelp">
+        <text class="cell-icon">💬</text>
+        <text class="cell-title">帮助与客服</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="goToAbout">
+        <text class="cell-icon">ℹ️</text>
+        <text class="cell-title">关于X平台</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+  </view>
+
+  <!-- 底部固定操作区 -->
+  <view class="bottom-actions">
+    <base-card extClass="bottom-card">
+      <view class="bottom-cell clickable" bindtap="switchAccount">
+        <text class="cell-icon">⇄</text>
+        <text class="cell-title">切换账号</text>
+      </view>
+      <view class="divider"></view>
+      <view class="bottom-cell logout-cell clickable" bindtap="logout">
+        <text class="cell-icon">⨯</text>
+        <text class="cell-title">退出登录</text>
+      </view>
+    </base-card>
+  </view>
+</view>

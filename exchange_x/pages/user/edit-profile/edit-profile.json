@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "编辑资料",
+  "usingComponents": {
+    "base-card": "/components/base-card/index",
+    "avatar-uploader": "/components/avatar-uploader/index"
+  }
+}

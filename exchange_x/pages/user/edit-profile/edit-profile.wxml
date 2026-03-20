@@ -1,0 +1,100 @@
+<view class="edit-page">
+  <!-- 顶部栏 -->
+  <view class="header">
+    <view class="header-left" bindtap="onClickLeft">← 返回</view>
+    <view class="header-title">编辑资料</view>
+    <button class="header-save" loading="{{saving}}" disabled="{{saving}}" bindtap="saveProfile">保存</button>
+  </view>
+
+  <view class="content">
+    <!-- 头像 -->
+    <base-card extClass="section-card">
+      <view class="avatar-section" bindtap="onAvatarTap">
+        <avatar-uploader
+          avatarUrl="{{form.avatarUrl || ''}}"
+          sizeRpx="{{80}}"
+          bind:requireLogin="onRequireLogin"
+          bind:change="onAvatarChanged"
+        />
+        <view class="avatar-text">
+          <text class="avatar-text-main">点击更换头像</text>
+          <text class="avatar-text-sub">支持 JPG、PNG 格式</text>
+        </view>
+      </view>
+    </base-card>
+
+    <!-- 基本信息 -->
+    <base-card extClass="section-card">
+      <view class="block-title">基本信息</view>
+
+      <view class="row">
+        <text class="label">昵称</text>
+        <input
+          class="field"
+          type="text"
+          placeholder="请输入昵称"
+          maxlength="20"
+          value="{{form.nickname}}"
+          bindinput="onNicknameInput"
+        />
+      </view>
+
+      <view class="row picker-row" bindtap="noop">
+        <text class="label">性别</text>
+        <picker mode="selector" range="{{genderTexts}}" value="{{genderIndex}}" bindchange="onGenderChange">
+          <view class="picker-field">{{genderTextDisplay || '请选择性别'}}</view>
+        </picker>
+      </view>
+
+      <view class="row picker-row" bindtap="noop">
+        <text class="label">生日</text>
+        <picker mode="date" value="{{birthdayValue}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onBirthdayChange">
+          <view class="picker-field">{{form.birthday || '请选择生日'}}</view>
+        </picker>
+      </view>
+    </base-card>
+
+    <!-- 联系方式 -->
+    <base-card extClass="section-card">
+      <view class="block-title">联系方式</view>
+
+      <view class="row">
+        <text class="label">地址</text>
+        <textarea
+          class="textarea"
+          placeholder="请输入地址"
+          maxlength="200"
+          auto-height
+          value="{{form.address}}"
+          bindinput="onAddressInput"
+        />
+      </view>
+
+      <view class="row">
+        <text class="label">微信</text>
+        <input class="field" type="text" placeholder="请输入微信号" value="{{form.wechat}}" bindinput="onWechatInput" />
+      </view>
+
+      <view class="row">
+        <text class="label">QQ</text>
+        <input class="field" type="text" placeholder="请输入QQ号" value="{{form.qq}}" bindinput="onQqInput" />
+      </view>
+    </base-card>
+
+    <!-- 简介 -->
+    <base-card extClass="section-card">
+      <view class="block-title">个人简介</view>
+      <view class="row">
+        <textarea
+          class="textarea"
+          placeholder="介绍一下自己吧..."
+          maxlength="200"
+          auto-height
+          value="{{form.brief}}"
+          bindinput="onBriefInput"
+        />
+      </view>
+    </base-card>
+  </view>
+</view>
+

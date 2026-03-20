@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "账号与安全",
+  "usingComponents": {
+    "base-card": "/components/base-card/index"
+  }
+}

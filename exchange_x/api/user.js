@@ -84,6 +84,42 @@ function getTradeScoreTransactions(params) {
   });
 }
 
+// 编辑用户资料
+function updateUserProfile(data) {
+  return request({
+    url: "/client/user/update",
+    method: "POST",
+    data,
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+// 设置交易密码
+function setTradePassword(newTradePasswd) {
+  return request({
+    url: "/client/security/set-trade-passwd",
+    method: "POST",
+    data: { newTradePasswd },
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+// 设置登录密码
+function setLoginPassword(newLoginPasswd) {
+  return request({
+    url: "/client/security/set-login-passwd",
+    method: "POST",
+    data: { newLoginPasswd },
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
 module.exports = {
   sendSms,
   loginByCode,
@@ -91,6 +127,9 @@ module.exports = {
   refreshUserInfo,
   getPointsAccount,
   getPointsTransactions,
-  getTradeScoreTransactions
+  getTradeScoreTransactions,
+  updateUserProfile,
+  setTradePassword,
+  setLoginPassword
 };
 

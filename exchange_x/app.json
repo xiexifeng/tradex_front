@@ -4,7 +4,10 @@
     "pages/login/login",
     "pages/stuff/publish/publish",
     "pages/profile/profile",
-    "pages/index/index"
+    "pages/user/edit-profile/edit-profile",
+    "pages/index/index",
+    "pages/user/settings/settings",
+    "pages/user/security/security"
   ],
   "window": {
     "backgroundTextStyle": "light",

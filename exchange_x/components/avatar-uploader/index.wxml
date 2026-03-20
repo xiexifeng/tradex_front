@@ -1,0 +1,11 @@
+<view
+  class="avatar-uploader"
+  style="width: {{sizeRpx}}rpx; height: {{sizeRpx}}rpx;"
+  bindtap="chooseAndUpload"
+>
+  <image class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+  <view class="overlay">
+    <text class="overlay-text">更换头像</text>
+  </view>
+</view>
+

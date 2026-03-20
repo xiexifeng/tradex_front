@@ -1,0 +1,96 @@
+<view class="security-page">
+  <view class="content">
+    <base-card extClass="section-card">
+      <view class="cell">
+        <text class="cell-title">手机号</text>
+        <text class="cell-value">{{maskedPhone}}</text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="handleSetLoginPassword">
+        <text class="cell-title">登录密码</text>
+        <text class="cell-value">{{loginPasswordStatus}}</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable" bindtap="handleSetTradePassword">
+        <text class="cell-title">交易密码</text>
+        <text class="cell-value">{{tradePasswordStatus}}</text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell">
+        <text class="cell-title">微信账号</text>
+        <text class="cell-value">{{wechatText}}</text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell">
+        <text class="cell-title">QQ账号</text>
+        <text class="cell-value">{{qqText}}</text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell">
+        <text class="cell-title">实名认证</text>
+        <text class="cell-value">{{authStatusText}}</text>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card">
+      <view class="cell clickable delete-cell" bindtap="handleDeleteAccount">
+        <text class="cell-title">注销账号</text>
+        <text class="cell-value"></text>
+        <text class="cell-arrow">></text>
+      </view>
+    </base-card>
+  </view>
+
+  <!-- 设置密码弹窗 -->
+  <view wx:if="{{showPasswordDialog}}" class="mask" bindtap="closePasswordDialog">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">{{passwordDialogTitle}}</view>
+
+      <view class="form">
+        <view class="input-row">
+          <text class="input-label">密码</text>
+          <input
+            class="input"
+            type="password"
+            placeholder="请输入密码"
+            value="{{passwordForm.password}}"
+            bindinput="onPasswordInput"
+          />
+        </view>
+        <view class="input-row">
+          <text class="input-label">确认密码</text>
+          <input
+            class="input"
+            type="password"
+            placeholder="请再次输入密码"
+            value="{{passwordForm.confirmPassword}}"
+            bindinput="onConfirmPasswordInput"
+          />
+        </view>
+      </view>
+
+      <button
+        class="confirm-btn"
+        type="primary"
+        loading="{{isSubmitting}}"
+        disabled="{{isSubmitting}}"
+        bindtap="confirmSetPassword"
+      >
+        确认设置
+      </button>
+    </view>
+  </view>
+</view>
+

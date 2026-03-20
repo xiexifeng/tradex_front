@@ -262,7 +262,9 @@ Page({
   },
 
   goSettings() {
-    wx.showToast({ title: "设置页开发中", icon: "none" });
+    wx.navigateTo({
+      url: "/pages/user/settings/settings"
+    });
   },
 
   openCamera() {
@@ -274,7 +276,9 @@ Page({
   },
 
   editProfile() {
-    wx.showToast({ title: "编辑资料开发中", icon: "none" });
+    wx.navigateTo({
+      url: "/pages/user/edit-profile/edit-profile"
+    });
   },
 
   viewStuffDetails(e) {
