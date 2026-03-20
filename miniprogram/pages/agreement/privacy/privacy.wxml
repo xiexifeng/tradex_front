@@ -1,0 +1,75 @@
+<view class="agreement-page">
+  <view class="content">
+    <view class="header">
+      <text class="header-title">xx公司用户隐私协议</text>
+      <view class="meta">
+        <view>生效日期：2026-02-28</view>
+        <view>版本号：V1.0</view>
+      </view>
+    </view>
+
+    <view class="divider" />
+
+    <view class="section">
+      <view class="section-title">一、协议目的</view>
+      <text class="paragraph">本隐私协议旨在向您说明xx公司（以下简称"我们"）如何收集、使用、存储和保护您的个人信息，以及您享有的权利。本协议适用于您使用x平台（以下简称"平台"）提供的各项服务。</text>
+    </view>
+
+    <view class="section">
+      <view class="section-title">二、信息收集与使用</view>
+      <text class="paragraph">为向您提供信息撮合相关服务，我们可能会收集并使用您在使用服务过程中提供或产生的信息，包括但不限于：</text>
+      <view class="list">
+        <view class="list-row">• 基本信息：手机号、登录凭证等</view>
+        <view class="list-row">• 设备信息：设备型号、操作系统版本、IP地址等</view>
+        <view class="list-row">• 使用信息：操作日志、发布信息、浏览记录等</view>
+        <view class="list-row">• 联系方式：您在平台上填写的联系方式</view>
+      </view>
+      <view class="highlight">特别说明：平台仅作为信息撮合方，不参与任何交易环节，不会收集或存储与交易资金相关的信息。</view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">三、信息共享与披露</view>
+      <text class="paragraph">除非获得您的明示同意，或法律法规另有规定，我们不会向第三方共享、转让您的个人信息。</text>
+      <text class="paragraph">在提供必要服务时（例如短信验证码服务、风控与安全服务），我们可能与合作方共享实现功能所必需的信息，并要求其遵守本协议与相关法律法规。</text>
+    </view>
+
+    <view class="section">
+      <view class="section-title">四、信息存储与保护</view>
+      <text class="paragraph">我们会在法律法规要求的期限内保存您的信息，并采用合理可行的安全措施保护您的信息安全，包括但不限于：</text>
+      <view class="list">
+        <view class="list-row">• 访问控制：严格的权限管理机制</view>
+        <view class="list-row">• 加密传输与存储：采用HTTPS加密传输，敏感数据加密存储</view>
+        <view class="list-row">• 安全审计：定期进行安全评估和漏洞扫描</view>
+      </view>
+      <view class="highlight">请您妥善保管账号与密码，因您自身原因导致的账号信息泄露，由您自行承担相应风险与责任。</view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">五、您的权利</view>
+      <text class="paragraph">您可以按照产品提供的功能入口对个人信息进行查询、更正、删除，或撤回授权同意。部分信息在法律法规或安全要求下可能无法立即删除。</text>
+    </view>
+
+    <view class="section">
+      <view class="section-title">六、未成年人保护</view>
+      <text class="paragraph">若您为未成年人，请在监护人陪同与指导下阅读并同意本协议后使用本服务。我们不会主动收集未成年人的个人信息，若发现未成年人使用服务，我们将及时删除相关信息。</text>
+    </view>
+
+    <view class="section">
+      <view class="section-title">七、协议更新</view>
+      <text class="paragraph">我们可能会根据法律法规的要求或业务发展需要更新本协议，更新后的协议将在平台上公布。请您定期查看本协议的最新版本。</text>
+    </view>
+
+    <view class="section">
+      <view class="section-title">八、联系我们</view>
+      <text class="paragraph">如您对本协议有任何疑问、意见或建议，可通过以下方式与我们联系：</text>
+      <view class="list">
+        <view class="list-row">• 客服邮箱：support@xx-company.com</view>
+        <view class="list-row">• 平台内反馈入口：个人中心 - 意见反馈</view>
+      </view>
+    </view>
+
+    <view class="divider" />
+
+    <view class="footer">© 2026 xx公司 保留所有权利</view>
+  </view>
+</view>

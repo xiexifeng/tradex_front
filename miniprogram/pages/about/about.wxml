@@ -1,0 +1,7 @@
+<view class="page">
+  <view class="card">
+    <text class="title">关于 Tradex</text>
+    <text class="para">本小程序为闲置换物与信息撮合平台，具体功能以各页面说明为准。</text>
+    <text class="para">您可通过「帮助与客服」查看更多使用说明。</text>
+  </view>
+</view>

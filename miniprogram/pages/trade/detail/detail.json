@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "交易详情",
+  "usingComponents": {
+    "trade-pay-popup": "../../../components/trade-pay-popup/trade-pay-popup"
+  }
+}

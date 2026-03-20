@@ -1,0 +1,53 @@
+<view class="notification-detail">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:elif="{{error}}" class="error-container">
+    <text class="error-icon">⚠</text>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-btn" bindtap="loadNotificationDetail">重新加载</button>
+  </view>
+
+  <block wx:elif="{{notification.id}}">
+    <view class="detail-card">
+      <view class="detail-header">
+        <view class="title">{{notification.title}}</view>
+        <view class="meta">
+          <text class="type-tag {{typeClass}}">{{typeText}}</text>
+          <text class="time">{{timeStr}}</text>
+        </view>
+      </view>
+      <view class="content">{{notification.content}}</view>
+
+      <view
+        wx:if="{{notification.relatedContent && notification.notificationType === 'STUFF' && stuffRejectReason}}"
+        class="related-content"
+      >
+        <view class="related-info">
+          <text class="info-item {{stuffRejectRed ? 'info-item--danger' : ''}}">原因：{{stuffRejectReason}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{notification.relatedId}}" class="actions">
+        <button class="action-btn" bindtap="viewRelated">{{auditButtonText}}</button>
+      </view>
+
+      <view
+        wx:if="{{notification.relatedContent && notification.notificationType === 'AUDIT'}}"
+        class="related-content"
+      >
+        <view class="related-title">审核任务信息</view>
+        <view wx:if="{{parseRelated}}" class="related-info">
+          <text class="info-item">物品标题：{{parseRelated.itemTitle}}</text>
+          <text class="info-item">审核类型：{{parseRelated.auditType === 'ITEM_AUDIT' ? '物品审核' : '其他审核'}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-container">
+    <text class="empty-desc">未找到通知详情</text>
+  </view>
+</view>

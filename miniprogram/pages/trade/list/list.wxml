@@ -1,0 +1,111 @@
+<view class="trade-list">
+  <view class="notice-card">
+    <view class="notice-content">
+      <text class="notice-icon">ⓘ</text>
+      <text class="notice-text">平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</text>
+    </view>
+  </view>
+
+  <view class="status-info-card">
+    <view class="status-info-title">
+      <text class="notice-icon">?</text>
+      <text>交易状态说明</text>
+    </view>
+    <view class="status-info-content">
+      <view class="status-item">
+        <view class="status-dot trading" />
+        <text>交易中：等待对方确认交易</text>
+      </view>
+      <view class="status-item">
+        <view class="status-dot accepted" />
+        <text>已达成：双方已确认交易，等待线下完成</text>
+      </view>
+      <view class="status-item">
+        <view class="status-dot completed" />
+        <text>已完成：交易已线下完成</text>
+      </view>
+      <view class="status-item">
+        <view class="status-dot cancelled" />
+        <text>已取消：交易已取消</text>
+      </view>
+      <view class="status-item">
+        <view class="status-dot rejected" />
+        <text>已拒绝：交易请求被拒绝</text>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-x class="tab-scroll" enable-flex>
+    <view class="tab-inner">
+      <view
+        wx:for="{{statusList}}"
+        wx:for-index="index"
+        wx:key="value"
+        class="tab-item {{activeTab === index ? 'tab-item--active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onTabTap"
+      >{{item.text}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="trade-list-content">
+    <view class="trade-item" wx:for="{{trades}}" wx:key="id" wx:for-item="trade">
+      <view class="trade-header">
+        <view class="trade-status {{trade.tradeStatus}}">{{trade.statusText}}</view>
+        <view class="trade-type {{trade.flagLower}}">
+          {{trade.flag === 'SELL' ? '换/售出' : '换/购入'}}
+        </view>
+      </view>
+
+      <view class="trade-content">
+        <image class="trade-image" src="{{trade.firstImage}}" mode="aspectFill" />
+        <view class="trade-info">
+          <view class="trade-title">{{trade.itemTitle}}</view>
+          <view class="trade-id">交易编号: {{trade.id}}</view>
+          <view class="trade-price">
+            <text class="label">{{trade.priceLabel}}</text>
+            <text class="value">{{trade.priceValue}}</text>
+          </view>
+          <view wx:if="{{trade.tradeStatus === 'completed' && userId && trade.rateMineStr}}" class="trade-score">
+            <view class="score-item">
+              <text class="label">评分：</text>
+              <text class="score-text">{{trade.rateMineStr}}</text>
+            </view>
+            <view class="score-item">
+              <text class="label">得分：</text>
+              <text class="score-text">{{trade.ratePeerStr}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="trade-footer">
+        <button class="btn btn-primary" size="mini" data-id="{{trade.id}}" bindtap="viewDetail">查看详情</button>
+        <block wx:if="{{trade.tradeStatus === 'trading'}}">
+          <block wx:if="{{userId && trade.fromUserId === userId && (trade.tradeMethod === 'ITEM_TO_ITEM' || trade.tradeMethod === 'ITEM_TO_MONEY')}}">
+            <button class="btn btn-danger" size="mini" data-id="{{trade.id}}" bindtap="rejectTrade">拒绝交易</button>
+            <button class="btn btn-primary-solid" size="mini" data-id="{{trade.id}}" bindtap="acceptTrade">接受交易</button>
+          </block>
+          <block wx:if="{{userId && trade.fromUserId !== userId}}">
+            <button class="btn btn-danger" size="mini" data-id="{{trade.id}}" bindtap="cancelTrade">取消交易</button>
+            <button wx:if="{{trade.tradeMethod === 'ITEM_TO_POINTS'}}" class="btn btn-primary-solid" size="mini" data-id="{{trade.id}}" bindtap="openPayPopup">去支付</button>
+          </block>
+        </block>
+        <block wx:if="{{userId && trade.toUserId === userId && trade.tradeStatus === 'accepted'}}">
+          <button class="btn btn-success" size="mini" data-id="{{trade.id}}" bindtap="confirmTrade">确认交易</button>
+        </block>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="list-foot">加载中...</view>
+    <view wx:elif="{{finished && trades.length}}" class="list-foot">没有更多了</view>
+    <view wx:elif="{{!trades.length && !loading}}" class="list-foot empty">暂无交易记录</view>
+  </view>
+
+  <trade-pay-popup
+    show="{{showPayPopup}}"
+    payPoints="{{payPoints}}"
+    bind:close="closePayPopup"
+    bind:submit="onPayPopupSubmit"
+  />
+</view>

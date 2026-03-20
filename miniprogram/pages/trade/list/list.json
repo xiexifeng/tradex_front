@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "交易列表",
+  "usingComponents": {
+    "trade-pay-popup": "../../../components/trade-pay-popup/trade-pay-popup"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "onReachBottomDistance": 100
+}

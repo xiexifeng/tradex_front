@@ -1,0 +1,8 @@
+.page {
+  padding: 48rpx;
+}
+
+.placeholder {
+  font-size: 28rpx;
+  color: #999;
+}

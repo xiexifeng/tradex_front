@@ -1,0 +1,88 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar">
+      <text class="nav-title">X平台</text>
+      <view class="nav-right">
+        <text wx:if="{{userInfo}}" class="nav-link" bindtap="goToProfile">个人</text>
+        <text wx:else class="nav-link" bindtap="onClickRight">登录</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="body" style="padding-top: {{navPaddingTop}}px;">
+    <view class="search-wrapper" bindtap="onSearchClick">
+      <view class="search-fake">
+        <text class="search-icon">⌕</text>
+        <text class="search-placeholder">搜索你想要的好物</text>
+      </view>
+    </view>
+
+    <view class="hero-section">
+      <view class="hero-text">
+        <view class="hero-title">让闲置重新流转</view>
+        <view class="hero-subtitle">发布闲置 · 寻找好物 · 安全换物</view>
+        <view class="hero-notice">平台仅提供信息撮合，所有交易均为线下进行</view>
+      </view>
+      <button class="hero-button" bindtap="goToPublish">立即发布闲置</button>
+    </view>
+
+    <view class="banner-wrapper">
+      <swiper class="banner" autoplay circular interval="{{3000}}" indicator-dots="{{false}}">
+        <swiper-item wx:for="{{banners}}" wx:key="*this">
+          <image class="banner-img" src="{{item}}" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <view class="feature-section">
+      <view class="feature-grid">
+        <view
+          class="feature-cell"
+          wx:for="{{features}}"
+          wx:key="text"
+          bindtap="onFeatureTap"
+          data-action="{{item.action}}"
+        >
+          <view class="feature-icon" style="background: {{item.color}};">
+            <text class="feature-icon-text">{{item.symbol}}</text>
+          </view>
+          <text class="feature-text">{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="products-section">
+      <view class="filter-bar">
+        <picker mode="selector" range="{{itemTypeLabels}}" value="{{itemTypeIndex}}" bindchange="onItemTypePick">
+          <view class="filter-cell">{{itemTypeLabels[itemTypeIndex]}}</view>
+        </picker>
+        <picker mode="selector" range="{{tradeMethodLabels}}" value="{{tradeMethodIndex}}" bindchange="onTradeMethodPick">
+          <view class="filter-cell">{{tradeMethodLabels[tradeMethodIndex]}}</view>
+        </picker>
+        <picker mode="selector" range="{{sortLabels}}" value="{{sortIndex}}" bindchange="onSortPick">
+          <view class="filter-cell">{{sortLabels[sortIndex]}}</view>
+        </picker>
+      </view>
+
+      <view wx:if="{{items.length}}" class="products-grid">
+        <item-card
+          wx:for="{{items}}"
+          wx:for-item="product"
+          wx:key="id"
+          item="{{product}}"
+          bind:select="onViewClick"
+        />
+      </view>
+      <view wx:else class="empty-state">
+        <view class="empty-title">还没有发现合适的好物</view>
+        <view class="empty-subtitle">去发布一件闲置，或稍后再来逛逛</view>
+        <button class="empty-btn" bindtap="goToPublish">发布我的第一件闲置</button>
+      </view>
+
+      <view wx:if="{{loading}}" class="list-status">加载中...</view>
+      <view wx:elif="{{finished && items.length}}" class="list-status">没有更多了</view>
+    </view>
+
+    <view class="bottom-space"></view>
+  </view>
+</view>

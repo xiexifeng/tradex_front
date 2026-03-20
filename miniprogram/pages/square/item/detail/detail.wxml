@@ -1,0 +1,219 @@
+<view class="page">
+  <view wx:if="{{loading && !itemDetail}}" class="state">加载中...</view>
+  <view wx:elif="{{loadError || !itemDetail}}" class="state">暂无数据或加载失败</view>
+
+  <block wx:else>
+    <view class="header-wrap">
+      <swiper
+        class="item-swiper"
+        indicator-dots="{{swiperImages.length > 1}}"
+        indicator-color="rgba(255,255,255,0.4)"
+        indicator-active-color="#fff"
+        autoplay="{{swiperImages.length > 1}}"
+        interval="3000"
+        circular="{{swiperImages.length > 1}}"
+        bindchange="onSwiperChange"
+        bindtap="previewImages"
+      >
+        <swiper-item wx:for="{{swiperImages}}" wx:key="*this">
+          <image class="swiper-img" src="{{item}}" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
+      <view wx:if="{{swiperImages.length}}" class="swiper-badge">
+        <text>{{currentSwiper + 1}}/{{swiperImages.length}}</text>
+      </view>
+      <button class="share-fab" open-type="share">分享</button>
+    </view>
+
+    <view class="content">
+      <view class="card price-card">
+        <view class="price-main">
+          <block wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_MONEY'}}">
+            <text class="currency">¥</text>
+            <text class="amount">{{itemDetail.transferPrice}}</text>
+          </block>
+          <block wx:elif="{{itemDetail.tradeMethod === 'ITEM_TO_POINTS'}}">
+            <text class="amount">{{itemDetail.transferPoints}}</text>
+            <text class="unit">积分</text>
+          </block>
+          <block wx:else>
+            <view class="exchange-info">
+              <text class="exchange-label">期望交换</text>
+              <text class="exchange-target">{{itemDetail.expectItem}}</text>
+            </view>
+          </block>
+        </view>
+        <view class="trade-tag">{{tradeMethodText}}</view>
+      </view>
+
+      <view class="card flow-card">
+        <view class="flow-hd">
+          <view class="flow-title">安全换物 · 简单三步</view>
+          <view class="flow-sub">发起申请后，请与对方确认细节再线下/快递完成交付</view>
+        </view>
+        <view class="flow-step">
+          <text class="flow-icon">1</text>
+          <view class="flow-txt">
+            <view class="flow-step-title">第 1 步 · 发起申请</view>
+            <view class="flow-step-desc">选择换物/购买方式，填写联系人与地址信息并提交</view>
+          </view>
+        </view>
+        <view class="flow-step">
+          <text class="flow-icon">2</text>
+          <view class="flow-txt">
+            <view class="flow-step-title">第 2 步 · 双方沟通确认</view>
+            <view class="flow-step-desc">与对方确认物品状态、价格/积分、发货与收货方式</view>
+          </view>
+        </view>
+        <view class="flow-step">
+          <text class="flow-icon">3</text>
+          <view class="flow-txt">
+            <view class="flow-step-title">第 3 步 · 完成交付</view>
+            <view class="flow-step-desc">按约定完成线下/快递交接，并在平台内完成后续操作</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="card info-card">
+        <view class="title">{{itemDetail.itemTitle}}</view>
+        <view class="bc-row" bindtap="copyItemBlockchain">
+          <text class="bc-label">区块链ID：</text>
+          <text class="bc-val">{{itemBlockchainShort}}</text>
+          <text wx:if="{{itemDetail.blockchainId}}" class="bc-copy">复制</text>
+        </view>
+        <view class="tags-row">
+          <text class="tag tag--p">{{itemDetail.itemType}}</text>
+          <text class="tag tag--s">{{itemDetail.depreciation}}成新</text>
+          <text class="tag tag--w">{{deliveryText}}</text>
+        </view>
+        <view class="stats">
+          <view class="stat"><text class="stat-num">{{itemDetail.viewCount}}</text><text class="stat-lab">浏览</text></view>
+          <view class="stat"><text class="stat-num">{{itemDetail.loveCount}}</text><text class="stat-lab">点赞</text></view>
+          <view class="stat"><text class="stat-num">{{itemDetail.collectionCount}}</text><text class="stat-lab">收藏</text></view>
+          <view class="stat"><text class="stat-num">{{itemDetail.transferTimes}}</text><text class="stat-lab">转让</text></view>
+        </view>
+      </view>
+
+      <view class="card seller-card">
+        <view class="seller-row">
+          <image class="avatar" src="{{itemDetail.userAvatar}}" mode="aspectFill" />
+          <view class="seller-meta">
+            <view class="seller-name-row">
+              <text class="seller-name">{{itemDetail.userNickname}}</text>
+              <text class="badge">认证用户</text>
+            </view>
+            <view class="score-row" bindtap="onScoreTap">
+              <text class="score-txt">
+                {{itemDetail.userExt.tradeScore === -999 ? '登录后可查看' : itemDetail.userExt.tradeScore + '分'}}
+              </text>
+            </view>
+            <view class="bc-row bc-row--sm" catchtap="copyUserBlockchain">
+              <text class="bc-label">区块链ID:</text>
+              <text class="bc-val">{{userBlockchainShort}}</text>
+              <text wx:if="{{itemDetail.userExt.blockchainId && itemDetail.userExt.blockchainId !== '登录后可查看'}}" class="bc-copy">复制</text>
+            </view>
+          </view>
+        </view>
+        <button class="contact-btn" bindtap="contactSeller">联系卖家</button>
+      </view>
+
+      <view class="card desc-card">
+        <view class="sec-title">商品描述</view>
+        <text class="desc-body">{{itemDetail.itemDescription}}</text>
+      </view>
+
+      <view class="card trade-card">
+        <view class="sec-title">交易信息</view>
+        <view class="grid">
+          <view class="grid-row"><text class="lab">联系人</text><text class="val">{{itemDetail.contactInfo.linkman}}</text></view>
+          <view class="grid-row"><text class="lab">联系电话</text><text class="val">{{itemDetail.contactInfo.phone}}</text></view>
+          <view class="grid-row"><text class="lab">交付方式</text><text class="val">{{deliveryText}}</text></view>
+          <view class="grid-row"><text class="lab">交付地址</text><text class="val">{{itemDetail.contactInfo.address}}</text></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-bar safe-bottom">
+      <view class="bar-left">
+        <view class="act" bindtap="toggleLike">
+          <text class="act-icon {{isLiked ? 'act-icon--on' : ''}}">♥</text>
+          <text>{{isLiked ? '已点赞' : '点赞'}}</text>
+        </view>
+        <view class="act" bindtap="toggleCollect">
+          <text class="act-icon {{isCollected ? 'act-icon--on' : ''}}">★</text>
+          <text>{{isCollected ? '已收藏' : '收藏'}}</text>
+        </view>
+      </view>
+      <button
+        class="cta"
+        disabled="{{userId && itemDetail.userId === userId}}"
+        loading="{{isSubmitting}}"
+        bindtap="handleBuyOrExchange"
+      >
+        {{itemDetail.tradeMethod !== 'ITEM_TO_POINTS' ? '申请交易' : '立即购买'}}
+      </button>
+    </view>
+  </block>
+
+  <view wx:if="{{showBuyForm}}" class="popup-mask popup-mask--bottom" catchtap="closeBuyForm">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-hd">
+        <text class="sheet-title">填写购买信息</text>
+        <text class="sheet-x" bindtap="closeBuyForm">×</text>
+      </view>
+      <scroll-view scroll-y class="sheet-body">
+        <view class="field"><text class="flab">联系人</text><input data-field="linkman" value="{{buyForm.linkman}}" bindinput="onBuyInput" placeholder="请输入联系人姓名" /></view>
+        <view class="field"><text class="flab">联系电话</text><input data-field="phone" value="{{buyForm.phone}}" bindinput="onBuyInput" type="number" placeholder="请输入联系电话" /></view>
+        <view class="field"><text class="flab">联系地址</text><input data-field="address" value="{{buyForm.address}}" bindinput="onBuyInput" placeholder="请输入联系地址" /></view>
+        <view class="field field--area">
+          <text class="flab">备注</text>
+          <textarea data-field="remark" value="{{buyForm.remark}}" bindinput="onBuyInput" placeholder="选填" auto-height />
+        </view>
+      </scroll-view>
+      <button class="sheet-submit" loading="{{isSubmitting}}" bindtap="onBuySubmit">确认购买</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showExchangeForm}}" class="popup-mask popup-mask--bottom" catchtap="closeExchangeForm">
+    <view class="sheet sheet--tall" catchtap="noop">
+      <view class="sheet-hd">
+        <text class="sheet-title">
+          {{itemDetail.tradeMethod === 'ITEM_TO_ITEM' ? '发起以物换物交易申请' : '发起线下支付交易申请'}}
+        </text>
+        <text class="sheet-x" bindtap="closeExchangeForm">×</text>
+      </view>
+      <scroll-view scroll-y class="sheet-body">
+        <block wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_ITEM'}}">
+          <picker mode="selector" range="{{itemTypeLabels}}" value="{{itemTypeIndex}}" bindchange="onItemTypePick">
+            <view class="fake-field">
+              <text class="flab">物品类型</text>
+              <text class="fph">{{exchangeForm.itemType || '请选择物品类型'}}</text>
+            </view>
+          </picker>
+          <picker wx:if="{{myItemColumns.length}}" mode="selector" range="{{myItemColumns}}" range-key="text" value="{{myItemIndex}}" bindchange="onMyItemPick">
+            <view class="fake-field">
+              <text class="flab">交换物品</text>
+              <text class="fph">{{exchangeForm.itemTitle || '请选择要交换的物品'}}</text>
+            </view>
+          </picker>
+          <view wx:else class="hint">暂无可交换物品，请先发布物品</view>
+        </block>
+        <view class="field"><text class="flab">联系人</text><input data-field="linkman" value="{{exchangeForm.linkman}}" bindinput="onExchangeInput" placeholder="请输入联系人姓名" /></view>
+        <view class="field"><text class="flab">联系电话</text><input data-field="phone" value="{{exchangeForm.phone}}" bindinput="onExchangeInput" type="number" placeholder="请输入联系电话" /></view>
+        <view class="field"><text class="flab">联系地址</text><input data-field="address" value="{{exchangeForm.address}}" bindinput="onExchangeInput" placeholder="请输入联系地址" /></view>
+        <view class="field field--area">
+          <text class="flab">备注</text>
+          <textarea data-field="remark" value="{{exchangeForm.remark}}" bindinput="onExchangeInput" placeholder="选填" auto-height />
+        </view>
+      </scroll-view>
+      <button class="sheet-submit" bindtap="onExchangeSubmit">提交申请</button>
+    </view>
+  </view>
+
+  <trade-pay-popup
+    show="{{showPayPopup}}"
+    payPoints="{{payPoints}}"
+    bind:close="closePayPopup"
+    bind:submit="onPayPopupSubmit"
+  />
+</view>

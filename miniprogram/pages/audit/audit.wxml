@@ -1,0 +1,103 @@
+<view class="audit-page">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:elif="{{error}}" class="error-container">
+    <text class="error-icon">⚠</text>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-btn" bindtap="loadItemDetail">重新加载</button>
+  </view>
+
+  <block wx:elif="{{itemDetail}}">
+    <view class="audit-content">
+      <swiper
+        wx:if="{{imageList.length}}"
+        class="item-swipe"
+        indicator-dots
+        indicator-color="rgba(255,255,255,0.6)"
+        indicator-active-color="#ffffff"
+        autoplay
+        interval="{{3000}}"
+        circular
+        bindtap="onSwipeTap"
+      >
+        <swiper-item wx:for="{{imageList}}" wx:key="*this">
+          <image class="swipe-img" src="{{item}}" mode="aspectFill" bindtap="onPreviewCurrent" data-index="{{index}}" />
+        </swiper-item>
+      </swiper>
+      <view wx:else class="item-swipe item-swipe--empty">
+        <text class="empty-img-tip">暂无图片</text>
+      </view>
+
+      <view class="info-card">
+        <view class="section-title">
+          <text class="section-icon">📄</text>
+          <text>物品信息</text>
+        </view>
+        <view class="item-info">
+          <view class="item-title">{{itemDetail.itemTitle}}</view>
+          <view class="item-description">{{itemDetail.itemDescription}}</view>
+          <view class="item-tags">
+            <text class="tag tag-primary">{{itemDetail.itemTypeName || itemDetail.itemType || '未知'}}</text>
+            <text class="tag tag-success">{{itemDetail.depreciation != null ? itemDetail.depreciation + '成新' : '未知'}}</text>
+          </view>
+          <view class="item-meta">
+            <view class="meta-item">
+              <text class="meta-label">残余估值(元)：</text>
+              <text class="meta-value">{{itemDetail.valuation != null ? itemDetail.valuation : '未知'}}</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-label">发布时间：</text>
+              <text class="meta-value">{{publishTimeStr}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="audit-card">
+        <block wx:if="{{itemDetail.auditResult === 'WAIT_AUDIT'}}">
+          <view class="section-title">
+            <text class="section-icon">📋</text>
+            <text>审核操作</text>
+          </view>
+          <view class="audit-form">
+            <view class="field-label">审核备注</view>
+            <textarea
+              class="remark-area"
+              placeholder="请输入审核备注（选填）"
+              value="{{auditRemark}}"
+              maxlength="{{500}}"
+              bindinput="onRemarkInput"
+            />
+            <view class="audit-actions">
+              <button class="action-btn reject-btn" bindtap="handleReject">拒绝</button>
+              <button class="action-btn approve-btn" bindtap="handleApprove">通过</button>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="section-title">
+            <text class="section-icon">✓</text>
+            <text>审核结果</text>
+          </view>
+          <view class="audit-result">
+            <view class="result-status {{itemDetail.auditResult === 'PASS_AUDIT' ? 'status-pass' : 'status-reject'}}">
+              <text class="result-icon">{{itemDetail.auditResult === 'PASS_AUDIT' ? '✓' : '✕'}}</text>
+              <view class="result-title">{{itemDetail.auditResult === 'PASS_AUDIT' ? '审核通过' : '审核不通过'}}</view>
+            </view>
+            <view wx:if="{{itemDetail.auditRemark}}" class="result-remark">
+              <text class="remark-label">审核备注：</text>
+              <text class="remark-value">{{itemDetail.auditRemark}}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-container">
+    <text class="empty-desc">未找到物品信息</text>
+  </view>
+</view>

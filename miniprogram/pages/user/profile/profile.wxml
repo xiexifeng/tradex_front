@@ -1,0 +1,131 @@
+<view class="page">
+  <view wx:if="{{userInfo}}" class="hero card">
+    <view class="hero-top">
+      <view class="hero-left">
+        <image class="avatar" src="{{userInfo.avatarUrl || '/images/tab/me.png'}}" mode="aspectFill" />
+        <view class="meta">
+          <view class="nick-row">
+            <text class="nick">{{userInfo.nickname}}</text>
+            <text class="gender">{{userInfo.gender === 'MAN' ? '♂' : userInfo.gender === 'FEMALE' ? '♀' : ''}}</text>
+          </view>
+          <text class="uid">用户编号: {{userInfo.userId}}</text>
+        </view>
+      </view>
+      <view class="hero-actions">
+        <text class="ha" bindtap="goSettings">设置</text>
+        <button class="ha-share" open-type="share">分享</button>
+        <button class="edit-mini" size="mini" bindtap="editProfile">编辑</button>
+      </view>
+    </view>
+    <view class="core-stats">
+      <view class="stat-box">
+        <text class="stat-val">{{pointsBalance}}</text>
+        <view class="stat-lab">积分余额 <text class="q" bindtap="showPointsRule">?</text></view>
+      </view>
+      <view class="stat-box">
+        <text class="stat-val">{{userInfo.tradeScore != null ? userInfo.tradeScore : 0}}</text>
+        <text class="stat-lab">信用评分</text>
+      </view>
+    </view>
+    <view class="social">
+      <text>{{userInfo.followers || 0}} 关注</text>
+      <text>{{userInfo.followers || 0}} 粉丝</text>
+      <text>{{userInfo.likes || 0}} 获赞</text>
+      <text>{{userInfo.collects || 0}} 收藏</text>
+    </view>
+    <view wx:if="{{userInfo.blockchainId}}" class="bc" bindtap="copyBc" data-id="{{userInfo.blockchainId}}">
+      <text>链ID {{userBcShort}}</text>
+      <text class="copy">复制</text>
+    </view>
+  </view>
+
+  <view class="entry" bindtap="goLoginReward">
+    <text class="e-ico">📅</text>
+    <view class="e-txt">
+      <text class="e-t">每日登录领积分</text>
+      <text class="e-d">签到领积分，连续有额外奖励</text>
+    </view>
+    <text class="e-ar">›</text>
+  </view>
+
+  <view class="card fold">
+    <view class="fold-hd" bindtap="toggleScore">
+      <text>评分记录 ({{transactions.length}})</text>
+      <text>{{scoreOpen ? '▼' : '▶'}}</text>
+    </view>
+    <view wx:if="{{scoreOpen}}" class="fold-bd">
+      <view wx:if="{{transactions.length === 0}}" class="empty">暂无</view>
+      <view wx:for="{{transactions}}" wx:key="tradeId" class="row3">
+        <text>{{item.tradeScore}}</text>
+        <text class="mid">{{item.tradeRemark}}</text>
+        <text class="t">{{item.timeStr}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card fold">
+    <view class="fold-hd" bindtap="togglePoints">
+      <text>积分明细 ({{usages.length}})</text>
+      <text>{{pointsOpen ? '▼' : '▶'}}</text>
+    </view>
+    <view wx:if="{{pointsOpen}}" class="fold-bd">
+      <view wx:if="{{usages.length === 0}}" class="empty">暂无</view>
+      <view wx:for="{{usages}}" wx:key="id" class="row4">
+        <text class="{{item.pointsChange > 0 ? 'inc' : 'dec'}}">{{item.pointsChange > 0 ? '+' : ''}}{{item.pointsChange}}</text>
+        <text>{{item.typeText}}</text>
+        <text class="mid">{{item.transactionDescription || '-'}}</text>
+        <text class="t">{{item.timeStr}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="items-sec">
+    <scroll-view scroll-x class="tab-scroll" show-scrollbar="{{false}}">
+      <view class="tabs">
+        <view wx:for="{{statusList}}" wx:key="value" class="tab {{tabIndex === index ? 'tab--on' : ''}}" data-i="{{index}}" bindtap="onTabTap">{{item.text}}</view>
+      </view>
+    </scroll-view>
+    <view wx:if="{{items.length === 0 && !itemsLoading}}" class="empty">暂无物品</view>
+    <view wx:for="{{items}}" wx:key="id" class="item-card">
+      <image class="thumb" src="{{item.firstImage}}" mode="aspectFill" />
+      <view class="item-body">
+        <view class="item-title">{{item.itemTitle}}</view>
+        <view class="tags">
+          <text class="tag t1">{{item.itemStatusText}}</text>
+          <text class="tag t2">{{item.transferText}}</text>
+        </view>
+        <view class="sub">编号 {{item.id}} · 链 {{item.bcShort}} <text class="copy" data-id="{{item.blockchainId}}" bindtap="copyBc">复制</text></view>
+        <view class="acts">
+          <button wx:if="{{item.transferStatus === 'own' && item.status === 'active'}}" size="mini" bindtap="viewDetail" data-id="{{item.id}}">发起出让</button>
+          <button wx:if="{{item.isCanCancel}}" size="mini" type="warn" data-id="{{item.id}}" bindtap="openCancel">取消出让</button>
+          <button wx:if="{{item.isCanCancel}}" size="mini" bindtap="viewOffers">查看报价</button>
+          <button size="mini" plain bindtap="viewDetail" data-id="{{item.id}}">物品详情</button>
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{itemsLoading}}" class="loading">加载中…</view>
+    <view wx:if="{{itemsFinished && items.length}}" class="end">没有更多了</view>
+  </view>
+
+  <view wx:if="{{pointsRuleOpen}}" class="mask" catchtap="closePointsRule">
+    <view class="rule-panel" catchtap="noop">
+      <view class="rule-hd">积分规则说明 <text class="x" bindtap="closePointsRule">×</text></view>
+      <scroll-view scroll-y class="rule-body">
+        <view class="rule-block"><text class="rh">积分获取方式</text><text class="rp">完成任务、活动、邀请、发布物品、成功交易等。</text></view>
+        <view class="rule-block"><text class="rh">积分使用</text><text class="rp">换物、活动兑换、信用相关（详见平台规则）。</text></view>
+        <view class="rule-block"><text class="rh">说明</text><text class="rp">积分不可兑换现金、不可转让；长期有效；平台仅撮合信息。</text></view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view wx:if="{{showCancelSheet}}" class="mask" catchtap="closeCancel">
+    <view class="dialog" catchtap="noop">
+      <view class="d-t">取消原因</view>
+      <textarea class="d-ta" value="{{cancelReason}}" bindinput="onCancelReason" placeholder="请输入" />
+      <view class="d-btns">
+        <button class="db" bindtap="closeCancel">取消</button>
+        <button class="db primary" bindtap="submitCancel">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

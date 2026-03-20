@@ -1,0 +1,52 @@
+<view class="page">
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索你想要的商品"
+      value="{{keyword}}"
+      confirm-type="search"
+      bindinput="onKeywordInput"
+      bindconfirm="onSearchConfirm"
+    />
+    <text class="search-btn" bindtap="onSearchConfirm">搜索</text>
+    <text class="cancel" bindtap="goBack">取消</text>
+  </view>
+
+  <block wx:if="{{!searching}}">
+    <view class="section">
+      <view class="section-hd">
+        <text class="section-tit">搜索历史</text>
+        <text wx:if="{{searchHistory.length}}" class="clear" bindtap="clearHistory">清空</text>
+      </view>
+      <view class="tags">
+        <text wx:for="{{searchHistory}}" wx:key="*this" class="tag" data-kw="{{item}}" bindtap="onHistoryTap">{{item}}</text>
+      </view>
+    </view>
+    <view class="section">
+      <view class="section-hd"><text class="section-tit">热门搜索</text></view>
+      <view class="tags">
+        <text wx:for="{{hotSearches}}" wx:key="*this" class="tag tag--hot" data-kw="{{item}}" bindtap="onHistoryTap">{{item}}</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="filter-bar">
+      <picker mode="selector" range="{{itemTypeLabels}}" value="{{itemTypeIndex}}" bindchange="onItemTypePick">
+        <view class="filter-cell">{{itemTypeLabels[itemTypeIndex]}}</view>
+      </picker>
+      <picker mode="selector" range="{{tradeMethodLabels}}" value="{{tradeMethodIndex}}" bindchange="onTradeMethodPick">
+        <view class="filter-cell">{{tradeMethodLabels[tradeMethodIndex]}}</view>
+      </picker>
+      <picker mode="selector" range="{{sortLabels}}" value="{{sortIndex}}" bindchange="onSortPick">
+        <view class="filter-cell">{{sortLabels[sortIndex]}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{items.length}}" class="grid">
+      <item-card wx:for="{{items}}" wx:key="id" item="{{item}}" bind:select="onCardTap" />
+    </view>
+    <view wx:elif="{{!loading}}" class="empty">暂无相关物品</view>
+    <view wx:if="{{loading}}" class="hint">加载中…</view>
+    <view wx:if="{{finished && items.length}}" class="end">没有更多了</view>
+  </block>
+</view>

@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="notice">
+    <text class="notice-icon">ⓘ</text>
+    <text class="notice-txt">平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</text>
+  </view>
+
+  <view class="card">
+    <view class="sec-title">物品图片 <text class="sub">（最多5张）</text></view>
+    <view class="img-grid">
+      <view wx:for="{{images}}" wx:key="imgKey" class="img-cell">
+        <image wx:if="{{item.url}}" class="thumb" src="{{item.url}}" mode="aspectFill" />
+        <view wx:else class="thumb thumb--load">上传中…</view>
+        <text class="img-del" data-index="{{index}}" bindtap="removeImage">×</text>
+      </view>
+      <view wx:if="{{images.length < 5}}" class="img-add" bindtap="chooseImages">
+        <text class="img-add-plus">+</text>
+        <text class="img-add-txt">上传图片</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="sec-title">基本信息</view>
+    <view class="field">
+      <text class="flab">物品名称</text>
+      <input class="finp" placeholder="1-50字" maxlength="50" value="{{form.name}}" bindinput="onNameInput" />
+    </view>
+    <picker mode="selector" range="{{itemTypeColumns}}" range-key="text" value="{{typePickIndex}}" bindchange="onTypePick">
+      <view class="field pick">
+        <text class="flab">物品类型</text>
+        <text class="fph">{{form.clazzText || '请选择'}}</text>
+      </view>
+    </picker>
+    <view class="field col">
+      <text class="flab">物品描述</text>
+      <textarea class="fta" placeholder="1-200字" maxlength="200" value="{{form.description}}" bindinput="onDescInput" />
+    </view>
+    <view class="field col">
+      <text class="flab">折旧程度 {{form.depreciation}}成新</text>
+      <slider
+        min="1"
+        max="10"
+        step="1"
+        show-value
+        value="{{form.depreciation}}"
+        activeColor="#07c160"
+        bindchange="onDepreciationChange"
+      />
+    </view>
+    <view class="field">
+      <text class="flab">价值（元）</text>
+      <input class="finp" type="digit" placeholder="0-999999" value="{{form.valuation}}" bindinput="onValuationInput" />
+    </view>
+  </view>
+
+  <view class="bottom-submit safe-bottom">
+    <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onSubmit">发布</button>
+  </view>
+</view>

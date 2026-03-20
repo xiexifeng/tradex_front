@@ -1,0 +1,149 @@
+<view class="help-page">
+  <view class="content">
+    <view class="header">
+      <text class="header-title">x平台帮助中心</text>
+      <text class="subtitle">为您提供全面的使用指南和常见问题解答</text>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">❓</text>
+        <text>常见问题</text>
+      </view>
+    </view>
+
+    <view class="collapse">
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="1">
+          <text>如何发布物品？</text>
+          <text class="collapse-arrow {{activeName === '1' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '1' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <text class="para">进入首页或“发布”入口，按提示填写物品名称、描述、图片与期望换物条件，提交后即可在列表中展示。</text>
+            <text class="tip">请确保您发布的物品信息真实、准确，避免发布虚假信息。</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="2">
+          <text>如何联系对方？</text>
+          <text class="collapse-arrow {{activeName === '2' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '2' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <text class="para">在物品详情页查看对方联系方式，通过平台提供的联系方式与对方沟通，确认物品状态、交易时间、地点等信息后再进行线下交易。</text>
+            <text class="tip">平台仅提供信息撮合服务，不参与任何交易环节。</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="3">
+          <text>线下交易安全提示</text>
+          <text class="collapse-arrow {{activeName === '3' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '3' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <view class="list-row">• 选择公共场所进行交易，如商场、咖啡厅等</view>
+            <view class="list-row">• 建议结伴前往，确保人身安全</view>
+            <view class="list-row">• 仔细检查物品状况，确认无误后再完成交易</view>
+            <view class="list-row">• 现金交易时注意验钞，避免收到假币</view>
+            <view class="list-row">• 保留交易凭证，如聊天记录、交易照片等</view>
+            <view class="list-row">• 如遇可疑情况，立即终止交易并报警</view>
+            <view class="highlight">安全提示：线下交易存在一定风险，请务必谨慎行事，确保自身安全。</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="4">
+          <text>验证码收不到怎么办？</text>
+          <text class="collapse-arrow {{activeName === '4' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '4' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <text class="para">请确认手机号是否填写正确、短信是否被拦截；可稍后重试或更换网络环境。若仍无法收到，请联系在线客服协助处理。</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="5">
+          <text>出现纠纷怎么处理？</text>
+          <text class="collapse-arrow {{activeName === '5' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '5' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <text class="para">建议优先与对方协商解决；如协商不成，可通过法律途径解决，平台仅提供信息撮合服务，不参与交易纠纷处理。</text>
+            <text class="tip">请在交易前仔细确认物品信息，避免产生不必要的纠纷。</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="collapse-item">
+        <view class="collapse-hd" bindtap="onCollapseTap" data-name="6">
+          <text>如何修改个人信息？</text>
+          <text class="collapse-arrow {{activeName === '6' ? 'collapse-arrow--open' : ''}}">▼</text>
+        </view>
+        <view class="collapse-bd {{activeName === '6' ? '' : 'collapse-bd--hidden'}}">
+          <view class="collapse-content">
+            <text class="para">进入个人中心，点击“编辑资料”，即可修改您的个人信息，包括昵称、头像、联系方式等。</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">💬</text>
+        <text>联系我们</text>
+      </view>
+      <view class="cell cell--link" bindtap="onOnlineService">
+        <view class="cell-main">
+          <text class="cell-title">在线客服</text>
+          <text class="cell-label">工作日 09:00-18:00</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell cell--link" bindtap="copyEmail">
+        <view class="cell-main">
+          <text class="cell-title">客服邮箱</text>
+          <text class="cell-label">点击复制</text>
+        </view>
+        <text class="cell-value">{{supportEmail}}</text>
+      </view>
+      <view class="cell cell--link" bindtap="onFeedback">
+        <view class="cell-main">
+          <text class="cell-title">意见反馈</text>
+          <text class="cell-label">提交问题与建议</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">📄</text>
+        <text>相关协议</text>
+      </view>
+      <view class="cell cell--link" bindtap="goPrivacy">
+        <view class="cell-main">
+          <text class="cell-title">用户隐私协议</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell cell--link" bindtap="goSwap">
+        <view class="cell-main">
+          <text class="cell-title">x平台使用协议</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="footer">
+      <text>© 2026 xx公司 保留所有权利</text>
+    </view>
+  </view>
+</view>

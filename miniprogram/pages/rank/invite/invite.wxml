@@ -1,0 +1,95 @@
+<view class="rank-container">
+  <view class="toolbar">
+    <text class="toolbar-hint">邀请好友注册，冲击榜单</text>
+    <button class="toolbar-share" size="mini" bindtap="onShare">分享</button>
+  </view>
+
+  <view class="rank-content">
+    <view wx:if="{{loading}}" class="list-status">加载中...</view>
+
+    <view wx:else class="rank-list">
+      <view
+        wx:for="{{rankRows}}"
+        wx:key="userId"
+        class="rank-item {{index < 3 ? 'top-three' : ''}}"
+      >
+        <view class="rank-number {{item.rankClass}}">
+          <text wx:if="{{index >= 3}}">{{item.rankNum}}</text>
+          <text wx:else class="medal-emoji">{{item.rankMedal}}</text>
+        </view>
+        <view class="user-info">
+          <view class="avatar-fallback">{{item.nickname ? item.nickname.slice(0, 1) : '用'}}</view>
+          <view class="user-details">
+            <view class="nickname">{{item.nickname || '未设置昵称'}}</view>
+            <view class="user-id">用户ID: {{item.userId}}</view>
+          </view>
+        </view>
+        <view class="invite-count">
+          <view class="count-value">{{item.inviteCount}}</view>
+          <view class="count-label">拉新人数</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!loading && rankRows.length === 0}}" class="empty-wrap">
+      <text class="empty-text">暂无排行榜数据</text>
+    </view>
+
+    <view class="latest-rank-link-wrap">
+      <text class="latest-rank-link" bindtap="onViewLatestRank">查看上一榜单</text>
+    </view>
+  </view>
+
+  <!-- 上一榜单 -->
+  <view wx:if="{{showLatestRankPopup}}" class="popup-mask popup-mask--bottom" bindtap="closeLatestPopup">
+    <view class="latest-popup" catchtap="noop">
+      <view class="latest-popup-hd">
+        <text class="latest-rank-title">上一期榜单</text>
+        <text class="popup-close" bindtap="closeLatestPopup">✕</text>
+      </view>
+      <view wx:if="{{latestRankLoading}}" class="latest-rank-loading">
+        <text>加载中...</text>
+      </view>
+      <block wx:elif="{{latestRankData}}">
+        <view class="latest-rank-period">{{latestRankPeriod}}</view>
+        <scroll-view scroll-y class="latest-scroll">
+          <view
+            wx:for="{{latestRankRows}}"
+            wx:for-index="lidx"
+            wx:key="lidx"
+            class="rank-item rank-item--compact {{lidx < 3 ? 'top-three' : ''}}"
+          >
+            <view class="rank-number rank-number--sm {{item.rankClass}}">
+              <text wx:if="{{lidx >= 3}}">{{item.rankNum}}</text>
+              <text wx:else class="medal-emoji medal-emoji--sm">{{item.rankMedal}}</text>
+            </view>
+            <view class="user-info">
+              <view class="avatar-fallback avatar-fallback--sm">{{item.nickname ? item.nickname.slice(0, 1) : '用'}}</view>
+              <view class="user-details">
+                <view class="nickname nickname--sm">{{item.nickname || '未设置昵称'}}</view>
+                <view class="user-id">用户ID: {{item.userId || '-'}}</view>
+              </view>
+            </view>
+            <view class="invite-count">
+              <view class="count-value count-value--sm">{{item.inviteCount}}</view>
+              <view class="count-label">拉新人数</view>
+            </view>
+          </view>
+          <view wx:if="{{!latestRankRows.length}}" class="empty-wrap">
+            <text class="empty-text">暂无排名数据</text>
+          </view>
+        </scroll-view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 分享说明（含可触发转发的按钮） -->
+  <view wx:if="{{showShareTips}}" class="popup-mask popup-mask--center" bindtap="closeShareTips">
+    <view class="share-dialog" catchtap="noop">
+      <view class="share-dialog-title">分享给好友</view>
+      <text class="share-dialog-desc">点击下方按钮使用微信转发；好友通过卡片打开注册页即算你的邀请。</text>
+      <button class="share-dialog-btn" open-type="share">转发给好友</button>
+      <button class="share-dialog-cancel" bindtap="closeShareTips">关闭</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="toolbar">
+    <button class="save" size="mini" loading="{{saving}}" bindtap="saveProfile">保存</button>
+  </view>
+
+  <view class="card avatar-card">
+    <view class="avatar-wrap" bindtap="chooseAvatar">
+      <image class="avatar" src="{{displayAvatar || '/images/tab/me.png'}}" mode="aspectFill" />
+      <view class="avatar-tip">点击更换头像</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="sec">基本信息</view>
+    <view class="field"><text class="lab">昵称</text><input maxlength="20" placeholder="昵称" value="{{form.nickname}}" data-field="nickname" bindinput="onInput" /></view>
+    <picker mode="selector" range="{{genderLabels}}" value="{{genderIndex}}" bindchange="onGenderChange">
+      <view class="field pick">
+        <text class="lab">性别</text>
+        <text class="ph">{{form.gender === 'MAN' ? '男' : form.gender === 'FEMALE' ? '女' : '选填'}}</text>
+      </view>
+    </picker>
+    <picker mode="date" value="{{form.birthday}}" start="1900-01-01" end="{{today}}" bindchange="onBirthChange">
+      <view class="field pick">
+        <text class="lab">生日</text>
+        <text class="ph">{{form.birthday || '选填'}}</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="card">
+    <view class="sec">联系方式</view>
+    <view class="field col"><text class="lab">地址</text><textarea placeholder="地址" value="{{form.address}}" data-field="address" bindinput="onInput" /></view>
+    <view class="field"><text class="lab">微信</text><input value="{{form.wechat}}" data-field="wechat" bindinput="onInput" /></view>
+    <view class="field"><text class="lab">QQ</text><input value="{{form.qq}}" data-field="qq" bindinput="onInput" /></view>
+  </view>
+
+  <view class="card">
+    <view class="sec">个人简介</view>
+    <textarea class="brief" maxlength="200" placeholder="介绍一下自己" value="{{form.brief}}" data-field="brief" bindinput="onInput" />
+  </view>
+</view>

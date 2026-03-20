@@ -1,0 +1,66 @@
+<view class="page">
+  <view class="cal-card">
+    <view class="cal-hd">
+      <text class="cal-title">{{monthTitle}}</text>
+      <text class="link" bindtap="openRules">每日登录奖励规则</text>
+    </view>
+    <view class="weeks">
+      <text wx:for="{{weekdays}}" wx:key="*this" class="w">{{item}}</text>
+    </view>
+    <view class="grid">
+      <view wx:for="{{calendarCells}}" wx:key="cellKey" class="cell {{item.empty ? 'cell--empty' : ''}} {{item.statusClass}} {{item.status === 0 ? 'cell--tap' : ''}}" data-empty="{{item.empty}}" data-date="{{item.dateStr}}" data-status="{{item.status}}" data-point="{{item.rewardPoint}}" bindtap="onDayTap">
+        <block wx:if="{{!item.empty}}">
+          <text class="dn">{{item.day}}</text>
+          <text wx:if="{{item.status !== -1 && item.rewardPoint > 0}}" class="pt">+{{item.rewardPoint}}</text>
+          <text wx:if="{{item.status === 0}}" class="act">领</text>
+          <text wx:elif="{{item.status === 1}}" class="done">已领</text>
+          <text wx:elif="{{item.status === 2}}" class="exp">过</text>
+        </block>
+      </view>
+    </view>
+    <view class="legend">
+      <text>未登录</text>
+      <text>可领</text>
+      <text>已领</text>
+      <text>过期</text>
+    </view>
+  </view>
+
+  <view class="task-card">
+    <view class="task-hd">
+      <text class="task-t">每日任务</text>
+      <text class="link" bindtap="openTaskRules">每日任务奖励规则</text>
+    </view>
+    <view wx:if="{{taskLoading}}" class="hint">加载中…</view>
+    <block wx:else>
+      <view wx:for="{{dailyTasks}}" wx:key="taskRowKey" class="task-item {{item.taskState === 2 ? 'task--done' : ''}}">
+        <view class="tn">{{item.taskName}}</view>
+        <view class="td">{{item.taskDesc}}</view>
+        <view class="tp">{{item.finishNum}} / {{item.targetNum}}</view>
+        <progress percent="{{item.pct || 0}}" stroke-width="6" active="{{true}}" />
+        <view class="tf">
+          <text class="rw">+{{item.rewardPoint}} 积分</text>
+          <button wx:if="{{item.taskState === 2}}" size="mini" disabled>已完成</button>
+          <button wx:else size="mini" type="primary" data-code="{{item.taskCode}}" bindtap="onGoTask">去完成</button>
+        </view>
+      </view>
+      <view wx:if="{{dailyTasks.length === 0}}" class="hint">暂无每日任务</view>
+    </block>
+  </view>
+
+  <view wx:if="{{showRules}}" class="mask" catchtap="closeRules">
+    <view class="pop" catchtap="noop">
+      <view class="pop-t">每日登录奖励规则</view>
+      <view class="pop-c">每日登录可领积分；连续登录与满勤有额外奖励；当日请及时领取以免过期。</view>
+      <button bindtap="closeRules">关闭</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showTaskRules}}" class="mask" catchtap="closeTaskRules">
+    <view class="pop" catchtap="noop">
+      <view class="pop-t">每日任务奖励规则</view>
+      <view class="pop-c">完成任务得积分；0点刷新；请及时领取。</view>
+      <button bindtap="closeTaskRules">关闭</button>
+    </view>
+  </view>
+</view>

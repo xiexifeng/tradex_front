@@ -1,0 +1,22 @@
+<view class="page">
+  <view class="card">
+    <view class="field"><text class="lab">收货人</text><input value="{{recipientName}}" data-field="recipientName" bindinput="onInput" /></view>
+    <view class="field"><text class="lab">手机号</text><input type="number" value="{{phone}}" data-field="phone" bindinput="onInput" /></view>
+    <picker mode="region" bindchange="onRegionChange">
+      <view class="field pick">
+        <text class="lab">省市区</text>
+        <text class="ph">{{regionText || '请选择'}}</text>
+      </view>
+    </picker>
+    <view class="field col">
+      <text class="lab">详细地址</text>
+      <textarea value="{{detail}}" data-field="detail" bindinput="onInput" />
+    </view>
+    <view class="field row">
+      <text class="lab">默认地址</text>
+      <switch checked="{{isDefault}}" bindchange="onDefaultChange" />
+    </view>
+  </view>
+  <button class="btn" bindtap="save">保存</button>
+  <button class="btn danger" bindtap="remove">删除</button>
+</view>

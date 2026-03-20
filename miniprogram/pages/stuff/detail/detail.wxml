@@ -1,0 +1,176 @@
+<view class="page">
+  <view wx:if="{{loading && !itemDetail}}" class="state">加载中...</view>
+
+  <block wx:elif="{{itemDetail}}">
+    <view class="swipe-wrap" bindtap="previewImages">
+      <swiper
+        class="item-swiper"
+        indicator-dots="{{swiperImages.length > 1}}"
+        indicator-color="rgba(255,255,255,0.5)"
+        indicator-active-color="#fff"
+        autoplay="{{swiperImages.length > 1}}"
+        interval="3000"
+        circular="{{swiperImages.length > 1}}"
+        bindchange="onSwiperChange"
+      >
+        <swiper-item wx:for="{{swiperImages}}" wx:key="*this">
+          <image class="swiper-img" src="{{item}}" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <view class="card info-group">
+      <view class="status-row">
+        <view class="item-status {{itemDetail.status}}">{{statusMainText}}</view>
+        <text class="item-id">物品编号: {{itemDetail.id}}</text>
+      </view>
+      <view class="title">{{itemDetail.itemTitle}}</view>
+      <view class="tags">
+        <text class="tag tag-p">{{itemDetail.itemType}}</text>
+        <text class="tag tag-s">{{itemDetail.depreciation}}成新</text>
+        <text wx:if="{{itemDetail.deliveryMethod}}" class="tag tag-w">{{deliveryDisplay}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{itemDetail.blockchainId || itemDetail.transferTimes > 0 || itemDetail.lastUserId}}" class="card">
+      <view class="sec-title">区块链信息</view>
+      <view wx:if="{{itemDetail.blockchainId}}" class="cell" bindtap="copyBlockchain">
+        <text class="cell-lab">区块链ID</text>
+        <text class="cell-val">{{blockchainShort}}</text>
+        <text class="cell-act">复制</text>
+      </view>
+      <view wx:if="{{itemDetail.transferTimes > 0}}" class="cell">
+        <text class="cell-lab">转让次数</text>
+        <text class="cell-val">{{itemDetail.transferTimes}}次</text>
+      </view>
+      <view wx:if="{{itemDetail.lastUserId}}" class="cell">
+        <text class="cell-lab">最后持有人</text>
+        <text class="cell-val">{{itemDetail.lastUserId}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{itemDetail.itemDescription}}" class="card">
+      <view class="sec-title">物品描述</view>
+      <text class="desc">{{itemDetail.itemDescription}}</text>
+    </view>
+
+    <view wx:if="{{itemDetail.transferStatus === 'transferring' && itemDetail.tradeMethod}}" class="card">
+      <view class="sec-title">交易设置</view>
+      <view class="cell"><text class="cell-lab">交易方式</text><text class="cell-val">{{tradeMethodDisplay}}</text></view>
+      <view wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_MONEY' && itemDetail.transferPrice}}" class="cell">
+        <text class="cell-lab">转让价格</text><text class="cell-val">¥{{itemDetail.transferPrice}}</text>
+      </view>
+      <view wx:elif="{{itemDetail.tradeMethod === 'ITEM_TO_POINTS' && itemDetail.transferPoints}}" class="cell">
+        <text class="cell-lab">所需积分</text><text class="cell-val">{{itemDetail.transferPoints}}积分</text>
+      </view>
+      <view wx:elif="{{itemDetail.tradeMethod === 'ITEM_TO_ITEM' && itemDetail.expectItem}}" class="cell">
+        <text class="cell-lab">期望物品</text><text class="cell-val">{{itemDetail.expectItem}}</text>
+      </view>
+      <view wx:if="{{itemDetail.deliveryMethod}}" class="cell">
+        <text class="cell-lab">交付方式</text><text class="cell-val">{{deliveryDisplay}}</text>
+      </view>
+      <view wx:if="{{itemDetail.contactInfo}}" class="cell">
+        <text class="cell-lab">联系人</text><text class="cell-val">{{itemDetail.contactInfo.linkman}}</text>
+      </view>
+      <view wx:if="{{itemDetail.contactInfo}}" class="cell">
+        <text class="cell-lab">联系方式</text><text class="cell-val">{{itemDetail.contactInfo.phone}}</text>
+      </view>
+      <view wx:if="{{itemDetail.contactInfo}}" class="cell">
+        <text class="cell-lab">交易地址</text><text class="cell-val">{{itemDetail.contactInfo.address}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{itemDetail.viewCount > 0 || itemDetail.loveCount > 0 || itemDetail.collectionCount > 0}}" class="card stats-card">
+      <view class="stats">
+        <view wx:if="{{itemDetail.viewCount > 0}}" class="stat-i"><text class="stat-n">{{itemDetail.viewCount}}</text><text class="stat-t">浏览</text></view>
+        <view wx:if="{{itemDetail.loveCount > 0}}" class="stat-i"><text class="stat-n">{{itemDetail.loveCount}}</text><text class="stat-t">点赞</text></view>
+        <view wx:if="{{itemDetail.collectionCount > 0}}" class="stat-i"><text class="stat-n">{{itemDetail.collectionCount}}</text><text class="stat-t">收藏</text></view>
+      </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
+
+    <view class="bottom-bar safe-bottom">
+      <block wx:if="{{itemDetail.transferStatus === 'own' && itemDetail.status === 'active'}}">
+        <button class="btn-primary" bindtap="initiateTransfer">发起出让</button>
+      </block>
+      <block wx:elif="{{itemDetail.transferStatus === 'transferring'}}">
+        <view class="btn-row">
+          <button wx:if="{{itemDetail.isCanCancel}}" class="btn-plain" bindtap="cancelTransferShow">取消出让</button>
+          <button class="btn-primary flex1" bindtap="viewOffers">查看报价</button>
+        </view>
+      </block>
+      <block wx:elif="{{itemDetail.transferStatus === 'trading'}}">
+        <button class="btn-primary" bindtap="viewTradeDetails">查看交易详情</button>
+      </block>
+    </view>
+  </block>
+
+  <view wx:else class="state">暂无数据</view>
+
+  <view wx:if="{{showTransferForm}}" class="popup-mask popup-bottom" catchtap="closeTransferForm">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-hd">
+        <text class="sheet-title">发起出让</text>
+        <text class="sheet-x" bindtap="closeTransferForm">×</text>
+      </view>
+      <scroll-view scroll-y class="sheet-scroll">
+        <picker mode="selector" range="{{deliveryColumns}}" range-key="text" value="{{deliveryPickIndex}}" bindchange="onDeliveryPick">
+          <view class="form-row pick-row">
+            <text class="flab">交付方式</text>
+            <text class="fval">{{transferForm.deliveryMethodText || '请选择'}}</text>
+          </view>
+        </picker>
+        <picker mode="selector" range="{{tradeMethodColumns}}" range-key="text" value="{{tradeMethodPickIndex}}" bindchange="onTradeMethodPick">
+          <view class="form-row pick-row">
+            <text class="flab">交易方式</text>
+            <text class="fval">{{transferForm.tradeMethodText || '请选择'}}</text>
+          </view>
+        </picker>
+        <view wx:if="{{transferForm.tradeMethod === 'ITEM_TO_MONEY'}}" class="form-row">
+          <text class="flab">转让价格</text>
+          <input class="finp" type="digit" placeholder="请输入" data-field="transferPrice" value="{{transferForm.transferPrice}}" bindinput="onTransferInput" />
+        </view>
+        <view wx:if="{{transferForm.tradeMethod === 'ITEM_TO_POINTS'}}" class="form-row">
+          <text class="flab">所需积分</text>
+          <input class="finp" type="number" placeholder="请输入" data-field="transferPoints" value="{{transferForm.transferPoints}}" bindinput="onTransferInput" />
+        </view>
+        <view wx:if="{{transferForm.tradeMethod === 'ITEM_TO_ITEM'}}" class="form-row col">
+          <text class="flab">期望物品</text>
+          <textarea class="fta" placeholder="请描述期望交换的物品" data-field="expectItem" value="{{transferForm.expectItem}}" bindinput="onTransferInput" />
+        </view>
+        <view class="form-row">
+          <text class="flab">联系方式</text>
+          <input class="finp" type="number" placeholder="手机号" data-field="phone" value="{{transferForm.phone}}" bindinput="onTransferInput" />
+        </view>
+        <picker mode="region" bindchange="onRegionChange">
+          <view class="form-row pick-row">
+            <text class="flab">省市区</text>
+            <text class="fval">{{transferForm.tradeAreaText || '点击选择'}}</text>
+          </view>
+        </picker>
+        <view class="form-row row-map">
+          <text class="flab">地图</text>
+          <button class="btn-mini" size="mini" bindtap="chooseMapLocation">选点填充</button>
+        </view>
+        <view class="form-row col">
+          <text class="flab">街道小区</text>
+          <input class="finp" placeholder="街道/小区/门牌号" data-field="tradeAddressDetail" value="{{transferForm.tradeAddressDetail}}" bindinput="onTransferInput" />
+        </view>
+        <view class="hint">如未能自动获取定位，可手动选择省市区并补充街道小区。</view>
+      </scroll-view>
+      <button class="sheet-submit" bindtap="onTransferSubmit">提交</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showCancelSheet}}" class="popup-mask popup-center" catchtap="closeCancelSheet">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">请输入取消原因</view>
+      <textarea class="dialog-ta" placeholder="取消原因" value="{{cancelReason}}" bindinput="onCancelReasonInput" />
+      <view class="dialog-btns">
+        <button class="d-btn d-cancel" bindtap="closeCancelSheet">取消</button>
+        <button class="d-btn d-ok" bindtap="confirmCancelTransfer">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

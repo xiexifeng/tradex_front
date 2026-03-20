@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "搜索",
+  "usingComponents": {
+    "item-card": "../../components/item-card/item-card"
+  },
+  "onReachBottomDistance": 120
+}

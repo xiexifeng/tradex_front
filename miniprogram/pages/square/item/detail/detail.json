@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "物品详情",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "trade-pay-popup": "../../../../components/trade-pay-popup/trade-pay-popup"
+  }
+}

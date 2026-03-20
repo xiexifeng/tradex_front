@@ -1,0 +1,193 @@
+<view class="trade-detail">
+  <view wx:if="{{loading && !tradeInfo}}" class="loading">加载中...</view>
+
+  <view wx:elif="{{!tradeInfo}}" class="loading">暂无数据</view>
+
+  <block wx:else>
+    <view class="detail-content">
+      <view class="notice-card">
+        <view class="notice-content">
+          <text class="notice-icon">ⓘ</text>
+          <text class="notice-text">平台仅提供信息撮合服务，所有交易均为线下进行，请选择安全的交易地点。</text>
+        </view>
+      </view>
+
+      <view class="trade-header">
+        <view class="status-wrap">
+          <view class="trade-status {{tradeInfo.tradeStatus}}">{{statusText}}</view>
+          <view class="trade-time">创建时间：{{createTimeStr}}</view>
+        </view>
+        <view class="trade-type {{flagLower}}">
+          {{tradeInfo.flag === 'SELL' ? '换/售出' : '换/购入'}}
+        </view>
+      </view>
+
+      <view class="flow-card">
+        <view class="flow-header">
+          <view class="flow-title">这是一笔 {{flowTypeText}} 交易</view>
+          <view class="flow-subtitle">按步骤完成双方确认、线下交付与评分，交易即告完成</view>
+        </view>
+        <view class="flow-steps">
+          <view class="flow-step {{tradeInfo.tradeStatus === 'trading' ? 'flow-step--active' : ''}}">
+            <view class="flow-icon">✎</view>
+            <view class="flow-text">
+              <view class="flow-step-title">发起申请 · 等待对方处理</view>
+              <view class="flow-step-desc">一方提交换物/购买申请，另一方可以接受、拒绝或取消</view>
+            </view>
+          </view>
+          <view class="flow-step {{tradeInfo.tradeStatus === 'accepted' ? 'flow-step--active' : ''}}">
+            <view class="flow-icon">👥</view>
+            <view class="flow-text">
+              <view class="flow-step-title">达成一致 · 安排交付</view>
+              <view class="flow-step-desc">双方确认换物/价格与交付方式，约定线下交易时间地点</view>
+            </view>
+          </view>
+          <view class="flow-step {{tradeInfo.tradeStatus === 'completed' ? 'flow-step--active' : ''}}">
+            <view class="flow-icon">✓</view>
+            <view class="flow-text">
+              <view class="flow-step-title">完成交付 · 互评打分</view>
+              <view class="flow-step-desc">线下确认物品无误后完成交易，并为本次交易打分</view>
+            </view>
+          </view>
+        </view>
+        <view class="safety-tips">
+          <view class="tips-title">
+            <text class="notice-icon">🛡</text>
+            <text>线下交易安全提示</text>
+          </view>
+          <view class="tips-content">
+            <view class="tip-row">• 选择公共场所进行交易，如商场、地铁站等</view>
+            <view class="tip-row">• 交易时最好有朋友陪同</view>
+            <view class="tip-row">• 仔细检查物品的真实性和完好性</view>
+            <view class="tip-row">• 现金交易时注意验钞</view>
+            <view class="tip-row">• 保留好交易凭证和沟通记录</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-group">
+        <view class="section-title">
+          <text class="section-icon">🛒</text>
+          <text>物品信息</text>
+        </view>
+        <view class="trade-content">
+          <image class="trade-image" src="{{tradeInfo.firstImage}}" mode="aspectFill" />
+          <view class="item-info">
+            <view class="item-title">{{tradeInfo.itemTitle}}</view>
+            <view class="item-meta">
+              <view class="meta-item">物品编号：{{tradeInfo.itemId}}</view>
+              <view class="meta-item">交易编号：{{tradeInfo.id}}</view>
+              <view class="meta-item">卖家ID：{{tradeInfo.fromUserId}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="trade-method-group">
+        <view class="section-title">
+          <text class="section-icon">⚖</text>
+          <text>交易方式</text>
+        </view>
+        <block wx:if="{{tradeInfo.tradeMethod === 'ITEM_TO_ITEM'}}">
+          <view class="swap-info">
+            <view class="swap-title">换物信息</view>
+            <view class="swap-content">
+              <image class="swap-image" src="{{tradeInfo.swapItemFirstImage}}" mode="aspectFill" />
+              <view class="swap-details">
+                <view class="swap-item-title">{{tradeInfo.swapItemTitle}}</view>
+                <view class="swap-meta">
+                  <view class="meta-item">物品编号：{{tradeInfo.swapItemId}}</view>
+                  <view class="meta-item">买家ID：{{tradeInfo.toUserId}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="payment-info">
+            <view class="payment-amount">
+              <text class="label">{{tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? '交易金额：' : '交易积分：'}}</text>
+              <text class="value">{{tradeInfo.tradeMethod === 'ITEM_TO_MONEY' ? (tradeInfo.tradePrice != null ? '¥' + tradeInfo.tradePrice : '--') : (tradeInfo.tradePoints != null ? tradeInfo.tradePoints : '--')}}</text>
+            </view>
+            <view wx:if="{{tradeInfo.payment}}" class="payment-detail">
+              <view class="meta-item">支付方式：{{tradeInfo.payment.paymentMethod}}</view>
+              <view class="meta-item">支付单号：{{tradeInfo.payment.paymentNo}}</view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <view wx:if="{{tradeInfo.logisticsFrom || tradeInfo.logisticsTo}}" class="logistics-group">
+        <view class="section-title">
+          <text class="section-icon">📦</text>
+          <text>物流信息</text>
+        </view>
+        <view class="logistics-info">
+          <view wx:if="{{tradeInfo.logisticsFrom}}" class="address-item">
+            <text class="label">发货地址：</text>
+            <text class="value">{{tradeInfo.logisticsFrom}}</text>
+          </view>
+          <view wx:if="{{tradeInfo.logisticsTo}}" class="address-item">
+            <text class="label">收货地址：</text>
+            <text class="value">{{tradeInfo.logisticsTo}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{tradeInfo.tradeStatus === 'completed'}}" class="score-group">
+        <view class="section-title">
+          <text class="section-icon">★</text>
+          <text>交易评分</text>
+        </view>
+        <view class="score-info">
+          <view class="score-item">
+            <text class="label">评分：</text>
+            <block wx:if="{{needRateInput}}">
+              <slider
+                class="rate-slider"
+                min="1"
+                max="5"
+                step="1"
+                value="{{rateValue}}"
+                show-value
+                bindchange="onRateChange"
+              />
+            </block>
+            <block wx:else>
+              <text wx:if="{{isSeller}}" class="score-value">{{tradeInfo.fromScore != null ? tradeInfo.fromScore + '分' : '--'}}</text>
+              <text wx:else class="score-value">{{tradeInfo.toScore != null ? tradeInfo.toScore + '分' : '--'}}</text>
+            </block>
+          </view>
+          <view class="score-item">
+            <text class="label">得分：</text>
+            <text wx:if="{{isSeller}}" class="score-value">{{tradeInfo.toScore != null ? tradeInfo.toScore + '分' : '--'}}</text>
+            <text wx:else class="score-value">{{tradeInfo.fromScore != null ? tradeInfo.fromScore + '分' : '--'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{tradeInfo.tradeStatus !== 'completed'}}" class="action-buttons">
+      <block wx:if="{{tradeInfo.tradeStatus === 'trading'}}">
+        <block wx:if="{{userId && tradeInfo.fromUserId === userId && (tradeInfo.tradeMethod === 'ITEM_TO_ITEM' || tradeInfo.tradeMethod === 'ITEM_TO_MONEY')}}">
+          <button class="abtn abtn-danger" bindtap="rejectTrade">拒绝交易</button>
+          <button class="abtn abtn-primary" bindtap="acceptTrade">接受交易</button>
+        </block>
+        <block wx:if="{{userId && tradeInfo.fromUserId !== userId}}">
+          <button class="abtn abtn-danger" bindtap="cancelTrade">取消交易</button>
+          <button wx:if="{{tradeInfo.tradeMethod === 'ITEM_TO_POINTS'}}" class="abtn abtn-primary" bindtap="openPayPopup">去支付</button>
+        </block>
+      </block>
+      <block wx:if="{{userId && tradeInfo.toUserId === userId && tradeInfo.tradeStatus === 'accepted'}}">
+        <button class="abtn abtn-success" bindtap="confirmTrade">确认交易</button>
+      </block>
+    </view>
+
+    <trade-pay-popup
+      show="{{showPayPopup}}"
+      payPoints="{{payPoints}}"
+      bind:close="closePayPopup"
+      bind:submit="onPayPopupSubmit"
+    />
+  </block>
+</view>

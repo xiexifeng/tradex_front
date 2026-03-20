@@ -1,0 +1,39 @@
+<view class="page">
+  <view class="group">
+    <view class="cell static"><text class="lab">手机号</text><text class="val">{{maskedPhone}}</text></view>
+  </view>
+  <view class="group">
+    <view class="cell" bindtap="openLoginPwd">
+      <text class="lab">登录密码</text>
+      <text class="val">{{loginPasswordStatus}}</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+  <view class="group">
+    <view class="cell" bindtap="openTradePwd">
+      <text class="lab">交易密码</text>
+      <text class="val">{{tradePasswordStatus}}</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+  <view class="group">
+    <view class="cell static"><text class="lab">微信账号</text><text class="val">{{userInfo && userInfo.wechat ? userInfo.wechat : '未绑定'}}</text></view>
+    <view class="cell static"><text class="lab">QQ账号</text><text class="val">{{userInfo && userInfo.qq ? userInfo.qq : '未绑定'}}</text></view>
+    <view class="cell static"><text class="lab">实名认证</text><text class="val">{{authStatusText}}</text></view>
+  </view>
+  <view class="group">
+    <view class="cell danger" bindtap="deleteAccount">
+      <text class="lab">注销账号</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showPwdSheet}}" class="mask" catchtap="closePwd">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-hd">{{pwdTitle}}</view>
+      <view class="field"><text class="flab">密码</text><input password type="text" placeholder="至少6位" value="{{password}}" bindinput="onPwdInput" /></view>
+      <view class="field"><text class="flab">确认</text><input password type="text" placeholder="再次输入" value="{{confirmPassword}}" bindinput="onPwd2Input" /></view>
+      <button class="btn" loading="{{submitting}}" bindtap="confirmPwd">确认设置</button>
+    </view>
+  </view>
+</view>

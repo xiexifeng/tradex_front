@@ -1,0 +1,18 @@
+<view class="mask" wx:if="{{show}}" catchtap="onClose">
+  <view class="dialog" catchtap="noop">
+    <view class="dialog-title">积分支付</view>
+    <view class="dialog-points">需支付 {{payPoints}} 积分</view>
+    <input
+      class="dialog-input"
+      password
+      type="text"
+      placeholder="请输入交易密码"
+      value="{{password}}"
+      bindinput="onPwdInput"
+    />
+    <view class="dialog-actions">
+      <button class="btn btn-cancel" bindtap="onClose">取消</button>
+      <button class="btn btn-ok" bindtap="onConfirm">确认支付</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,45 @@
+<view class="notification">
+  <scroll-view scroll-x class="tab-scroll" enable-flex>
+    <view class="tab-inner">
+      <view
+        wx:for="{{statusTabs}}"
+        wx:for-index="idx"
+        wx:key="value"
+        class="tab-item {{activeTab === idx ? 'tab-item--active' : ''}}"
+        data-index="{{idx}}"
+        bindtap="onTabTap"
+      >{{item.title}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="list-wrap">
+    <block wx:if="{{notifications.length}}">
+      <view
+        wx:for="{{notifications}}"
+        wx:key="id"
+        class="notification-item {{item.status === 1 ? 'unread' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onItemTap"
+      >
+        <view wx:if="{{item.status === 1}}" class="unread-dot" />
+        <view class="type-icon {{item.iconType}}">
+          <text class="type-icon-text">{{item.iconText}}</text>
+        </view>
+        <view class="content-wrapper">
+          <view class="header-row">
+            <text class="title">{{item.title}}</text>
+            <text class="time">{{item.displayTime}}</text>
+          </view>
+          <text class="content-preview">{{item.content}}</text>
+        </view>
+        <text class="arrow-icon">›</text>
+      </view>
+    </block>
+    <view wx:else class="empty-state">
+      <text class="empty-text">暂无消息</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="list-foot">加载中...</view>
+    <view wx:elif="{{finished && notifications.length}}" class="list-foot">没有更多了</view>
+  </view>
+</view>

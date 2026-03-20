@@ -1,0 +1,63 @@
+<view class="page">
+  <view class="card">
+    <view class="field">
+      <text class="lab">手机号 *</text>
+      <input type="number" maxlength="11" placeholder="请输入手机号" value="{{form.phone}}" data-field="phone" bindinput="onInput" bindblur="onPhoneBlur" />
+    </view>
+    <view wx:if="{{phoneError}}" class="err">{{phoneError}}</view>
+
+    <view class="field row-code">
+      <text class="lab">验证码 *</text>
+      <input class="inp-flex" placeholder="验证码" value="{{form.verfiyCode}}" data-field="verfiyCode" bindinput="onInput" />
+      <button class="mini" size="mini" disabled="{{countdown > 0}}" bindtap="onSendCode">{{countdown > 0 ? countdown + 's' : '发送验证码'}}</button>
+    </view>
+
+    <view class="field">
+      <text class="lab">昵称</text>
+      <input placeholder="选填" value="{{form.nickName}}" data-field="nickName" bindinput="onInput" />
+    </view>
+
+    <view class="field">
+      <text class="lab">密码 *</text>
+      <input password="{{pwdHidden}}" placeholder="不少于6位" value="{{form.password}}" data-field="password" bindinput="onInput" />
+      <text class="eye" bindtap="togglePwd">{{pwdHidden ? '显示' : '隐藏'}}</text>
+    </view>
+
+    <view class="field">
+      <text class="lab">确认密码 *</text>
+      <input password="{{pwd2Hidden}}" placeholder="再次输入" value="{{form.confirmPassword}}" data-field="confirmPassword" bindinput="onInput" />
+      <text class="eye" bindtap="togglePwd2">{{pwd2Hidden ? '显示' : '隐藏'}}</text>
+    </view>
+
+    <picker mode="selector" range="{{genderLabels}}" value="{{genderIndex}}" bindchange="onGenderChange">
+      <view class="field pick">
+        <text class="lab">性别</text>
+        <text class="ph">{{form.gender === '1' ? '男' : form.gender === '2' ? '女' : '选填'}}</text>
+      </view>
+    </picker>
+
+    <picker mode="date" value="{{form.birthday}}" start="1900-01-01" end="{{today}}" bindchange="onBirthdayChange">
+      <view class="field pick">
+        <text class="lab">出生日期</text>
+        <text class="ph">{{form.birthday || '选填'}}</text>
+      </view>
+    </picker>
+
+    <view class="field">
+      <text class="lab">头像URL</text>
+      <input placeholder="选填" value="{{form.avatarUrl}}" data-field="avatarUrl" bindinput="onInput" />
+    </view>
+
+    <view class="field">
+      <text class="lab">邮箱</text>
+      <input placeholder="选填" value="{{form.email}}" data-field="email" bindinput="onInput" />
+    </view>
+
+    <view class="field col">
+      <text class="lab">简介</text>
+      <textarea placeholder="选填" value="{{form.brief}}" data-field="brief" bindinput="onInput" />
+    </view>
+  </view>
+
+  <button class="btn" loading="{{submitting}}" bindtap="onSubmit">注册</button>
+</view>

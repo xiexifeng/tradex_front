@@ -1,0 +1,101 @@
+<view class="about-page">
+  <view class="content">
+    <view class="brand">
+      <view class="logo">X</view>
+      <view class="name">x平台</view>
+      <view class="desc">让闲置流转更简单</view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">ℹ️</text>
+        <text>平台介绍</text>
+      </view>
+      <view class="paragraph">x平台是xx公司旗下的闲置物品信息撮合平台，致力于为用户提供便捷的闲置物品信息发布和获取服务，帮助更多好物实现再利用，减少浪费。</view>
+      <view class="paragraph">
+        <text class="highlight-inline">平台仅作为信息撮合方，不参与任何交易环节，所有交易均由用户线下自行协商完成。</text>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">⭐</text>
+        <text>核心价值</text>
+      </view>
+      <view class="paragraph">
+        <view class="list-row">• 便捷高效：快速发布和发现闲置物品</view>
+        <view class="list-row">• 环保节能：促进资源循环利用</view>
+        <view class="list-row">• 安全可靠：提供信息撮合服务，保障用户隐私</view>
+        <view class="list-row">• 社区友好：构建互助共享的邻里关系</view>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">📱</text>
+        <text>主要功能</text>
+      </view>
+      <view class="cell-plain cell-plain--first">
+        <text class="cell-plain-title">发布与管理物品</text>
+        <text class="cell-plain-label">发布物品信息、图片与期望换物条件</text>
+      </view>
+      <view class="cell-plain">
+        <text class="cell-plain-title">浏览与搜索</text>
+        <text class="cell-plain-label">按关键词/分类快速找到心仪物品</text>
+      </view>
+      <view class="cell-plain">
+        <text class="cell-plain-title">信息沟通</text>
+        <text class="cell-plain-label">通过平台提供的联系方式与对方沟通</text>
+      </view>
+      <view class="cell-plain">
+        <text class="cell-plain-title">消息通知</text>
+        <text class="cell-plain-label">重要信息及时提醒</text>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">💬</text>
+        <text>联系我们</text>
+      </view>
+      <view class="cell" bindtap="copySupport">
+        <view class="cell-main">
+          <text class="cell-title">客服邮箱</text>
+          <text class="cell-label">点击复制</text>
+        </view>
+        <text class="cell-value">{{supportEmail}}</text>
+      </view>
+      <view class="cell" bindtap="copyBiz">
+        <view class="cell-main">
+          <text class="cell-title">商务合作</text>
+          <text class="cell-label">点击复制</text>
+        </view>
+        <text class="cell-value">{{bizEmail}}</text>
+      </view>
+    </view>
+
+    <view class="group">
+      <view class="group-head">
+        <text class="group-head-icon">📄</text>
+        <text>法律与协议</text>
+      </view>
+      <view class="cell" bindtap="goPrivacy">
+        <view class="cell-main">
+          <text class="cell-title">用户隐私协议</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+      <view class="cell" bindtap="goSwap">
+        <view class="cell-main">
+          <text class="cell-title">x平台使用协议</text>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="footer">
+      <view>© 2026 xx公司 保留所有权利</view>
+      <view class="version">版本号：V1.0.0</view>
+    </view>
+  </view>
+</view>
