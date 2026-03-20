@@ -50,6 +50,19 @@
   font-size: 36rpx;
 }
 
+.group-head-ico {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 16rpx;
+  border-radius: 50%;
+  background: rgba(25, 137, 250, 0.12);
+  color: #1989fa;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 48rpx;
+  text-align: center;
+}
+
 .collapse {
   margin: 0 0 32rpx;
   border-radius: 24rpx;

@@ -1,43 +1,44 @@
 <view class="page">
-  <view class="group">
-    <view class="cell" bindtap="goSecurity">
-      <text class="icon">🛡</text>
-      <text class="tit">账号与安全</text>
-      <text class="arrow">›</text>
+  <view class="main">
+    <view class="section-tip">账户与偏好</view>
+    <view class="group">
+      <view class="cell" hover-class="cell--active" bindtap="goSecurity">
+        <view class="ico-wrap"><text class="ico-txt">盾</text></view>
+        <text class="tit">账号与安全</text>
+        <text class="arrow">›</text>
+      </view>
+      <view class="cell cell--last" hover-class="cell--active" bindtap="goAddress">
+        <view class="ico-wrap"><text class="ico-txt">址</text></view>
+        <text class="tit">收货地址</text>
+        <text class="arrow">›</text>
+      </view>
     </view>
-  </view>
-  <view class="group">
-    <view class="cell" bindtap="goAddress">
-      <text class="icon">📍</text>
-      <text class="tit">收货地址</text>
-      <text class="arrow">›</text>
-    </view>
-  </view>
-  <view class="group">
-    <view class="cell" bindtap="goHelp">
-      <text class="icon">💬</text>
-      <text class="tit">帮助与客服</text>
-      <text class="arrow">›</text>
-    </view>
-  </view>
-  <view class="group">
-    <view class="cell" bindtap="goAbout">
-      <text class="icon">ℹ</text>
-      <text class="tit">关于X平台</text>
-      <text class="arrow">›</text>
+
+    <view class="section-tip">支持</view>
+    <view class="group">
+      <view class="cell" hover-class="cell--active" bindtap="goHelp">
+        <view class="ico-wrap"><text class="ico-txt">助</text></view>
+        <text class="tit">帮助与客服</text>
+        <text class="arrow">›</text>
+      </view>
+      <view class="cell cell--last" hover-class="cell--active" bindtap="goAbout">
+        <view class="ico-wrap"><text class="ico-txt">介</text></view>
+        <text class="tit">关于X平台</text>
+        <text class="arrow">›</text>
+      </view>
     </view>
   </view>
 
-  <view class="bottom">
-    <view class="group">
-      <view class="cell" bindtap="switchAccount">
-        <text class="icon">⇄</text>
+  <view class="footer-fixed">
+    <view class="group group--footer">
+      <view class="cell" hover-class="cell--active" bindtap="switchAccount">
+        <view class="ico-wrap ico-wrap--muted"><text class="ico-txt ico-txt--muted">换</text></view>
         <text class="tit">切换账号</text>
         <text class="arrow">›</text>
       </view>
-      <view class="cell cell--danger" bindtap="logout">
-        <text class="icon">✕</text>
-        <text class="tit">退出登录</text>
+      <view class="cell cell--last cell--danger" hover-class="cell--danger-active" bindtap="logout">
+        <view class="ico-wrap ico-wrap--danger"><text class="ico-txt ico-txt--danger">退</text></view>
+        <text class="tit tit--danger">退出登录</text>
       </view>
     </view>
   </view>

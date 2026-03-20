@@ -46,3 +46,14 @@
    - Vue的<style> → 小程序的.wxss
    - Vue的<script> → 小程序的.js（生命周期要改为onLoad/onShow等）
    - Vue的路由 → 在app.json的pages数组里注册
+
+## 样式对齐说明（`src/views` ↔ `miniprogram/pages`）
+
+- **技术差异**：H5 使用 Vant + `theme.scss`（`px`）；小程序用原生组件 + **`rpx`**，无 Vant，需在 `.wxss` 中手写与 Vant 接近的圆角、阴影、间距。
+- **已对照 Vue 结构/配色做的页面**
+  - **首页** `HomeView.vue` ↔ `pages/home/home`：顶栏渐变、搜索条、hero、轮播、四列功能宫格、筛选条、双列 `item-card`、空态；本次加强了筛选条轻阴影、空态主按钮渐变（贴近 Vue 主色按钮）。
+  - **登录** `LoginView.vue` ↔ `pages/user/login/login`：此前已按现代表单风格美化（卡片、分段 Tab、主按钮渐变）。
+  - **注册** `RegisterView.vue` ↔ `pages/user/register/register`：与登录页统一 — 顶区文案、白卡片 + 左缩进分割线、获取验证码幽灵按钮、渐变注册按钮、简介区灰底 textarea。
+  - **设置** `SettingsView.vue` ↔ `pages/user/settings/settings`：补齐 Vue 的 **顶区渐变、分组卡片阴影、底部固定操作区**；列表项用色块首字图标替代 emoji，对应原 `van-cell` + 蓝色 `cell-icon`。
+  - **帮助** `HelpView.vue` ↔ `pages/help/help/help` + `styles/help-page.wxss`：折叠与分组样式本就按 Vue 转写；分组标题由 emoji 改为与主题色一致的圆形字标（? / 联 / 约）。
+- **其余页面**：按 `app.json` 与上表路径自行对照；若某页仍是「能跑但丑」，优先对齐 Vue 的 **背景渐变、白卡片圆角阴影、主按钮渐变、列表分隔线** 四要素即可。

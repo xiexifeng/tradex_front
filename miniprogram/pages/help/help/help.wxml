@@ -7,7 +7,7 @@
 
     <view class="group">
       <view class="group-head">
-        <text class="group-head-icon">❓</text>
+        <view class="group-head-ico">?</view>
         <text>常见问题</text>
       </view>
     </view>
@@ -97,7 +97,7 @@
 
     <view class="group">
       <view class="group-head">
-        <text class="group-head-icon">💬</text>
+        <view class="group-head-ico">联</view>
         <text>联系我们</text>
       </view>
       <view class="cell cell--link" bindtap="onOnlineService">
@@ -125,7 +125,7 @@
 
     <view class="group">
       <view class="group-head">
-        <text class="group-head-icon">📄</text>
+        <view class="group-head-ico">约</view>
         <text>相关协议</text>
       </view>
       <view class="cell cell--link" bindtap="goPrivacy">

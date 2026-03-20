@@ -1,50 +1,116 @@
+/* 与 SettingsView.vue：顶区渐变、inset 卡片组、底部固定操作区 */
 .page {
   min-height: 100vh;
-  background: #f7f8fa;
-  padding: 24rpx;
-  padding-bottom: 48rpx;
   box-sizing: border-box;
+  padding-bottom: calc(220rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #eaf2ff 0%, #f7f8fa 400rpx);
+}
+
+.main {
+  padding: 24rpx 24rpx 8rpx;
+}
+
+.section-tip {
+  font-size: 24rpx;
+  color: #868b94;
+  padding: 8rpx 8rpx 16rpx;
+  letter-spacing: 1rpx;
 }
 
 .group {
   background: #fff;
-  border-radius: 16rpx;
+  border-radius: 28rpx;
   margin-bottom: 24rpx;
   overflow: hidden;
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8rpx 32rpx rgba(31, 56, 88, 0.08);
 }
 
 .cell {
   display: flex;
   align-items: center;
-  padding: 28rpx 24rpx;
-  border-bottom: 1rpx solid #ebedf0;
-  font-size: 30rpx;
+  padding: 30rpx 28rpx;
+  border-bottom: 1rpx solid #f0f2f5;
 }
 
-.cell:last-child {
+.cell--last {
   border-bottom: none;
 }
 
-.cell--danger .tit {
-  color: #ee0a24;
+.cell--active {
+  background: #f7f8fa;
 }
 
-.icon {
-  width: 48rpx;
-  margin-right: 16rpx;
-  text-align: center;
+.ico-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  background: rgba(25, 137, 250, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 22rpx;
+  flex-shrink: 0;
+}
+
+.ico-wrap--muted {
+  background: rgba(100, 116, 139, 0.12);
+}
+
+.ico-wrap--danger {
+  background: rgba(238, 10, 36, 0.1);
+}
+
+.ico-txt {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1989fa;
+}
+
+.ico-txt--muted {
+  color: #64748b;
+}
+
+.ico-txt--danger {
+  color: #ee0a24;
 }
 
 .tit {
   flex: 1;
+  font-size: 30rpx;
   color: #323233;
+  font-weight: 500;
+}
+
+.tit--danger {
+  color: #ee0a24;
 }
 
 .arrow {
   color: #c8c9cc;
-  font-size: 36rpx;
+  font-size: 40rpx;
+  font-weight: 300;
+  line-height: 1;
 }
 
-.bottom {
-  margin-top: 48rpx;
+.cell--danger {
+  border-bottom: none;
+}
+
+.cell--danger-active {
+  background: #fff5f5;
+}
+
+.footer-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(247, 248, 250, 0) 0%, rgba(247, 248, 250, 0.92) 28%, #f7f8fa 100%);
+}
+
+.group--footer {
+  margin-bottom: 0;
+  box-shadow: 0 12rpx 40rpx rgba(31, 56, 88, 0.12);
 }

@@ -53,14 +53,25 @@
 
     <view class="products-section">
       <view class="filter-bar">
-        <picker mode="selector" range="{{itemTypeLabels}}" value="{{itemTypeIndex}}" bindchange="onItemTypePick">
-          <view class="filter-cell">{{itemTypeLabels[itemTypeIndex]}}</view>
+        <picker class="filter-pick" mode="selector" range="{{itemTypeLabels}}" value="{{itemTypeIndex}}" bindchange="onItemTypePick">
+          <view class="filter-cell {{itemTypeIndex > 0 ? 'filter-cell--on' : ''}}">
+            <text class="filter-label">{{itemTypeLabels[itemTypeIndex]}}</text>
+            <text class="filter-caret">▼</text>
+          </view>
         </picker>
-        <picker mode="selector" range="{{tradeMethodLabels}}" value="{{tradeMethodIndex}}" bindchange="onTradeMethodPick">
-          <view class="filter-cell">{{tradeMethodLabels[tradeMethodIndex]}}</view>
+        <view class="filter-vsep"></view>
+        <picker class="filter-pick" mode="selector" range="{{tradeMethodLabels}}" value="{{tradeMethodIndex}}" bindchange="onTradeMethodPick">
+          <view class="filter-cell {{tradeMethodIndex > 0 ? 'filter-cell--on' : ''}}">
+            <text class="filter-label">{{tradeMethodLabels[tradeMethodIndex]}}</text>
+            <text class="filter-caret">▼</text>
+          </view>
         </picker>
-        <picker mode="selector" range="{{sortLabels}}" value="{{sortIndex}}" bindchange="onSortPick">
-          <view class="filter-cell">{{sortLabels[sortIndex]}}</view>
+        <view class="filter-vsep"></view>
+        <picker class="filter-pick" mode="selector" range="{{sortLabels}}" value="{{sortIndex}}" bindchange="onSortPick">
+          <view class="filter-cell {{sortIndex > 0 ? 'filter-cell--on' : ''}}">
+            <text class="filter-label">{{sortLabels[sortIndex]}}</text>
+            <text class="filter-caret">▼</text>
+          </view>
         </picker>
       </view>
 

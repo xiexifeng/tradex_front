@@ -1,41 +1,59 @@
 <view class="page">
   <view class="hero">
+    <view class="hero-badge">Tradex</view>
     <view class="hero-title">欢迎来到 X平台</view>
     <view class="hero-sub">登录后即可发布闲置、发起换物并查看交易进度</view>
   </view>
 
-  <view class="tabs">
-    <view class="tab {{tab === 0 ? 'tab--on' : ''}}" data-index="0" bindtap="switchLoginTab">密码登录</view>
-    <view class="tab {{tab === 1 ? 'tab--on' : ''}}" data-index="1" bindtap="switchLoginTab">验证码登录</view>
+  <view class="tabs-wrap">
+    <view class="tabs">
+      <view class="tab {{tab === 0 ? 'tab--on' : ''}}" data-index="0" bindtap="switchLoginTab">密码登录</view>
+      <view class="tab {{tab === 1 ? 'tab--on' : ''}}" data-index="1" bindtap="switchLoginTab">验证码登录</view>
+    </view>
   </view>
 
   <block wx:if="{{tab === 0}}">
     <view class="card">
       <view class="field">
-        <text class="icon">📱</text>
-        <input placeholder="请输入手机号" type="number" maxlength="11" value="{{passwordForm.username}}" bindinput="onPwdAccountInput" />
+        <view class="ico ico-phone">
+          <view class="ico-phone-inner"></view>
+        </view>
+        <input class="field-input" placeholder="请输入手机号" placeholder-class="ph" type="number" maxlength="11" value="{{passwordForm.username}}" bindinput="onPwdAccountInput" />
       </view>
+      <view class="field-divider"></view>
       <view class="field">
-        <text class="icon">🔒</text>
-        <input placeholder="请输入密码" password="{{passwordType === 'password'}}" value="{{passwordForm.password}}" bindinput="onPwdPassInput" />
+        <view class="ico ico-lock" aria-hidden="true">
+          <view class="ico-lock-arch"></view>
+          <view class="ico-lock-body"></view>
+        </view>
+        <input class="field-input" placeholder="请输入密码" placeholder-class="ph" password="{{passwordType === 'password'}}" value="{{passwordForm.password}}" bindinput="onPwdPassInput" />
         <text class="eye" bindtap="togglePwd">{{passwordType === 'password' ? '显示' : '隐藏'}}</text>
       </view>
     </view>
-    <view class="forgot-row"><text class="muted">忘记密码？</text></view>
+    <view class="forgot-row">
+      <text class="forgot-link">忘记密码？</text>
+    </view>
     <button class="btn-main" bindtap="onPasswordSubmit">登录</button>
   </block>
 
   <block wx:else>
     <view class="card">
       <view class="field">
-        <text class="icon">📱</text>
-        <input placeholder="请输入手机号" type="number" maxlength="11" value="{{codeForm.phone}}" bindinput="onCodePhoneInput" />
+        <view class="ico ico-phone">
+          <view class="ico-phone-inner"></view>
+        </view>
+        <input class="field-input" placeholder="请输入手机号" placeholder-class="ph" type="number" maxlength="11" value="{{codeForm.phone}}" bindinput="onCodePhoneInput" />
       </view>
+      <view class="field-divider"></view>
       <view class="field">
-        <text class="icon">💬</text>
-        <input class="flex1" placeholder="请输入验证码" value="{{codeForm.code}}" bindinput="onCodeInput" />
-        <button class="code-btn" size="mini" disabled="{{countdown > 0}}" bindtap="onSendCode">
-          {{countdown > 0 ? countdown + 's' : '发送验证码'}}
+        <view class="ico ico-code">
+          <view class="ico-code-line"></view>
+          <view class="ico-code-line"></view>
+          <view class="ico-code-line"></view>
+        </view>
+        <input class="field-input flex1" placeholder="请输入验证码" placeholder-class="ph" value="{{codeForm.code}}" bindinput="onCodeInput" />
+        <button class="code-btn" hover-class="code-btn--hover" disabled="{{countdown > 0}}" bindtap="onSendCode">
+          {{countdown > 0 ? countdown + 's' : '获取验证码'}}
         </button>
       </view>
     </view>
@@ -43,12 +61,13 @@
   </block>
 
   <view class="agree">
-    <text>登录即表示您已阅读并同意</text>
+    <text class="agree-txt">登录即表示您已阅读并同意</text>
     <text class="link" bindtap="goPrivacy">《用户隐私协议》</text>
-    <text>与</text>
+    <text class="agree-txt">与</text>
     <text class="link" bindtap="goSwap">《换物使用协议》</text>
   </view>
-  <view class="links">
-    <text class="link" bindtap="goRegister">立即注册</text>
+  <view class="register-row">
+    <text class="register-hint">还没有账号？</text>
+    <text class="link link-strong" bindtap="goRegister">立即注册</text>
   </view>
 </view>
