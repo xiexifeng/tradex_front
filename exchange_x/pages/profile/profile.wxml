@@ -1,0 +1,242 @@
+<view class="profile-page">
+  <view class="profile-content" wx:if="{{userInfo}}">
+    <view class="quick-actions">
+      <text class="qa-link" bindtap="goSettings">设置</text>
+      <text class="qa-dot">·</text>
+      <text class="qa-link" bindtap="openCamera">扫描</text>
+      <text class="qa-dot">·</text>
+      <text class="qa-link" bindtap="onShare">分享</text>
+    </view>
+    <base-card extClass="user-hero-card">
+      <view class="hero-header">
+        <view class="hero-left">
+          <view class="avatar-wrapper">
+            <image wx:if="{{userInfo.avatarUrl}}" class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar avatar-placeholder">👤</view>
+            <view class="user-badge">🛡</view>
+          </view>
+          <view class="user-info-compact">
+            <view class="nickname-row">
+              <text class="nickname">{{userInfo.nickname || '未设置昵称'}}</text>
+              <text class="gender-tag {{userInfo.gender === 'MAN' ? 'male' : 'female'}}">
+                {{userInfo.gender === 'MAN' ? '♂' : '♀'}}
+              </text>
+            </view>
+            <view class="user-id-compact">用户编号: {{userInfo.userId || ''}}</view>
+          </view>
+        </view>
+        <button class="edit-btn" size="mini" bindtap="editProfile">编辑</button>
+      </view>
+
+      <view class="core-stats">
+        <view class="core-stat-item highlight">
+          <view class="core-stat-icon">💰</view>
+          <view class="core-stat-content">
+            <view class="core-stat-value">{{pointsAccount.pointsBalance || 0}}</view>
+            <view class="core-stat-label" bindtap="showPointsRule">
+              <text>积分余额</text>
+              <text class="rule-icon">?</text>
+            </view>
+          </view>
+        </view>
+        <view class="core-stat-item highlight">
+          <view class="core-stat-icon score">⭐</view>
+          <view class="core-stat-content">
+            <view class="core-stat-value">{{userInfo.tradeScore || 0}}</view>
+            <view class="core-stat-label">信用评分</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="social-stats">
+        <view class="social-item">
+          <text class="social-value">{{userInfo.followers || 0}}</text>
+          <text class="social-label">关注</text>
+        </view>
+        <view class="social-divider"></view>
+        <view class="social-item">
+          <text class="social-value">{{userInfo.followers || 0}}</text>
+          <text class="social-label">粉丝</text>
+        </view>
+        <view class="social-divider"></view>
+        <view class="social-item">
+          <text class="social-value">{{userInfo.likes || 0}}</text>
+          <text class="social-label">获赞</text>
+        </view>
+        <view class="social-divider"></view>
+        <view class="social-item">
+          <text class="social-value">{{userInfo.collects || 0}}</text>
+          <text class="social-label">收藏</text>
+        </view>
+      </view>
+
+      <view class="blockchain-compact" wx:if="{{userInfo.blockchainId}}" bindtap="copyBlockchainId" data-id="{{userInfo.blockchainId}}">
+        <text class="cert-icon">📜</text>
+        <text class="blockchain-text">{{blockchainUserShort}}</text>
+        <text class="copy-hint">复制</text>
+      </view>
+    </base-card>
+
+    <base-card extClass="records-card">
+      <view class="collapse-head" bindtap="toggleCollapse" data-key="score">
+        <text class="collapse-icon">⭐</text>
+        <text class="collapse-title">评分记录</text>
+        <text class="collapse-count">({{transactions.length}})</text>
+        <text class="collapse-arrow">{{activeCollapse === 'score' ? '▲' : '▼'}}</text>
+      </view>
+      <view class="collapse-body" wx:if="{{activeCollapse === 'score'}}">
+        <view class="table-header row-3">
+          <text>得分</text>
+          <text>交易项</text>
+          <text>时间</text>
+        </view>
+        <block wx:for="{{transactions}}" wx:key="tradeId">
+          <view class="table-row row-3">
+            <text class="col-score">{{item.tradeScore}}</text>
+            <text class="col-ellipsis">{{item.tradeRemark}}</text>
+            <text class="col-time">{{item._time}}</text>
+          </view>
+        </block>
+        <view class="empty-hint" wx:if="{{transactions.length === 0}}">暂无评分记录</view>
+      </view>
+
+      <view class="collapse-head" bindtap="toggleCollapse" data-key="points">
+        <text class="collapse-icon">💰</text>
+        <text class="collapse-title">积分明细</text>
+        <text class="collapse-count">({{usages.length}})</text>
+        <text class="collapse-arrow">{{activeCollapse === 'points' ? '▲' : '▼'}}</text>
+      </view>
+      <view class="collapse-body" wx:if="{{activeCollapse === 'points'}}">
+        <view class="table-header row-3-points">
+          <text>变动</text>
+          <text>类型</text>
+          <text>时间</text>
+        </view>
+        <block wx:for="{{usages}}" wx:for-item="u" wx:for-index="ui" wx:key="ui">
+          <view class="table-row row-3-points">
+            <text class="{{u.pointsChange > 0 ? 'increase' : 'decrease'}}">
+              {{u.pointsChange > 0 ? '+' : ''}}{{u.pointsChange}}
+            </text>
+            <text class="col-ellipsis">{{u._typeText}}</text>
+            <text class="col-time">{{u._time}}</text>
+          </view>
+        </block>
+        <view class="empty-hint" wx:if="{{usages.length === 0}}">暂无积分记录</view>
+      </view>
+    </base-card>
+
+    <view class="items-section">
+      <scroll-view class="tab-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="tab-list">
+          <view
+            wx:for="{{statusList}}"
+            wx:key="value"
+            class="tab-pill {{activeTabIndex === index ? 'active' : ''}}"
+            data-index="{{index}}"
+            bindtap="onTabChange"
+          >
+            {{item.text}}
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="items-list-wrap">
+        <view class="items-list" wx:if="{{displayItems.length}}">
+          <view class="mine-item-card" wx:for="{{displayItems}}" wx:key="id">
+            <view class="mine-item-row">
+              <image class="mine-thumb" src="{{item.firstImage}}" mode="aspectFill" />
+              <view class="mine-item-main">
+                <view class="mine-title">{{item.itemTitle}}</view>
+                <view class="mine-tags">
+                  <text class="tag tag-{{item._itemStatusClass}}">{{item._itemStatusText}}</text>
+                  <text class="tag tag-{{item._transferClass}}">{{item._transferText}}</text>
+                </view>
+                <view class="mine-desc">
+                  <text>编号: {{item.id}}</text>
+                  <view class="blockchain-row" wx:if="{{item.blockchainId}}" bindtap="copyBlockchainId" data-id="{{item.blockchainId}}">
+                    <text class="bc-text">{{item._bcShort}}</text>
+                    <text class="bc-copy">复制</text>
+                  </view>
+                </view>
+                <view class="mine-actions">
+                  <block wx:if="{{item.transferStatus === 'own' && item.status === 'active'}}">
+                    <button class="mini-btn primary-plain" size="mini" data-item="{{item}}" bindtap="viewStuffDetails">发起出让</button>
+                  </block>
+                  <block wx:if="{{item.isCanCancel}}">
+                    <button class="mini-btn danger-plain" size="mini" data-id="{{item.id}}" bindtap="showCancelDialog">取消出让</button>
+                    <button class="mini-btn primary" size="mini" data-item="{{item}}" bindtap="viewOffers">查看报价</button>
+                  </block>
+                  <button class="mini-btn primary-plain" size="mini" data-item="{{item}}" bindtap="viewStuffDetails">物品详情</button>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="empty-hint block" wx:else>暂无物品</view>
+        <view class="list-footer" wx:if="{{listLoading}}">加载中...</view>
+        <view class="list-footer" wx:if="{{listFinished && displayItems.length}}">没有更多了</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="profile-empty" wx:else>
+    <text>加载中...</text>
+  </view>
+
+  <app-tab-bar active="profile" />
+
+  <!-- 积分规则 -->
+  <view class="popup-mask popup-mask-bottom" wx:if="{{showPointsRulePopup}}" bindtap="hidePointsRule">
+    <view class="points-popup" catchtap="noop">
+      <view class="popup-header">
+        <text class="popup-title">积分规则说明</text>
+        <text class="popup-close" bindtap="hidePointsRule">✕</text>
+      </view>
+      <scroll-view scroll-y class="popup-scroll">
+        <view class="rule-section">
+          <view class="rule-h4">积分获取方式</view>
+          <text class="rule-li">· 完成平台任务获取积分</text>
+          <text class="rule-li">· 参与平台活动获取积分</text>
+          <text class="rule-li">· 邀请新用户注册获取积分</text>
+          <text class="rule-li">· 发布闲置物品获取积分</text>
+          <text class="rule-li">· 成功完成交易获取积分</text>
+        </view>
+        <view class="rule-section">
+          <view class="rule-h4">积分使用范围</view>
+          <text class="rule-li">· 用于交换其他用户发布的闲置物品</text>
+          <text class="rule-li">· 参与平台积分兑换活动</text>
+          <text class="rule-li">· 提升账号信用等级</text>
+        </view>
+        <view class="rule-section">
+          <view class="rule-h4">积分使用规则</view>
+          <text class="rule-li">· 积分不可兑换现金</text>
+          <text class="rule-li">· 积分不可转让给其他用户</text>
+          <text class="rule-li">· 积分长期有效，可累积使用</text>
+          <text class="rule-li">· 积分使用需遵守平台相关规定</text>
+        </view>
+        <view class="rule-section">
+          <view class="rule-h4">平台免责声明</view>
+          <text class="rule-p">平台仅提供信息撮合服务，积分仅作为用户参与平台活动的虚拟奖励，不涉及任何资金交易。</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 取消出让 -->
+  <view class="popup-mask popup-mask-center" wx:if="{{showCancelTransfer}}" catchtap="hideCancelDialog">
+    <view class="cancel-dialog" catchtap="noop">
+      <view class="cancel-title">请输入取消原因</view>
+      <textarea
+        class="cancel-textarea"
+        placeholder="请输入取消原因"
+        value="{{cancelReason}}"
+        bindinput="onCancelReasonInput"
+        maxlength="200"
+      />
+      <view class="cancel-actions">
+        <button class="cancel-btn" bindtap="hideCancelDialog">取消</button>
+        <button class="confirm-btn" type="primary" bindtap="confirmCancelTransfer">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

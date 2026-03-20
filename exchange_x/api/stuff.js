@@ -59,10 +59,34 @@ function publishItemApi(data) {
   });
 }
 
+function getMyItems(params) {
+  return request({
+    url: "/client/item/list-mine",
+    method: "POST",
+    data: params,
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+function cancelTransferApi(data) {
+  return request({
+    url: "/client/item/cancel-transfer",
+    method: "POST",
+    data,
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
 module.exports = {
   listSquareItems,
   uploadFileApi,
-  publishItemApi
+  publishItemApi,
+  getMyItems,
+  cancelTransferApi
 };
 
 

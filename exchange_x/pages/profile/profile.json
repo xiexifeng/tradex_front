@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "我的",
+  "navigationBarBackgroundColor": "#1989fa",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "app-tab-bar": "/components/app-tab-bar/index",
+    "base-card": "/components/base-card/index"
+  }
+}

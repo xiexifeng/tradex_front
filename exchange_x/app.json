@@ -3,6 +3,7 @@
     "pages/home/home",
     "pages/login/login",
     "pages/stuff/publish/publish",
+    "pages/profile/profile",
     "pages/index/index"
   ],
   "window": {

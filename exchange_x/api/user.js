@@ -36,9 +36,61 @@ function loginByPassword(username, password) {
   });
 }
 
+// 刷新用户信息（GET）
+function refreshUserInfo() {
+  return request({
+    url: "/client/user/get",
+    method: "GET",
+    data: {},
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+// 积分账户
+function getPointsAccount() {
+  return request({
+    url: "/client/user/points-account",
+    method: "GET",
+    data: {},
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+// 积分流水
+function getPointsTransactions(params) {
+  return request({
+    url: "/client/user/points-account/list-transaction",
+    method: "POST",
+    data: params,
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+// 信用评分记录
+function getTradeScoreTransactions(params) {
+  return request({
+    url: "/client/trade/list-mine-score",
+    method: "POST",
+    data: params,
+    header: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
 module.exports = {
   sendSms,
   loginByCode,
-  loginByPassword
+  loginByPassword,
+  refreshUserInfo,
+  getPointsAccount,
+  getPointsTransactions,
+  getTradeScoreTransactions
 };
 
