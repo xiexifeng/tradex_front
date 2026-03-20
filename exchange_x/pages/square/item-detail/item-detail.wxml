@@ -1,0 +1,116 @@
+<view class="page-container">
+  <item-detail-header
+    images="{{itemDetail.itemImageList || []}}"
+    itemTitle="{{itemDetail.itemTitle || ''}}"
+    tags="{{headerTags}}"
+  />
+
+  <view class="content">
+    <base-card extClass="section-card">
+      <view class="price-row">
+        <view class="price-main">
+          <template wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_MONEY'}}">
+            <text class="currency">¥</text>
+            <text class="amount">{{itemDetail.transferPrice || 0}}</text>
+          </template>
+          <template wx:elif="{{itemDetail.tradeMethod === 'ITEM_TO_POINTS'}}">
+            <text class="amount">{{itemDetail.transferPoints || 0}}</text>
+            <text class="unit">积分</text>
+          </template>
+          <template wx:else>
+            <view class="exchange-info">
+              <text class="exchange-label">期望交换</text>
+              <text class="exchange-target">{{itemDetail.expectItem || ''}}</text>
+            </view>
+          </template>
+        </view>
+
+        <view class="trade-pill">{{tradeMethodText}}</view>
+      </view>
+    </base-card>
+
+    <base-card extClass="seller-card">
+      <view class="seller-main">
+        <view class="seller-avatar">
+          <image
+            wx:if="{{itemDetail.userAvatar}}"
+            class="seller-avatar-img"
+            src="{{itemDetail.userAvatar}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="seller-avatar-placeholder">👤</view>
+          <view class="seller-badge">🛡</view>
+        </view>
+
+        <view class="seller-info">
+          <view class="seller-name-row">
+            <text class="seller-name">{{itemDetail.userNickname || ''}}</text>
+            <text class="cert-tag">认证用户</text>
+          </view>
+          <view class="seller-score">
+            <text class="score-text">{{tradeScoreText}}</text>
+          </view>
+          <view class="seller-bc" wx:if="{{itemDetail.userExt && itemDetail.userExt.blockchainId}}">
+            <text class="bc-label">区块链ID:</text>
+            <text class="bc-value">{{itemDetail.userExt.blockchainId.slice(0, 10)}}...</text>
+            <text
+              class="bc-copy"
+              bindtap="copySellerBlockchainId"
+              data-blockchain-id="{{itemDetail.userExt.blockchainId}}"
+            >
+              复制
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <button class="contact-btn" bindtap="contactSeller">联系卖家</button>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{itemDetail.itemDescription}}">
+      <view class="section-title">商品描述</view>
+      <view class="description-content">{{itemDetail.itemDescription}}</view>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{itemDetail.contactInfo}}">
+      <view class="section-title">交易信息</view>
+      <view class="trade-grid">
+        <view class="trade-item">
+          <text class="item-label">联系人</text>
+          <text class="item-value">{{itemDetail.contactInfo.linkman || ''}}</text>
+        </view>
+        <view class="trade-item">
+          <text class="item-label">联系电话</text>
+          <text class="item-value">{{itemDetail.contactInfo.phone || ''}}</text>
+        </view>
+        <view class="trade-item">
+          <text class="item-label">交付方式</text>
+          <text class="item-value">{{deliveryMethodText}}</text>
+        </view>
+        <view class="trade-item">
+          <text class="item-label">交付地址</text>
+          <text class="item-value">{{itemDetail.contactInfo.address || ''}}</text>
+        </view>
+      </view>
+    </base-card>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="actions-group">
+      <view class="action-item" bindtap="toggleLike">
+        <text class="action-icon">{{isLiked ? '已点赞' : '点赞'}}</text>
+        <text class="action-count">{{itemDetail.loveCount || 0}}</text>
+      </view>
+      <view class="action-item" bindtap="toggleCollect">
+        <text class="action-icon">{{isCollected ? '已收藏' : '收藏'}}</text>
+        <text class="action-count">{{itemDetail.collectionCount || 0}}</text>
+      </view>
+    </view>
+
+    <button class="primary-btn" disabled="{{isSelf}}" bindtap="handleBuyOrExchange">
+      {{bottomActionText}}
+    </button>
+  </view>
+</view>
+

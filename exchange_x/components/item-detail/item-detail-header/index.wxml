@@ -1,0 +1,33 @@
+<view class="header">
+  <view class="swiper-wrap">
+    <swiper
+      class="swiper"
+      autoplay="{{autoplay}}"
+      interval="{{interval}}"
+      circular="{{circular}}"
+      indicator-dots="{{showDots}}"
+    >
+      <block wx:for="{{images}}" wx:for-item="img" wx:for-index="idx" wx:key="idx">
+        <swiper-item>
+          <image
+            class="swiper-img"
+            src="{{img}}"
+            mode="aspectFill"
+            data-index="{{idx}}"
+            bindtap="onPreview"
+          />
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <view class="info">
+    <view class="title">{{itemTitle}}</view>
+    <view class="tags">
+      <block wx:for="{{tags}}" wx:for-item="t" wx:key="t">
+        <view class="pill">{{t}}</view>
+      </block>
+    </view>
+  </view>
+</view>
+

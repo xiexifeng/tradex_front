@@ -1,0 +1,150 @@
+<view class="page-container">
+  <item-detail-header
+    images="{{itemDetail.itemImageList || []}}"
+    itemTitle="{{itemDetail.itemTitle || ''}}"
+    tags="{{headerTags}}"
+  />
+
+  <view class="content">
+    <base-card extClass="section-card">
+      <view class="status-row">
+        <view class="status-badge {{statusBadgeClass}}">
+          {{statusBadgeText}}
+        </view>
+        <view class="item-id">物品编号: {{itemDetail.id || ''}}</view>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{showBlockchain}}">
+      <view class="section-title">区块链信息</view>
+
+      <view class="blockchain-info">
+        <view class="info-row" wx:if="{{itemDetail.blockchainId}}">
+          <view class="info-label">区块链ID</view>
+          <view class="info-value">{{itemDetail.blockchainId.slice(0, 10)}}...</view>
+          <view class="copy-action" bindtap="copyBlockchainId" data-blockchain-id="{{itemDetail.blockchainId}}">
+            复制
+          </view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.transferTimes > 0}}">
+          <view class="info-label">转让次数</view>
+          <view class="info-value">{{itemDetail.transferTimes}}次</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.lastUserId}}">
+          <view class="info-label">最后持有人</view>
+          <view class="info-value">{{itemDetail.lastUserId}}</view>
+        </view>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{itemDetail.itemDescription}}">
+      <view class="section-title">物品描述</view>
+      <view class="description">{{itemDetail.itemDescription}}</view>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{showTradeSettings}}">
+      <view class="section-title">交易设置</view>
+
+      <view class="trade-info">
+        <view class="info-row" wx:if="{{itemDetail.tradeMethod}}">
+          <view class="info-label">交易方式</view>
+          <view class="info-value">{{tradeMethodText}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_MONEY' && itemDetail.transferPrice}}">
+          <view class="info-label">转让价格</view>
+          <view class="info-value">¥{{itemDetail.transferPrice}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_POINTS' && itemDetail.transferPoints}}">
+          <view class="info-label">所需积分</view>
+          <view class="info-value">{{itemDetail.transferPoints}}积分</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.tradeMethod === 'ITEM_TO_ITEM' && itemDetail.expectItem}}">
+          <view class="info-label">期望物品</view>
+          <view class="info-value">{{itemDetail.expectItem}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.deliveryMethod}}">
+          <view class="info-label">交付方式</view>
+          <view class="info-value">{{deliveryMethodText}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.contactInfo && itemDetail.contactInfo.linkman}}">
+          <view class="info-label">联系人</view>
+          <view class="info-value">{{itemDetail.contactInfo.linkman}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.contactInfo && itemDetail.contactInfo.phone}}">
+          <view class="info-label">联系方式</view>
+          <view class="info-value">{{itemDetail.contactInfo.phone}}</view>
+        </view>
+
+        <view class="info-row" wx:if="{{itemDetail.contactInfo && itemDetail.contactInfo.address}}">
+          <view class="info-label">交易地址</view>
+          <view class="info-value">{{itemDetail.contactInfo.address}}</view>
+        </view>
+      </view>
+    </base-card>
+
+    <base-card extClass="section-card" wx:if="{{showStats}}">
+      <view class="section-title">互动数据</view>
+
+      <view class="stats-row">
+        <view class="stat-item" wx:if="{{itemDetail.viewCount > 0}}">
+          <text class="stat-icon">👀</text>
+          <text class="stat-value">{{itemDetail.viewCount}}</text>
+        </view>
+        <view class="stat-item" wx:if="{{itemDetail.loveCount > 0}}">
+          <text class="stat-icon">👍</text>
+          <text class="stat-value">{{itemDetail.loveCount}}</text>
+        </view>
+        <view class="stat-item" wx:if="{{itemDetail.collectionCount > 0}}">
+          <text class="stat-icon">⭐</text>
+          <text class="stat-value">{{itemDetail.collectionCount}}</text>
+        </view>
+      </view>
+    </base-card>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bottom-btn-group">
+      <button
+        wx:if="{{showInitiateTransfer}}"
+        class="bottom-btn bottom-btn-primary"
+        bindtap="initiateTransfer"
+      >
+        发起出让
+      </button>
+
+      <button
+        wx:if="{{showCancelTransfer}}"
+        class="bottom-btn bottom-btn-primary bottom-btn-plain"
+        bindtap="cancelTransfer"
+      >
+        取消出让
+      </button>
+
+      <button
+        wx:if="{{showOffers}}"
+        class="bottom-btn bottom-btn-primary"
+        bindtap="viewOffers"
+      >
+        查看报价
+      </button>
+
+      <button
+        wx:if="{{showTradeDetails}}"
+        class="bottom-btn bottom-btn-primary"
+        bindtap="viewTradeDetails"
+      >
+        查看交易详情
+      </button>
+    </view>
+  </view>
+</view>
+

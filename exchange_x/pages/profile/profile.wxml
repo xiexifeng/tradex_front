@@ -160,13 +160,13 @@
                 </view>
                 <view class="mine-actions">
                   <block wx:if="{{item.transferStatus === 'own' && item.status === 'active'}}">
-                    <button class="mini-btn primary-plain" size="mini" data-item="{{item}}" bindtap="viewStuffDetails">发起出让</button>
+                    <button class="mini-btn primary-plain" size="mini" data-id="{{item.id}}" bindtap="viewStuffDetails">发起出让</button>
                   </block>
                   <block wx:if="{{item.isCanCancel}}">
                     <button class="mini-btn danger-plain" size="mini" data-id="{{item.id}}" bindtap="showCancelDialog">取消出让</button>
-                    <button class="mini-btn primary" size="mini" data-item="{{item}}" bindtap="viewOffers">查看报价</button>
+                    <button class="mini-btn primary" size="mini" data-id="{{item.id}}" bindtap="viewOffers">查看报价</button>
                   </block>
-                  <button class="mini-btn primary-plain" size="mini" data-item="{{item}}" bindtap="viewStuffDetails">物品详情</button>
+                  <button class="mini-btn primary-plain" size="mini" data-id="{{item.id}}" bindtap="viewStuffDetails">物品详情</button>
                 </view>
               </view>
             </view>

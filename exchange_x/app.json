@@ -7,7 +7,9 @@
     "pages/user/edit-profile/edit-profile",
     "pages/index/index",
     "pages/user/settings/settings",
-    "pages/user/security/security"
+    "pages/user/security/security",
+    "pages/stuff/item-detail/item-detail",
+    "pages/square/item-detail/item-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,0 +1,46 @@
+.header {
+  background: #f6f7fb;
+}
+
+.swiper-wrap {
+  height: 360rpx;
+  background: #000;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-img {
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  padding: 18rpx 24rpx 12rpx;
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #323233;
+  line-height: 1.4;
+  margin-bottom: 12rpx;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.pill {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #eef1f6;
+  font-size: 26rpx;
+  color: #323233;
+}
+

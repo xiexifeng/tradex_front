@@ -120,8 +120,10 @@ Page({
 
   onViewClick(e) {
     const id = e.detail;
-    // TODO: 跳转详情页，例如 /pages/item-detail/item-detail?id=xxx
-    console.log("view item", id);
+    if (!id) return;
+    wx.navigateTo({
+      url: `/pages/square/item-detail/item-detail?id=${encodeURIComponent(id)}`
+    });
   },
 
   onSearchClick() {

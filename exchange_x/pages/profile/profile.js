@@ -282,14 +282,20 @@ Page({
   },
 
   viewStuffDetails(e) {
-    const item = e.currentTarget.dataset.item;
-    if (!item || !item.id) return;
-    wx.showToast({ title: "物品详情页开发中", icon: "none" });
+    const id =
+      e.currentTarget.dataset.id ||
+      (e.currentTarget.dataset.item && e.currentTarget.dataset.item.id);
+    if (!id) return;
+    wx.navigateTo({
+      url: `/pages/stuff/item-detail/item-detail?id=${encodeURIComponent(id)}`
+    });
   },
 
   viewOffers(e) {
-    const item = e.currentTarget.dataset.item;
-    if (!item || !item.id) return;
+    const id =
+      e.currentTarget.dataset.id ||
+      (e.currentTarget.dataset.item && e.currentTarget.dataset.item.id);
+    if (!id) return;
     wx.showToast({ title: "报价页开发中", icon: "none" });
   },
 
